@@ -1,0 +1,3139 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pace">
+<meta name="theme-color" content="#0A0B0F" id="themeColor">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230A0B0F'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='96' font-style='italic' fill='%23E85D3F' text-anchor='middle'%3Ep%3C/text%3E%3C/svg%3E">
+<title>Pace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* ============================================================
+     PACE  ·  Design System v14 · iOS input hardening
+     ------------------------------------------------------------
+     Brand:   Pace — "Your training pace." EN/PT, direct.
+     Type:    Instrument Serif (display, italic) + Inter (body)
+              + JetBrains Mono (numerics/weights)
+     Palette: Graphite paper + hierarchical neutrals; warm ember
+              per-user accent (Gabriel #E85D3F, Eduarda #F06B95).
+              No fitness-green cliche.
+     Motion:  220ms cubic-bezier(.22,1,.36,1); tap = 0.98 scale.
+     Grid:    4/8pt spacing; three radii, three shadows.
+     Icons:   Lucide-family stroke SVGs (1.7 default).
+     ============================================================ */
+
+  :root{
+    --paper:#0A0B0F;
+    --surface:#14161B;
+    --surface-2:#1B1E25;
+    --sunk:#0E1015;
+    --ink:#F5F5F0;
+    --muted:#9099A6;
+    --faint:#5B6270;
+    --hair:rgba(255,255,255,.055);
+    --hair-2:rgba(255,255,255,.11);
+    --hair-3:rgba(255,255,255,.18);
+    --ok:#4ADE80; --warn:#F5B946; --danger:#F87171; --info:#7EA9FF; --blue:#7EA9FF;
+    --ac:#E85D3F; --ac-ink:#0A0B0F;
+    --ac-soft:rgba(232,93,63,.10);
+    --ac-glow:rgba(232,93,63,.28);
+    --serif:'Instrument Serif','Iowan Old Style',Palatino,Georgia,serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;
+    --display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --r-sm:10px; --r-md:16px; --r-lg:22px;
+    --sh-1:0 1px 2px rgba(0,0,0,.4),0 0 0 .5px rgba(255,255,255,.02);
+    --sh-2:0 6px 20px rgba(0,0,0,.42),0 0 0 .5px rgba(255,255,255,.03);
+    --sh-3:0 22px 50px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.04);
+    --shadow:var(--sh-1); --shadow-lg:var(--sh-2);
+    --radius:14px; --radius-lg:18px;
+    --ease:cubic-bezier(.22,1,.36,1); --dur:220ms; --dur-fast:160ms;
+    --tab-bg:rgba(10,11,15,.78);
+  }
+  html[data-theme="light"]{
+    --paper:#F7F6F1; --surface:#FFFFFF; --surface-2:#EFECE4; --sunk:#EAE7DE;
+    --ink:#0A0B0F; --muted:#565E6C; --faint:#8B92A0;
+    --hair:rgba(10,11,15,.07); --hair-2:rgba(10,11,15,.13); --hair-3:rgba(10,11,15,.20);
+    --ac-ink:#FFFFFF;
+    --sh-1:0 1px 2px rgba(20,22,30,.05),0 0 0 .5px rgba(20,22,30,.03);
+    --sh-2:0 6px 20px rgba(20,22,30,.08),0 0 0 .5px rgba(20,22,30,.03);
+    --sh-3:0 22px 50px rgba(20,22,30,.14),0 0 0 .5px rgba(20,22,30,.04);
+    --shadow:var(--sh-1); --shadow-lg:var(--sh-2);
+    --tab-bg:rgba(247,246,241,.85);
+  }
+  @media (prefers-color-scheme: light){
+    html[data-theme="auto"]{
+      --paper:#F7F6F1; --surface:#FFFFFF; --surface-2:#EFECE4; --sunk:#EAE7DE;
+      --ink:#0A0B0F; --muted:#565E6C; --faint:#8B92A0;
+      --hair:rgba(10,11,15,.07); --hair-2:rgba(10,11,15,.13); --hair-3:rgba(10,11,15,.20);
+      --ac-ink:#FFFFFF;
+      --sh-1:0 1px 2px rgba(20,22,30,.05),0 0 0 .5px rgba(20,22,30,.03);
+      --sh-2:0 6px 20px rgba(20,22,30,.08),0 0 0 .5px rgba(20,22,30,.03);
+      --sh-3:0 22px 50px rgba(20,22,30,.14),0 0 0 .5px rgba(20,22,30,.04);
+      --shadow:var(--sh-1); --shadow-lg:var(--sh-2);
+      --tab-bg:rgba(247,246,241,.85);
+    }
+  }
+  .sync-badge{position:fixed;top:calc(8px + env(safe-area-inset-top));right:10px;z-index:1000;
+    font-size:9px;line-height:1;padding:5px 9px;border-radius:999px;background:rgba(20,22,27,.72);
+    border:.5px solid var(--hair-2);color:var(--muted);font-family:var(--sans);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:none;
+    display:flex;align-items:center;gap:5px;transition:opacity .3s var(--ease),transform .3s var(--ease);
+    opacity:0;transform:translateY(-4px)}
+  .sync-badge.saving{color:var(--warn);opacity:1;transform:none}
+  .sync-badge.offline{color:var(--danger);border-color:rgba(248,113,113,.4);opacity:1;transform:none}
+  .sync-badge.ok{opacity:0;transform:translateY(-4px)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--paper)}
+  body{margin:0;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+       -moz-osx-font-smoothing:grayscale;font-size:15px;line-height:1.45;
+       font-feature-settings:'ss03','cv11','cv06';
+       letter-spacing:-.005em;transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
+  .wrap{max-width:520px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(120px + env(safe-area-inset-bottom))}
+  button{font-family:inherit;border:none;background:none;color:inherit;font-size:inherit;cursor:pointer;letter-spacing:inherit}
+  input,textarea{font-family:inherit;-webkit-appearance:none;color:var(--ink)}
+  ::selection{background:var(--ac);color:var(--ac-ink)}
+  :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:6px}
+  .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600}
+
+  /* Brand bar */
+  .head2{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;height:40px}
+  .head2 .who{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;
+    line-height:1;letter-spacing:-.012em;color:var(--ink)}
+  .head2 .who .logo{width:26px;height:26px;border-radius:8px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .head2 .who .logo svg{width:14px;height:14px;color:var(--paper)}
+  .head2 .who small{font-family:var(--sans);font-size:11.5px;color:var(--muted);font-weight:500;
+    letter-spacing:-.005em;padding-left:8px;margin-left:2px;border-left:.5px solid var(--hair-2);
+    text-transform:none}
+  .head2 .cfg{width:38px;height:38px;border-radius:12px;background:var(--surface);
+    border:.5px solid var(--hair-2);display:flex;align-items:center;justify-content:center;
+    color:var(--muted);transition:all var(--dur-fast) var(--ease)}
+  .head2 .cfg:active{transform:scale(.94);background:var(--surface-2);color:var(--ink)}
+  .head2 .cfg svg{width:17px;height:17px;stroke-width:1.7}
+
+  .datenav{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .arw{width:38px;height:38px;border-radius:12px;background:var(--surface);
+       border:.5px solid var(--hair-2);display:flex;align-items:center;justify-content:center;
+       flex-shrink:0;color:var(--muted);transition:all var(--dur-fast) var(--ease)}
+  .arw:active{transform:scale(.94);background:var(--surface-2);color:var(--ink)}
+  .arw svg{width:15px;height:15px;stroke-width:2}
+  .dt{flex:1;text-align:center}
+  .dt .d1{font-family:var(--serif);font-size:19px;line-height:1.15;color:var(--ink);letter-spacing:-.01em}
+  .dt .d2{font-size:11px;color:var(--faint);margin-top:4px;letter-spacing:.02em}
+  .dt .d2 b{color:var(--ac);font-weight:600}
+
+  /* HERO */
+  .hero{background:var(--surface);border:.5px solid var(--hair-2);border-radius:var(--r-lg);
+        overflow:hidden;box-shadow:var(--sh-2);margin-bottom:14px;position:relative}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 60% at 0% 0%,var(--ac-soft),transparent 55%)}
+  .hero .top{display:flex;gap:22px;padding:30px 24px 22px;position:relative;z-index:1;align-items:flex-start}
+  .hero .letter{font-family:var(--serif);font-style:italic;font-size:120px;line-height:.78;
+    color:var(--ac);letter-spacing:-.055em;flex-shrink:0;margin-top:-10px;
+    text-shadow:0 12px 40px var(--ac-glow);font-feature-settings:'ss01'}
+  .hero .info{flex:1;min-width:0;padding-top:10px}
+  .hero .info .lbl{font-family:var(--display);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:10px;
+    display:inline-flex;align-items:center;gap:6px}
+  .hero .info .ttl{font-family:var(--display);font-size:34px;line-height:1.04;
+    letter-spacing:-.028em;color:var(--ink);margin-bottom:10px;font-weight:700;
+    font-feature-settings:'ss03','cv11'}
+  .hero .info .sub{font-family:var(--display);font-size:13.5px;color:var(--muted);
+    letter-spacing:-.005em;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.35}
+  .hero .why{padding:2px 24px 24px;font-family:var(--sans);font-size:14.5px;line-height:1.62;
+    color:var(--muted);letter-spacing:-.005em;position:relative;z-index:1;font-weight:400}
+  .hero .why b{color:var(--ink);font-weight:600;letter-spacing:-.01em}
+  .hero.done{border-color:rgba(74,222,128,.35)}
+  .hero.done::after{background:radial-gradient(120% 60% at 0% 0%,rgba(74,222,128,.10),transparent 55%)}
+  .hero.done .letter{color:var(--ok);text-shadow:0 12px 40px rgba(74,222,128,.28)}
+  .hero.done .info .lbl{color:var(--ok)}
+
+  .go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;
+      border-radius:16px;background:var(--ac);color:var(--ac-ink);
+      font-size:15px;font-weight:600;margin-bottom:10px;letter-spacing:-.005em;
+      box-shadow:0 10px 26px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.22);
+      transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast) var(--ease)}
+  .go:active{transform:scale(.98);opacity:.94}
+  .go svg{width:17px;height:17px;stroke-width:2.2}
+
+  .coach-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;
+      border-radius:15px;background:var(--surface);color:var(--ink);
+      font-size:14px;font-weight:600;letter-spacing:-.005em;margin-bottom:10px;
+      border:.5px solid var(--hair-2);box-shadow:var(--sh-1);
+      transition:all var(--dur-fast) var(--ease)}
+  .coach-btn:active{transform:scale(.98);background:var(--surface-2)}
+  .coach-btn svg{width:17px;height:17px;color:var(--ac);stroke-width:1.9}
+
+  .acts2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .act2{height:52px;border-radius:14px;background:var(--surface);border:.5px solid var(--hair-2);
+       display:flex;align-items:center;justify-content:center;gap:8px;
+       font-size:13.5px;color:var(--muted);font-weight:500;letter-spacing:-.005em;
+       transition:all var(--dur-fast) var(--ease);box-shadow:var(--sh-1)}
+  .act2:active{transform:scale(.98);background:var(--surface-2)}
+  .act2 svg{width:16px;height:16px;stroke-width:1.7}
+  .act2.on{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.06)}
+
+  .extras-list{margin:-4px 4px 14px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .extras-list .row{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+  .extras-list .rm{color:var(--danger);font-size:11px;background:none;border:0;padding:0 4px}
+
+  /* Session picker */
+  .segs{display:flex;gap:6px;margin-bottom:18px}
+  .sg{flex:1;height:64px;border-radius:14px;background:var(--surface);border:.5px solid var(--hair-2);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+      transition:all var(--dur-fast) var(--ease);color:var(--muted)}
+  .sg:active{transform:scale(.97)}
+  .sg.on{border-color:var(--ac);background:var(--ac-soft);color:var(--ac)}
+  .sg .l{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1;letter-spacing:-.03em}
+  .sg .s{font-size:10px;color:var(--faint);letter-spacing:.02em;margin-top:2px}
+  .sg.on .s{color:var(--muted)}
+
+  .tbar{display:flex;justify-content:space-between;align-items:center;margin:0 2px 18px;gap:10px}
+  .tbar .t{font-family:var(--serif);font-size:24px;line-height:1.15;color:var(--ink);letter-spacing:-.012em}
+  .edt{padding:9px 14px;border-radius:11px;border:.5px solid var(--hair-2);background:var(--surface);
+       font-size:12.5px;color:var(--muted);flex-shrink:0;font-weight:500;
+       transition:all var(--dur-fast) var(--ease)}
+  .edt:active{transform:scale(.96);background:var(--surface-2)}
+  .edt.on{border-color:var(--ac);color:var(--ac);font-weight:600;background:var(--ac-soft)}
+
+  /* Cards / exercises */
+  .card{background:var(--surface);border:.5px solid var(--hair-2);border-radius:16px;
+        padding:16px;margin-bottom:10px;box-shadow:var(--sh-1)}
+  .card.ed{border:1px dashed var(--ac);background:var(--ac-soft)}
+  .ex-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .ex-n{font-size:15px;font-weight:600;line-height:1.3;color:var(--ink);letter-spacing:-.01em}
+  .ex-p{font-family:var(--mono);font-size:12px;color:var(--ac);white-space:nowrap;font-weight:500;
+    font-variant-numeric:tabular-nums}
+  .ex-a{font-size:11.5px;margin:8px 0 12px;color:var(--faint);letter-spacing:.005em}
+  .ex-a.has{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .ap{width:100%;height:36px;border:.5px dashed var(--hair-2);border-radius:10px;background:transparent;
+      font-size:12.5px;color:var(--muted);padding:0 12px;margin:0 0 12px;outline:none;
+      transition:all var(--dur-fast) var(--ease)}
+  .ap:focus{border-style:solid;border-color:var(--ac);background:var(--sunk);color:var(--ink)}
+  .ap::placeholder{color:var(--faint)}
+  .set{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .set .i{width:20px;font-family:var(--mono);font-size:12px;color:var(--faint);flex-shrink:0;font-weight:600;
+    font-variant-numeric:tabular-nums}
+  .fw{position:relative;flex:1}
+  .fw input{width:100%;height:46px;background:var(--sunk);border:.5px solid var(--hair-2);
+    border-radius:12px;color:var(--ink);font-size:16px;text-align:center;outline:none;padding:0;
+    font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;
+    transition:all var(--dur-fast) var(--ease)}
+  .fw input::placeholder{color:var(--faint);font-weight:400}
+  .fw input:focus{border-color:var(--ac);background:var(--surface);box-shadow:0 0 0 3px var(--ac-soft)}
+  /* iOS input — apenas caret visível e touch-action. NADA de -webkit-user-modify:
+     read-write-plaintext-only aqui: essa propriedade é pra contenteditable e no
+     iOS Safari faz o input exigir long-press pra focar (tap curto não abre teclado). */
+  .fw input, .obs-in, .ed-f, .ap, .ta{
+    -webkit-user-select: text; user-select: text;
+    caret-color: var(--ac);
+    touch-action: manipulation;
+  }
+  .fw span{position:absolute;right:11px;top:15px;font-size:10.5px;color:var(--faint);
+    pointer-events:none;letter-spacing:.02em}
+  .obs-row{margin:-2px 0 10px 28px}
+  .obs-in{width:calc(100% - 28px);height:32px;background:transparent;border:.5px dashed var(--hair-2);
+    border-radius:8px;color:var(--muted);font-size:12px;padding:0 10px;font-family:var(--sans);
+    outline:none;transition:all var(--dur-fast) var(--ease)}
+  .obs-in::placeholder{color:var(--faint);font-weight:400}
+  .obs-in:focus{border-style:solid;border-color:var(--ac);background:var(--sunk);color:var(--ink)}
+
+  .ed-f{width:100%;height:44px;border:.5px solid var(--hair-2);border-radius:11px;background:var(--sunk);
+        padding:0 13px;font-size:14.5px;color:var(--ink);outline:none;margin-bottom:10px;
+        transition:all var(--dur-fast) var(--ease)}
+  .ed-f:focus{border-color:var(--ac);background:var(--surface);box-shadow:0 0 0 3px var(--ac-soft)}
+  .ed-f::placeholder{color:var(--faint)}
+  .ed-row{display:flex;gap:9px;align-items:center;margin-bottom:10px}
+  .step{display:flex;align-items:center;border:.5px solid var(--hair-2);border-radius:11px;
+    overflow:hidden;background:var(--sunk)}
+  .step button{width:42px;height:44px;font-size:19px;color:var(--ac);font-weight:600}
+  .step button:active{background:var(--surface-2)}
+  .step .v{width:44px;text-align:center;font-family:var(--mono);font-size:15px;color:var(--ink);font-weight:600}
+  .tys{display:flex;gap:5px;flex:1}
+  .ty{flex:1;height:44px;border-radius:11px;border:.5px solid var(--hair-2);background:var(--sunk);
+      font-size:11.5px;color:var(--muted);transition:all var(--dur-fast) var(--ease)}
+  .ty:active{transform:scale(.97)}
+  .ty.on{border-color:var(--ac);color:var(--ac);font-weight:600;background:var(--ac-soft)}
+  .del{width:100%;height:40px;border-radius:11px;border:.5px solid var(--hair-2);color:var(--danger);
+    font-size:12.5px;background:var(--surface);transition:all var(--dur-fast) var(--ease)}
+  .del:active{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.35);transform:scale(.98)}
+  .addx{width:100%;height:50px;border-radius:14px;border:1px dashed var(--ac);color:var(--ac);
+        font-size:14px;font-weight:600;background:var(--ac-soft);margin-bottom:10px;
+        transition:all var(--dur-fast) var(--ease)}
+  .addx:active{transform:scale(.98)}
+  .reset{width:100%;height:44px;border-radius:12px;border:.5px solid var(--hair-2);color:var(--muted);
+    font-size:12.5px;background:var(--surface);transition:all var(--dur-fast) var(--ease)}
+  .reset:active{background:var(--surface-2);transform:scale(.98)}
+
+  .h-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+  .h-d{font-family:var(--serif);font-size:17px;color:var(--ink);letter-spacing:-.01em}
+  .hist{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;font-size:13px;padding:2px 0}
+  .hist .n{color:var(--muted)}
+  .hist .v{font-family:var(--mono);white-space:nowrap;font-size:12.5px;color:var(--ink);font-weight:500;
+    font-variant-numeric:tabular-nums}
+
+  .save-wrap{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));
+    padding:0 16px;z-index:50;pointer-events:none}
+  .save{pointer-events:auto;display:block;width:100%;max-width:488px;margin:0 auto;height:52px;
+    border-radius:14px;background:var(--surface-2);color:var(--faint);
+    font-size:15px;font-weight:600;letter-spacing:-.005em;box-shadow:var(--sh-2);
+    border:.5px solid var(--hair-2);transition:all var(--dur) var(--ease)}
+  .save.on{background:var(--ac);color:var(--ac-ink);border-color:transparent;
+    box-shadow:0 10px 26px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.22)}
+  .save.done{background:var(--ok);color:#0A0B0F;border-color:transparent;
+    box-shadow:0 10px 26px rgba(74,222,128,.32)}
+  .save:active{transform:scale(.99)}
+
+  /* Bottom nav */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--tab-bg);
+          backdrop-filter:saturate(1.6) blur(22px);-webkit-backdrop-filter:saturate(1.6) blur(22px);
+          border-top:.5px solid var(--hair-2);padding-bottom:env(safe-area-inset-bottom);z-index:40}
+  .tabbar .in{max-width:520px;margin:0 auto;display:flex;padding:8px 6px 0;gap:2px}
+  .tb{flex:1;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:4px;color:var(--faint);font-size:10px;font-weight:500;border-radius:12px;
+      letter-spacing:.01em;transition:all var(--dur-fast) var(--ease);position:relative;padding:0 2px}
+  .tb::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);
+    width:24px;height:2px;background:var(--ac);border-radius:0 0 2px 2px;
+    transition:transform var(--dur) var(--ease)}
+  .tb.on{color:var(--ink);font-weight:600}
+  .tb.on::before{transform:translateX(-50%) scaleX(1)}
+  .tb.on svg{color:var(--ac);stroke-width:2}
+  .tb:active{transform:scale(.94)}
+  .tb svg{width:20px;height:20px;stroke-width:1.7;transition:color var(--dur-fast) var(--ease)}
+
+  .toast{position:fixed;left:16px;right:16px;bottom:150px;max-width:488px;margin:0 auto;
+    border-radius:14px;padding:14px 16px;font-size:13.5px;background:var(--surface);color:var(--ink);
+    border:.5px solid var(--hair-2);box-shadow:var(--sh-3);z-index:60;animation:toastup .28s var(--ease)}
+  @keyframes toastup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Calendar */
+  .cal{background:var(--surface);border:.5px solid var(--hair-2);border-radius:18px;
+    padding:18px 16px 16px;margin-bottom:16px;box-shadow:var(--sh-1)}
+  .cal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .cal-h .m{font-family:var(--serif);font-size:20px;color:var(--ink);letter-spacing:-.012em}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .gh{font-size:9px;text-align:center;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;
+    padding-bottom:6px;font-weight:600}
+  .cell{aspect-ratio:1;border-radius:10px;background:transparent;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:2px;border:.5px solid transparent;
+        transition:all var(--dur-fast) var(--ease);color:var(--muted)}
+  .cell.out{opacity:.30}
+  .cell:active{transform:scale(.94)}
+  .cell.sel{border-color:var(--ac);background:var(--ac-soft)}
+  .cell .n{font-size:11px;color:var(--muted);line-height:1;font-family:var(--mono);
+    font-variant-numeric:tabular-nums}
+  .cell.hoje .n{font-weight:700;color:var(--ink)}
+  .cell.hoje{background:var(--surface-2)}
+  .cell .l{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ac);
+    line-height:1;letter-spacing:-.02em}
+  .cell .dot{width:5px;height:5px;border-radius:50%;background:var(--info)}
+  .cell .skip{width:8px;height:2px;background:var(--faint);border-radius:1px}
+  .cell.skipd{background:rgba(255,255,255,.02)}
+  html[data-theme="light"] .cell.skipd{background:rgba(0,0,0,.02)}
+
+  .sum{display:flex;gap:8px;margin-bottom:18px}
+  .sum>div{flex:1;background:var(--surface);border:.5px solid var(--hair-2);border-radius:14px;
+    padding:14px 6px;text-align:center;box-shadow:var(--sh-1)}
+  .sum .v{font-family:var(--serif);font-size:26px;line-height:1;color:var(--ink);letter-spacing:-.02em}
+  .sum .k{font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;
+    margin-top:6px;font-weight:600}
+
+  .macro{display:flex;gap:8px;margin-bottom:16px}
+  .macro>div{flex:1;background:var(--surface);border:.5px solid var(--hair-2);border-radius:14px;
+    padding:14px 4px 12px;text-align:center;box-shadow:var(--sh-1);position:relative;overflow:hidden}
+  .macro>div::before{content:"";position:absolute;top:0;left:12px;right:12px;height:2px;border-radius:0 0 2px 2px}
+  .macro>div:nth-child(1)::before{background:#4ADE80}
+  .macro>div:nth-child(2)::before{background:#A78BFA}
+  .macro>div:nth-child(3)::before{background:#FB923C}
+  .macro>div:nth-child(4)::before{background:#F5B946}
+  .macro .v{font-family:var(--mono);font-size:15px;color:var(--ink);font-weight:600;
+    font-variant-numeric:tabular-nums}
+  .macro .k{font-size:8.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;
+    margin-top:5px;font-weight:600}
+
+  /* Meal cards (old .meal kept for compat) */
+  .meal{background:var(--surface);border:.5px solid var(--hair-2);border-radius:14px;padding:14px;
+    margin-bottom:8px;display:flex;gap:12px;box-shadow:var(--sh-1);transition:opacity .2s;position:relative}
+  .chk{width:26px;height:26px;border-radius:8px;border:.5px solid var(--hair-3);flex-shrink:0;
+       display:flex;align-items:center;justify-content:center;color:var(--ac-ink);font-size:14px;margin-top:1px;
+       background:var(--sunk);transition:all var(--dur-fast) var(--ease);font-weight:700}
+  .chk:active{transform:scale(.94)}
+  .chk.on{background:var(--ok);border-color:var(--ok);color:#0A0B0F}
+  .chk.no{background:var(--danger);border-color:var(--danger);color:#fff}
+  .meal.faltou{opacity:.5}
+  .meal.faltou .mi{text-decoration:line-through;text-decoration-color:var(--faint)}
+  .meal .b{flex:1;min-width:0}
+  .meal .mt{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.005em;line-height:1.3}
+  .meal .mi{font-size:12.5px;color:var(--muted);line-height:1.55;white-space:pre-line;margin-top:5px}
+  .meal .dots{width:28px;height:28px;border-radius:8px;background:transparent;color:var(--faint);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;letter-spacing:1px}
+
+  /* Dieta hero + layout */
+  .diet-hero{background:var(--surface);border:.5px solid var(--hair-2);border-radius:var(--r-lg);
+    padding:22px 22px 20px;margin-bottom:16px;box-shadow:var(--sh-2);position:relative;overflow:hidden}
+  .diet-hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 60% at 100% 0%,var(--ac-soft),transparent 55%)}
+  .diet-hero .row{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+  .diet-hero .avatar{width:48px;height:48px;border-radius:50%;background:var(--ac);color:var(--ac-ink);
+    display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;
+    font-size:24px;font-weight:400;flex-shrink:0;letter-spacing:-.02em;
+    box-shadow:0 4px 14px var(--ac-glow)}
+  .diet-hero .greet{flex:1;min-width:0}
+  .diet-hero .greet .hi{font-size:11px;color:var(--faint);letter-spacing:.16em;
+    text-transform:uppercase;font-weight:600}
+  .diet-hero .greet .nm{font-family:var(--serif);font-size:22px;line-height:1.15;color:var(--ink);
+    letter-spacing:-.015em;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .diet-hero .today{margin-top:16px;font-size:12.5px;color:var(--muted);letter-spacing:-.005em;
+    position:relative;z-index:1;font-variant-numeric:tabular-nums}
+  .diet-hero .today b{font-weight:600;color:var(--ink)}
+
+  .qa-title{font-family:var(--serif);font-size:17px;color:var(--ink);margin:18px 4px 10px;letter-spacing:-.01em}
+  .qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+  .qa-btn{display:flex;flex-direction:column;align-items:center;gap:7px;background:transparent;
+    padding:6px 2px;transition:transform var(--dur-fast) var(--ease)}
+  .qa-btn:active{transform:scale(.94)}
+  .qa-btn .ic{width:52px;height:52px;border-radius:16px;background:var(--surface);
+    border:.5px solid var(--hair-2);display:flex;align-items:center;justify-content:center;
+    color:var(--ink);box-shadow:var(--sh-1);font-size:20px}
+  .qa-btn .ic svg{width:20px;height:20px;stroke-width:1.7}
+  .qa-btn.accent .ic{background:var(--ac);border-color:transparent;color:var(--ac-ink);
+    box-shadow:0 4px 14px var(--ac-glow)}
+  .qa-btn .lb{font-size:11px;color:var(--muted);text-align:center;line-height:1.2;
+    letter-spacing:-.005em;font-weight:500}
+
+  .plan-head{display:flex;justify-content:space-between;align-items:baseline;margin:8px 4px 12px}
+  .plan-head .t{font-family:var(--serif);font-size:19px;color:var(--ink);letter-spacing:-.012em}
+  .plan-head .a{font-size:12.5px;color:var(--ac);font-weight:600;background:none;border:0;padding:0;letter-spacing:-.005em}
+
+  .macros-lite{display:flex;gap:4px;margin:0 4px 14px;padding:12px 4px;background:var(--surface);
+    border:.5px solid var(--hair-2);border-radius:14px;box-shadow:var(--sh-1)}
+  .macros-lite>div{flex:1;text-align:center;position:relative}
+  .macros-lite>div+div::before{content:"";position:absolute;left:0;top:6px;bottom:6px;
+    width:.5px;background:var(--hair-2)}
+  .macros-lite .v{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);
+    font-variant-numeric:tabular-nums}
+  .macros-lite .k{font-size:9px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;
+    margin-top:4px;font-weight:600}
+
+  .mealx{background:var(--surface);border:.5px solid var(--hair-2);border-radius:18px;
+    padding:16px 16px 14px;margin-bottom:12px;box-shadow:var(--sh-1);position:relative;
+    transition:opacity .2s var(--ease)}
+  .mealx.done{border-color:rgba(74,222,128,.35);
+    background:linear-gradient(180deg,rgba(74,222,128,.05) 0%,var(--surface) 60%)}
+  .mealx.faltou{opacity:.55}
+  .mealx.faltou .mx-items{text-decoration:line-through;text-decoration-color:var(--faint)}
+  .mx-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .mx-head .badge{width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0}
+  .mealx.done .mx-head .badge{background:var(--ok)}
+  .mealx.faltou .mx-head .badge{background:var(--danger)}
+  .mx-name{flex:1;font-family:var(--serif);font-size:18px;color:var(--ink);
+    letter-spacing:-.012em;line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .mx-hora{font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--sunk);
+    border:.5px solid var(--hair-2);padding:4px 9px;border-radius:999px;letter-spacing:.02em;
+    font-weight:500;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .mx-dots{width:30px;height:30px;border-radius:9px;background:transparent;color:var(--faint);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;
+    letter-spacing:1px;transition:all var(--dur-fast) var(--ease)}
+  .mx-dots:active{background:var(--surface-2);color:var(--ink)}
+  .mx-items{font-size:13px;color:var(--muted);line-height:1.65;white-space:pre-line;
+    margin:0 0 14px;padding:0 2px;letter-spacing:-.005em}
+  .mx-foot{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+  .mx-check-mini{width:36px;height:36px;border-radius:11px;border:.5px solid var(--hair-2);
+    background:var(--sunk);color:var(--muted);font-size:15px;display:flex;align-items:center;
+    justify-content:center;transition:all var(--dur-fast) var(--ease);font-weight:600}
+  .mx-check-mini:active{transform:scale(.94)}
+  .mx-check-mini.on{background:var(--ok);border-color:var(--ok);color:#0A0B0F}
+  .mx-check-mini.no{background:var(--danger);border-color:var(--danger);color:#fff}
+  .mx-reg{flex:1;height:44px;border-radius:12px;background:var(--ac);color:var(--ac-ink);
+    font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;
+    letter-spacing:-.005em;box-shadow:0 4px 12px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.2);
+    transition:all var(--dur-fast) var(--ease)}
+  .mx-reg:active{transform:scale(.98);opacity:.94}
+  .mx-reg.done{background:var(--surface-2);color:var(--ac);box-shadow:none;
+    border:.5px solid rgba(232,93,63,.35)}
+
+  .extras-card{background:var(--surface);border:.5px solid var(--hair-2);border-radius:16px;
+    padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh-1)}
+  .extras-card .eh{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+    font-weight:600;margin-bottom:10px}
+  .extras-card .ei{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:13.5px;color:var(--ink)}
+  .extras-card .ei+.ei{border-top:.5px dashed var(--hair)}
+  .extras-card .ei .dt{color:var(--ac);font-size:14px}
+
+  .diary-title{font-family:var(--serif);font-size:17px;color:var(--ink);margin:22px 4px 12px;
+    display:flex;justify-content:space-between;align-items:baseline;letter-spacing:-.01em}
+  .diary-title button{font-size:12px;color:var(--ac);font-weight:600;background:none;
+    border:0;padding:0;font-family:var(--sans);letter-spacing:-.005em}
+  .diary-empty{padding:24px 18px;background:var(--surface);border:1px dashed var(--hair-2);
+    border-radius:14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+  .diary-empty b{color:var(--ink);font-weight:600}
+  .diary-mini{background:var(--surface);border:.5px solid var(--hair-2);border-radius:12px;
+    padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh-1)}
+  .diary-mini .top{display:flex;justify-content:space-between;align-items:baseline;
+    gap:8px;margin-bottom:5px}
+  .diary-mini .rn{font-size:12.5px;font-weight:600;color:var(--ac)}
+  .diary-mini .dm{font-size:10.5px;color:var(--faint);font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .diary-mini .tx{font-size:12.5px;color:var(--muted);line-height:1.55;white-space:pre-line;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .diet-nota{margin:4px 4px 14px;font-size:12px;color:var(--faint);line-height:1.6;
+    padding:12px 14px;background:var(--surface);border:.5px dashed var(--hair-2);border-radius:12px}
+
+  .ta{width:100%;min-height:110px;border:.5px solid var(--hair-2);border-radius:11px;background:var(--sunk);
+      padding:12px;font-size:13.5px;font-family:var(--sans);color:var(--ink);outline:none;
+      line-height:1.6;resize:vertical;transition:all var(--dur-fast) var(--ease)}
+  .ta:focus{border-color:var(--ac);background:var(--surface);box-shadow:0 0 0 3px var(--ac-soft)}
+  .ta::placeholder{color:var(--faint)}
+
+  /* Sheets */
+  .sug-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:2000;
+    display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadeIn .24s var(--ease)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .sug-sheet{background:var(--surface);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+    border-radius:24px 24px 0 0;padding:22px 18px calc(24px + env(safe-area-inset-bottom));
+    box-shadow:0 -20px 60px rgba(0,0,0,.6);border-top:.5px solid var(--hair-2);position:relative;
+    -webkit-overflow-scrolling:touch}
+  .sug-sheet::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:38px;height:4px;border-radius:999px;background:var(--hair-3)}
+  .sug-head{display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:18px;gap:12px;padding-top:6px}
+  .sug-head .t{font-family:var(--serif);font-size:22px;line-height:1.2;color:var(--ink);letter-spacing:-.012em}
+  .sug-head .s{font-size:11.5px;color:var(--faint);margin-top:5px;letter-spacing:.005em}
+  .sug-close{width:34px;height:34px;border-radius:11px;background:var(--sunk);
+    border:.5px solid var(--hair-2);color:var(--muted);font-size:18px;line-height:1;flex-shrink:0;
+    transition:all var(--dur-fast) var(--ease)}
+  .sug-close:active{background:var(--surface-2);transform:scale(.94)}
+  .sug-card{background:var(--sunk);border:.5px solid var(--hair-2);border-radius:14px;
+    padding:14px;margin-bottom:10px}
+  .sug-card .n{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--ink);letter-spacing:-.005em}
+  .sug-card .i{font-size:12.5px;color:var(--muted);line-height:1.7;white-space:pre-line;margin-bottom:10px}
+  .sug-card .u{width:100%;height:40px;border-radius:11px;background:var(--ac);color:var(--ac-ink);
+    font-size:12.5px;font-weight:600;letter-spacing:-.005em;
+    box-shadow:0 3px 10px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.2)}
+  .sug-load{padding:44px 20px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+  .sug-load::before{content:"";display:block;width:22px;height:22px;margin:0 auto 14px;
+    border:2px solid var(--hair-3);border-top-color:var(--ac);border-radius:50%;
+    animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sug-err{padding:14px 16px;background:rgba(248,113,113,.08);
+    border:.5px solid rgba(248,113,113,.35);border-radius:12px;color:var(--danger);
+    font-size:12.5px;line-height:1.5}
+
+  /* Coach */
+  .coach-sec{background:var(--surface);border:.5px solid var(--hair-2);border-radius:14px;
+    padding:14px 15px;margin-bottom:10px;box-shadow:var(--sh-1)}
+  .coach-sec .hd{display:flex;align-items:center;gap:8px;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:12px;font-weight:600}
+  .coach-sec .hd .em{font-size:15px;letter-spacing:0;color:var(--ac)}
+  .coach-treino .letter{font-family:var(--serif);font-style:italic;font-size:52px;line-height:.82;
+    color:var(--ac);letter-spacing:-.04em}
+  .coach-treino .row{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+  .coach-treino .nome{font-family:var(--serif);font-size:20px;line-height:1.2;color:var(--ink);letter-spacing:-.012em}
+  .coach-body{font-size:14px;color:var(--muted);line-height:1.65;letter-spacing:-.005em}
+  .coach-body b{color:var(--ink);font-weight:600}
+  .coach-cargas .item{padding:11px 0;border-top:.5px dashed var(--hair);font-size:13px;line-height:1.55}
+  .coach-cargas .item:first-child{border-top:none;padding-top:2px}
+  .coach-cargas .nm{font-weight:600;color:var(--ink);display:block;font-size:13px;margin-bottom:3px;letter-spacing:-.005em}
+  .coach-cargas .sg{color:var(--muted)}
+  .coach-alert{background:rgba(245,185,70,.06);border-color:rgba(245,185,70,.35)}
+  .coach-alert .hd{color:var(--warn)}
+  .coach-motiv{background:linear-gradient(135deg,var(--ac-soft) 0%,rgba(126,169,255,.06) 100%);
+    border-color:rgba(232,93,63,.25);font-family:var(--serif);font-size:16px;font-style:italic;
+    line-height:1.5;color:var(--ink);text-align:center;padding:18px;margin-bottom:10px;letter-spacing:-.01em}
+  .coach-apply{width:100%;height:48px;border-radius:12px;background:var(--ac);color:var(--ac-ink);
+    font-size:14px;font-weight:600;margin-top:8px;letter-spacing:-.005em;
+    box-shadow:0 4px 12px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.2)}
+  .coach-apply.done{background:var(--ok);color:#0A0B0F}
+
+  .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+  .chip{height:46px;border-radius:12px;background:var(--surface);border:.5px solid var(--hair-2);
+        font-size:12.5px;color:var(--muted);font-weight:500;display:flex;align-items:center;
+        justify-content:center;gap:6px;transition:all var(--dur-fast) var(--ease)}
+  .chip:active{transform:scale(.97);background:var(--surface-2)}
+  .chip.on{border-color:var(--ac);color:var(--ac);background:var(--ac-soft);font-weight:600}
+
+  .log-item{background:var(--sunk);border:.5px solid var(--hair-2);border-radius:12px;
+    padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:all var(--dur-fast) var(--ease)}
+  .log-item:active{background:var(--surface-2);transform:scale(.99)}
+  .log-item .log-meta{font-size:10.5px;color:var(--faint);font-family:var(--mono);margin-bottom:3px;
+    letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .log-item .log-txt{font-size:12.5px;color:var(--muted);line-height:1.5;overflow:hidden;
+    text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+  .sug-sheet .ed-f{margin-bottom:9px}
+  .sug-sheet .ta{margin-bottom:12px;min-height:80px}
+  .sug-save{width:100%;height:48px;border-radius:12px;background:var(--ac);color:var(--ac-ink);
+    font-size:14px;font-weight:600;margin-top:4px;letter-spacing:-.005em;
+    box-shadow:0 4px 12px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.2)}
+  .sug-save:disabled{background:var(--surface-2);color:var(--faint);box-shadow:none;
+    border:.5px solid var(--hair-2)}
+
+  /* Empty */
+  .empty{text-align:center;padding:44px 24px;color:var(--muted)}
+  .empty .icon{width:52px;height:52px;margin:0 auto 14px;border-radius:16px;
+    background:var(--surface);border:.5px solid var(--hair-2);display:flex;align-items:center;
+    justify-content:center;color:var(--faint);font-size:24px}
+  .empty .icon svg{width:22px;height:22px;stroke-width:1.5}
+  .empty .ttl{font-family:var(--serif);font-size:19px;color:var(--ink);
+    margin-bottom:8px;letter-spacing:-.012em}
+  .empty .sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:280px;margin:0 auto}
+
+  @media (prefers-reduced-motion:no-preference){
+    .sug-sheet{animation:sheetup .26s var(--ease)}
+    @keyframes sheetup{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+    .hero,.diet-hero{animation:cardin .28s var(--ease)}
+    @keyframes cardin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  }
+
+  /* Config */
+  .cfg-sec{margin-bottom:22px}
+  .cfg-sec .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+    font-weight:600;margin:0 4px 10px;display:flex;align-items:center;gap:8px}
+  .cfg-list{background:var(--surface);border:.5px solid var(--hair-2);border-radius:16px;
+    overflow:hidden;box-shadow:var(--sh-1)}
+  .cfg-row{display:flex;align-items:center;gap:14px;padding:16px 16px;
+    border-bottom:.5px solid var(--hair);color:var(--ink);font-size:14.5px;
+    transition:background var(--dur-fast) var(--ease);width:100%;text-align:left;background:transparent}
+  .cfg-row:last-child{border-bottom:none}
+  .cfg-row:active{background:var(--surface-2)}
+  .cfg-row .em{width:28px;height:28px;border-radius:8px;background:var(--sunk);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);
+    font-size:14px;line-height:1}
+  .cfg-row .em svg{width:14px;height:14px;stroke-width:1.75}
+  .cfg-row .lb{flex:1;min-width:0}
+  .cfg-row .lb .tt{font-size:14.5px;color:var(--ink);font-weight:500;letter-spacing:-.005em}
+  .cfg-row .lb .st{font-size:12px;color:var(--faint);margin-top:2px;letter-spacing:-.005em}
+  .cfg-row .cv{color:var(--muted);font-size:12.5px;font-weight:500}
+  .cfg-row .caret{color:var(--faint);font-size:16px;line-height:1}
+  .cfg-row.danger{color:var(--danger)}
+  .cfg-row.danger .tt{color:var(--danger)}
+  .cfg-row.danger .em{color:var(--danger);background:rgba(248,113,113,.08)}
+  .cfg-perfil{display:flex;padding:6px}
+  .cfg-perfil button{flex:1;height:48px;border-radius:11px;background:transparent;color:var(--muted);
+    font-size:14px;font-weight:500;transition:all var(--dur-fast) var(--ease)}
+  .cfg-perfil button:active{transform:scale(.97)}
+  .cfg-perfil button.on{background:var(--sunk);color:var(--ink);font-weight:600;box-shadow:var(--sh-1)}
+  .cfg-perfil button.on[data-cfp="gabriel"]{color:#E85D3F}
+  .cfg-perfil button.on[data-cfp="eduarda"]{color:#F06B95}
+  .cfg-theme{display:flex;gap:6px;padding:8px}
+  .cfg-theme button{flex:1;height:60px;border-radius:11px;background:transparent;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    font-size:11.5px;font-weight:500;transition:all var(--dur-fast) var(--ease);border:.5px solid transparent}
+  .cfg-theme button:active{transform:scale(.97)}
+  .cfg-theme button.on{background:var(--sunk);color:var(--ink);border-color:var(--hair-2);font-weight:600}
+  .cfg-theme button svg{width:18px;height:18px;stroke-width:1.75}
+
+  /* Login */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(120% 80% at 50% 0%,#1B1E28 0%,#0A0B0F 60%)}
+  html[data-theme="light"] .login-wrap{background:radial-gradient(120% 80% at 50% 0%,#FFFFFF 0%,#EAE7DE 60%)}
+  .login-card{width:100%;max-width:380px;background:var(--surface);border:.5px solid var(--hair-2);
+    border-radius:24px;padding:36px 26px 28px;box-shadow:var(--sh-3)}
+  .login-brand{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:6px}
+  .login-brand .logo{width:56px;height:56px;border-radius:18px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .login-brand .logo span{font-family:var(--serif);font-style:italic;font-size:34px;line-height:1;
+    color:var(--ac);letter-spacing:-.04em}
+  .login-brand .nm{font-family:var(--serif);font-size:32px;color:var(--ink);letter-spacing:-.02em;line-height:1}
+  .login-brand .nm em{color:var(--ac);font-style:italic}
+  .login-sub{text-align:center;font-family:var(--serif);font-style:italic;font-size:15px;
+    color:var(--muted);margin:2px 0 26px;letter-spacing:-.005em}
+  .login-card label{display:block;font-size:10px;color:var(--faint);letter-spacing:.16em;
+    text-transform:uppercase;margin:14px 0 6px;font-weight:600}
+  .login-card input{width:100%;height:50px;background:var(--sunk);border:.5px solid var(--hair-2);
+    border-radius:12px;padding:0 14px;font-size:15px;color:var(--ink);outline:none;
+    transition:all var(--dur-fast) var(--ease)}
+  .login-card input:focus{border-color:var(--ac);background:var(--surface);
+    box-shadow:0 0 0 3px var(--ac-soft)}
+  .login-err{font-size:12.5px;color:var(--danger);margin-top:12px;min-height:16px;
+    text-align:center;font-weight:500}
+  .login-btn{width:100%;height:52px;margin-top:18px;background:var(--ac);color:var(--ac-ink);
+    border-radius:12px;font-size:15px;font-weight:600;letter-spacing:-.005em;
+    box-shadow:0 10px 26px var(--ac-glow),inset 0 .5px 0 rgba(255,255,255,.22);
+    transition:all var(--dur-fast) var(--ease)}
+  .login-btn:active{transform:scale(.98);opacity:.94}
+  .login-hint{font-size:11px;color:var(--faint);text-align:center;margin-top:18px;letter-spacing:.02em}
+  .login-btn:active{opacity:.9;transform:translateY(1px)}
+  .login-hint{font-size:11px;color:var(--faint);text-align:center;margin-top:16px;letter-spacing:.3px}
+  /* ==== v31: PaceScoring IA card ==== */
+  .pace-ia-slot{margin:14px 0 10px}
+  .pace-ia-box{background:var(--surface);border:.5px solid var(--hair-2);border-radius:16px;padding:16px 18px;box-shadow:var(--sh-1);transition:all .18s ease}
+  .pace-ia-box.collapsed .pace-ia-body{display:none}
+  .pace-ia-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .pace-ia-t{font-family:var(--display);font-size:11px;font-weight:700;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .pace-ia-toggle{background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1}
+  .pace-ia-body{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .pace-ia-det{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.55;font-weight:400}
+  .pace-ia-gaps{display:flex;flex-wrap:wrap;gap:6px}
+  .pace-gap-chip{display:inline-block;padding:3px 9px;font-size:10.5px;letter-spacing:.04em;text-transform:lowercase;background:rgba(255,255,255,.05);border:1px solid var(--hair);border-radius:999px;color:var(--muted)}
+  .pace-ia-ai{font-family:var(--sans);font-size:13.5px;color:var(--ink);line-height:1.55;padding-top:10px;border-top:.5px solid var(--hair);font-weight:400;letter-spacing:-.003em}
+  .pace-ia-th{font-family:var(--display);font-size:15px;color:var(--ac);margin-bottom:8px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+  .pace-ia-jus{font-family:var(--sans);font-size:13.5px;color:var(--ink);opacity:.94;margin-bottom:8px;line-height:1.55;font-weight:400}
+  .pace-ia-alerta{font-family:var(--sans);font-size:12px;background:rgba(255,180,60,.12);border:.5px solid rgba(255,180,60,.3);color:#f0b64c;padding:8px 10px;border-radius:10px;margin-bottom:8px;font-weight:500;line-height:1.45}
+  .pace-ia-prox{margin-top:10px;padding-top:10px;border-top:.5px solid var(--hair)}
+  .pace-ia-prox-t{font-family:var(--display);font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin-bottom:6px;font-weight:600}
+  .pace-ia-prox-l{font-family:var(--sans);font-size:12.5px;color:var(--ink);opacity:.88;line-height:1.6;font-weight:400}
+  .pace-ia-muted{color:var(--faint);font-size:12px;font-family:var(--sans);font-weight:400}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="tabbar"><div class="in" id="tabs"></div></div>
+<div class="sync-badge" id="syncBadge" style="opacity:0">&#9729; sincronizado</div>
+<div id="sugModal"></div>
+
+<script>
+/* ============================================================ tema */
+const THEME_KEY = "gt-theme";
+function applyTheme(t){
+  const v = (t==="light"||t==="auto"||t==="dark") ? t : "dark";
+  document.documentElement.dataset.theme = v;
+  const meta = document.getElementById("themeColor");
+  if(meta){
+    const isLight = v==="light" || (v==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches);
+    meta.setAttribute("content", isLight ? "#F5F7FA" : "#0E1218");
+  }
+}
+function getTheme(){ try{ return localStorage.getItem(THEME_KEY) || "dark"; }catch(e){ return "dark"; } }
+function setTheme(t){ try{ localStorage.setItem(THEME_KEY, t); }catch(e){} applyTheme(t); }
+applyTheme(getTheme());
+if(window.matchMedia){
+  try{ window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", ()=>{ if(getTheme()==="auto") applyTheme("auto"); }); }catch(e){}
+}
+
+/* ============================================================ armazenagem */
+const STORE_KEY = "gt-state-v2";
+const VERSION_KEY = "gt-version-v2";
+const store = {
+  async get(){
+    try{ if(window.storage){ const r = await window.storage.get(STORE_KEY); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
+    try{ const s = localStorage.getItem(STORE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; }
+  },
+  async set(v){
+    const s = JSON.stringify(v);
+    try{ if(window.storage){ await window.storage.set(STORE_KEY, s, false); syncEngine.schedulePush(); return true; } }catch(e){}
+    try{ localStorage.setItem(STORE_KEY, s); syncEngine.schedulePush(); return true; }catch(e){ return false; }
+  }
+};
+
+/* ============================================================ syncEngine (Supabase) */
+const syncEngine = (function(){
+  const SUPA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co';
+  const SUPA_KEY = 'sb_publishable_s0FBWPYPcIXO5ln95i5f6g_oPj7Bsar';
+  const ROW_ID   = 'gabi_eduarda';
+  const DEVICE_ID = (function(){
+    let d = localStorage.getItem('gt-device-id');
+    if(!d){ d = 'dev-'+Math.random().toString(36).slice(2,10); try{localStorage.setItem('gt-device-id',d);}catch(e){} }
+    return d;
+  })();
+  let client = null;
+  try { client = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null; } catch(e) { console.warn('supabase init falhou',e); }
+  let localVersion = Number(localStorage.getItem(VERSION_KEY) || 0);
+  let pushTimer = null;
+  let pushInflight = false;
+  let pendingWhile = false;
+  let statusEl = null;
+  let applyingRemote = false;
+  const setStatus = (kind, txt) => {
+    if(!statusEl) statusEl = document.getElementById('syncBadge');
+    if(!statusEl) return;
+    statusEl.className = 'sync-badge ' + (kind||'');
+    statusEl.textContent = txt;
+    clearTimeout(statusEl._t);
+    if(kind==='ok'){ statusEl._t = setTimeout(()=>{ statusEl.textContent=''; }, 800); }
+  };
+  const getVersion = () => localVersion;
+  const setLocalVersion = v => { localVersion = v; try{localStorage.setItem(VERSION_KEY, String(v));}catch(e){} };
+
+  async function pullOnce(){
+    if(!client) throw new Error('no client');
+    const { data, error } = await client.from('treino_state').select('data,version').eq('id', ROW_ID).maybeSingle();
+    if(error) throw error;
+    return data;
+  }
+
+  async function pushNow(){
+    if(!client){ setStatus('offline','⚠ offline'); return; }
+    if(pushInflight){ pendingWhile = true; return; }
+    if(!navigator.onLine){ setStatus('offline','⚠ offline'); return; }
+    pushInflight = true;
+    setStatus('saving','⏳ salvando');
+    try {
+      const nextVersion = localVersion + 1;
+      const payload = { id: ROW_ID, data: S, version: nextVersion, updated_at: new Date().toISOString(), updated_by: DEVICE_ID };
+      const { error } = await client.from('treino_state').upsert(payload);
+      if(error) throw error;
+      setLocalVersion(nextVersion);
+      setStatus('ok','☁ sincronizado');
+    } catch(e){
+      console.warn('push falhou', e);
+      setStatus('offline','⚠ offline');
+    } finally {
+      pushInflight = false;
+      if(pendingWhile){ pendingWhile = false; schedulePush(); }
+    }
+  }
+
+  function schedulePush(){
+    if(applyingRemote) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushNow, 800);
+  }
+
+  async function pullAndMerge(){
+    if(!client || !navigator.onLine){ return; }
+    try {
+      const remote = await pullOnce();
+      if(!remote) return;
+      const rv = Number(remote.version || 0);
+      if(rv > localVersion && remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length){
+        applyingRemote = true;
+        Object.assign(S, remote.data);
+        if(!S.events) S.events = [];
+        if(!S.draft) S.draft = {};
+        if(!S.check) S.check = {};
+        setLocalVersion(rv);
+        try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+        if(typeof safeRender === 'function') safeRender();
+        else if(typeof render === 'function') render();
+        applyingRemote = false;
+        setStatus('ok','☁ sincronizado');
+      } else {
+        setStatus('ok','☁ sincronizado');
+      }
+    } catch(e){
+      console.warn('pull falhou', e);
+      setStatus('offline','⚠ offline');
+    }
+  }
+
+  async function bootstrap(){
+    let remote = null;
+    try { remote = await pullOnce(); } catch(e){ console.warn('pull inicial falhou', e); }
+    const local = await store.get();
+    const remoteHas = remote && remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length;
+    const rv = remote ? Number(remote.version||0) : 0;
+    if(remoteHas && rv >= localVersion){
+      Object.assign(S, remote.data);
+      setLocalVersion(rv);
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+      setStatus('ok','☁ sincronizado');
+    } else if(local){
+      Object.assign(S, local);
+      if(remote && rv < localVersion) schedulePush();
+      else if(!remoteHas && (local.events && local.events.length)) schedulePush();
+    }
+    if(!navigator.onLine) setStatus('offline','⚠ offline');
+  }
+
+  function start(){
+    setInterval(pullAndMerge, 15000);
+    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) pullAndMerge(); });
+    window.addEventListener('online', ()=>{ setStatus('saving','⏳ reconectando'); pullAndMerge().then(()=>schedulePush()); });
+    window.addEventListener('offline', ()=>setStatus('offline','⚠ offline'));
+  }
+
+  return { schedulePush, pushNow, pullAndMerge, bootstrap, start, getVersion };
+})();
+
+let salvaTimer = null;
+const salvaSoft = () => { clearTimeout(salvaTimer); salvaTimer = setTimeout(()=>store.set(S), 400); };
+
+/* ========================================================== plano padrão */
+const BASE = {
+  gabriel:{ label:"Gabriel", ac:"#3AD879", extra:"Jiu-jitsu", sigla:"JJ",
+    days:{
+      A:{t:"Superiores horizontal",cat:"sup",ex:[
+        {id:"a1",n:"Supino inclinado halter",p:"6-10",s:4,ty:"load",ap:""},
+        {id:"a2",n:"Remada low row (straps)",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"a3",n:"Pec deck (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
+        {id:"a4",n:"Crucifixo inverso (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
+        {id:"a5",n:"Tríceps testa (bi-set)",p:"10-12",s:2,ty:"load",ap:""},
+        {id:"a6",n:"Rosca martelo (bi-set)",p:"10-12",s:2,ty:"load",ap:""}]},
+      B:{t:"Pernas anterior",cat:"inf",ex:[
+        {id:"b1",n:"Agachamento ou hack",p:"6-10",s:4,ty:"load",ap:""},
+        {id:"b2",n:"Leg press",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"b3",n:"Cadeira abdutora (bi-set)",p:"15-20",s:3,ty:"load",ap:""},
+        {id:"b4",n:"Panturrilha em pé (bi-set)",p:"15-20",s:3,ty:"load",ap:""},
+        {id:"b5",n:"Abdominal com carga",p:"10-20",s:2,ty:"load",ap:""}]},
+      C:{t:"Superiores vertical",cat:"sup",ex:[
+        {id:"c1",n:"Puxada alta pronada",p:"6-10",s:4,ty:"load",ap:""},
+        {id:"c2",n:"Desenvolvimento máquina",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"c3",n:"Remada serrote (por lado)",p:"10",s:3,ty:"load",ap:""},
+        {id:"c4",n:"Elevação lateral cabo (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
+        {id:"c5",n:"Rosca direta (bi-set)",p:"10-15",s:3,ty:"load",ap:""}]},
+      D:{t:"Pernas posterior e pegada",cat:"inf",ex:[
+        {id:"d1",n:"Terra romeno ou pélvica",p:"8-12",s:4,ty:"load",ap:""},
+        {id:"d2",n:"Flexora deitado (bi-set)",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"d3",n:"Panturrilha sentado (bi-set)",p:"15",s:3,ty:"load",ap:""},
+        {id:"d4",n:"Búlgaro (por perna)",p:"10",s:3,ty:"load",ap:""},
+        {id:"d5",n:"Farmer walk ou pendurado",p:"40 s",s:3,ty:"time",ap:""}]}
+    }},
+  eduarda:{ label:"Eduarda", ac:"#F06B95", extra:"Corrida", sigla:"CO",
+    days:{
+      A:{t:"Superiores horizontal",cat:"sup",ex:[
+        {id:"ea1",n:"Supino máquina",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"ea2",n:"Remada low row",p:"10-12",s:4,ty:"load",ap:""},
+        {id:"ea3",n:"Puxada supinada",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"ea4",n:"Isometria na barra",p:"4 tentativas",s:4,ty:"time",ap:""},
+        {id:"ea5",n:"Rosca martelo",p:"10-12",s:2,ty:"load",ap:""}]},
+      B:{t:"Pernas anterior",cat:"inf",ex:[
+        {id:"eb1",n:"Agachamento ou hack",p:"8-12",s:3,ty:"load",ap:""},
+        {id:"eb2",n:"Leg press pés altos",p:"10-12",s:3,ty:"load",ap:""},
+        {id:"eb3",n:"Cadeira abdutora",p:"15-20",s:3,ty:"load",ap:""},
+        {id:"eb4",n:"Abdominal supra 1 min",p:"1 min",s:3,ty:"reps",ap:""},
+        {id:"eb5",n:"Panturrilha em pé",p:"15",s:3,ty:"load",ap:""}]},
+      C:{t:"Superiores vertical",cat:"sup",ex:[
+        {id:"ec1",n:"Puxada alta ou graviton",p:"8-12",s:4,ty:"load",ap:""},
+        {id:"ec2",n:"Desenvolvimento máquina",p:"10-12",s:3,ty:"load",ap:""},
+        {id:"ec3",n:"Remada serrote (por lado)",p:"12",s:3,ty:"load",ap:""},
+        {id:"ec4",n:"Rosca direta",p:"10-12",s:3,ty:"load",ap:""},
+        {id:"ec5",n:"Isometria na barra",p:"4 tentativas",s:4,ty:"time",ap:""},
+        {id:"ec6",n:"Prancha",p:"40 s",s:3,ty:"time",ap:""}]},
+      D:{t:"Pernas posterior",cat:"inf",ex:[
+        {id:"ed1",n:"Elevação pélvica com barra",p:"10-12",s:4,ty:"load",ap:""},
+        {id:"ed2",n:"Flexora deitado",p:"10-12",s:3,ty:"load",ap:""},
+        {id:"ed3",n:"Búlgaro (por perna)",p:"10-12",s:3,ty:"load",ap:""},
+        {id:"ed4",n:"Pendurado na barra",p:"40 s",s:3,ty:"time",ap:""},
+        {id:"ed5",n:"Abdominal supra 1 min",p:"1 min",s:3,ty:"reps",ap:""}]}
+    }}
+};
+const ORDER = ["A","B","C","D"];
+const clone = o => JSON.parse(JSON.stringify(o));
+
+/* ================ Schedule semanal fixo do Gabriel ================ */
+const WDK = ["dom","seg","ter","qua","qui","sex","sab"];
+const SCHED_GABRIEL = {
+  seg:{musc:"A",jiu:true,nota:"Upper leve pra jiu"},
+  ter:{musc:"B",jiu:false,nota:"Pernas — dia forte"},
+  qua:{musc:"C",jiu:true,nota:"Upper leve pra jiu"},
+  qui:{musc:null,jiu:true,nota:"Recuperação/mobilidade"},
+  sex:{musc:null,jiu:true,nota:"Descanso musculação"},
+  sab:{musc:"D",jiu:false,nota:"Posterior+glúteo+core"},
+  dom:{musc:null,jiu:false,nota:"Descanso completo"}
+};
+const DIETA_DIAS_GABRIEL = {seg:"musc_jiu",ter:"musc",qua:"musc_jiu",qui:"jiu",sex:"jiu",sab:"musc",dom:"descanso"};
+const DIETA_ALVOS_DIA_GABRIEL = {
+  musc_jiu:{kcal:2850,prot:175,carb:380,gord:70},
+  musc:{kcal:2700,prot:175,carb:340,gord:70},
+  jiu:{kcal:2700,prot:175,carb:340,gord:70},
+  descanso:{kcal:2400,prot:175,carb:250,gord:70},
+  // v27: jejum (estrito, sem sólido antes do 1º almoço)
+  jejum:{kcal:2400,prot:175,carb:250,gord:70},
+  // v27: jejum modificado (SuperCoffee + jiu à noite)
+  jejum_jiu:{kcal:2500,prot:175,carb:280,gord:70}
+};
+const SCHED_EDUARDA = {
+  seg:{musc:"A",corrida:false,nota:"Superior — foco em push"},
+  ter:{musc:"B",corrida:true,nota:"Corrida à noite — treino leve"},
+  qua:{musc:"C",corrida:false,nota:"Superior — foco em pull"},
+  qui:{musc:"D",corrida:true,nota:"Corrida à noite — treino leve"},
+  sex:{musc:"A",corrida:false,nota:"Superior — reforço"},
+  sab:{musc:"B",corrida:false,nota:"Pernas — dia forte"},
+  dom:{musc:null,corrida:false,nota:"Descanso completo"}
+};
+const DIETA_DIAS_EDUARDA = {seg:"musc",ter:"musc_corrida",qua:"musc",qui:"musc_corrida",sex:"musc",sab:"musc",dom:"descanso"};
+const DIETA_ALVOS_DIA_EDUARDA = {
+  musc_corrida:{kcal:2100,prot:130,carb:260,gord:55},
+  musc:{kcal:1950,prot:130,carb:220,gord:55},
+  corrida:{kcal:2000,prot:130,carb:250,gord:55},
+  descanso:{kcal:1750,prot:130,carb:180,gord:55}
+};
+const TIPO_DIA_LABEL = {musc_jiu:"Musc + Jiu",musc:"Só Musc",jiu:"Só Jiu",musc_corrida:"Musc + Corrida",corrida:"Só Corrida",descanso:"Descanso",jejum:"Jejum",jejum_jiu:"Jejum + Jiu"};
+
+/* Atividades quick-action por perfil (chips no card do dia) — v27 inclui "jejum" p/ Gabriel */
+const ATIV_QUICK = {
+  gabriel: ["jiu","corrida","futebol","bike","jejum"],
+  eduarda: ["corrida","bike","jiu","futebol"]
+};
+const ATIV_LABEL = { jiu:"Jiu", corrida:"Corrida", futebol:"Futebol", bike:"Bike", natacao:"Natação", caminhada:"Caminhada", jejum:"Jejum" };
+
+function getSchedule(p){
+  const s = S.plan && S.plan[p] && S.plan[p].schedule;
+  if(s && typeof s==="object") return s;
+  return p==="gabriel" ? SCHED_GABRIEL : (p==="eduarda" ? SCHED_EDUARDA : null);
+}
+function getDietaDias(p){
+  const d = S.dieta && S.dieta[p] && S.dieta[p].dias;
+  if(d && typeof d==="object") return d;
+  return p==="gabriel" ? DIETA_DIAS_GABRIEL : (p==="eduarda" ? DIETA_DIAS_EDUARDA : null);
+}
+function getAlvosDia(p){
+  const a = S.dieta && S.dieta[p] && S.dieta[p].alvos_dia;
+  if(a && typeof a==="object") return a;
+  return p==="gabriel" ? DIETA_ALVOS_DIA_GABRIEL : (p==="eduarda" ? DIETA_ALVOS_DIA_EDUARDA : null);
+}
+/* ============ Planejado (atividades dinâmicas por data) ============
+   S.planejado[perfil][YYYY-MM-DD] = {jiu:true, corrida:true, musc:"A", ...} */
+function getPlanejado(p, dataISO){
+  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
+  if(!S.planejado[p]) S.planejado[p] = {};
+  return S.planejado[p][dataISO] || null;
+}
+function setPlanejado(p, dataISO, obj){
+  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
+  if(!S.planejado[p]) S.planejado[p] = {};
+  if(!obj || Object.keys(obj).length===0) delete S.planejado[p][dataISO];
+  else S.planejado[p][dataISO] = obj;
+}
+async function togglePlanejado(p, dataISO, ativ){
+  try{
+    const atual = getPlanejado(p, dataISO) || {};
+    const willActivate = !atual[ativ];
+    // v27: alerta ao marcar jejum em dia com musc programada (schedule ou override)
+    if(ativ === "jejum" && willActivate){
+      const sch = getSchedule(p);
+      if(sch){
+        const d = new Date(dataISO+"T12:00");
+        const dia = sch[WDK[d.getDay()]] || {};
+        const muscOverride = (atual.musc !== undefined) ? atual.musc : dia.musc;
+        if(muscOverride){
+          const ok = confirm("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\nSuperCoffee 05h45 fica liberado como pré-treino (jejum modificado).\n\nConfirmar jejum hoje?");
+          if(!ok) return;
+        }
+      }
+    }
+    atual[ativ] = !atual[ativ];
+    if(!atual[ativ]) delete atual[ativ];
+    setPlanejado(p, dataISO, atual);
+    // Render primeiro (feedback imediato), persiste depois
+    render();
+    try{ await store.set(S); }catch(e){ console.error("[togglePlanejado] persist error", e); }
+  }catch(e){ console.error("[togglePlanejado] error", e); }
+}
+async function setPlanejadoMusc(p, dataISO, letra){
+  try{
+    const atual = getPlanejado(p, dataISO) || {};
+    atual.musc = letra;
+    setPlanejado(p, dataISO, atual);
+    render();
+    try{ await store.set(S); }catch(e){ console.error("[setPlanejadoMusc] persist error", e); }
+  }catch(e){ console.error("[setPlanejadoMusc] error", e); }
+}
+// v25: expõe pra window pra permitir handlers globais/delegação
+if(typeof window !== "undefined"){
+  window.togglePlanejado = togglePlanejado;
+  window.setPlanejadoMusc = setPlanejadoMusc;
+}
+/* Se existe atividade "principal" planejada no dia que conflita com o schedule (jiu/corrida
+   em dia de pernas), sugere trocar pra letra alternativa (A é a mais segura). */
+function conflitoPlan(p, dataISO, letraEfetiva){
+  const plan = getPlanejado(p, dataISO); if(!plan) return null;
+  const sch = getSchedule(p); if(!sch) return null;
+  const d = new Date(dataISO+"T12:00");
+  const dia = sch[WDK[d.getDay()]]; if(!dia) return null;
+  // v29: usa letra EFETIVA (após override anti-repetição do avaliar()) quando fornecida,
+  // caso contrário cai no schedule bruto. Sem isso, o alerta amarelo dizia "treino
+  // sugerido é B (pernas)" mesmo quando o card principal já tinha trocado pra C (upper).
+  const letraSchedule = letraEfetiva || plan.musc || dia.musc;
+  const isPernas = letraSchedule==="B" || letraSchedule==="D";
+  const temAtividade = plan.jiu || plan.corrida || plan.futebol;
+  if(isPernas && temAtividade){
+    const ativ = plan.jiu?"jiu":(plan.corrida?"corrida":"futebol");
+    return {
+      msg:`Você planejou ${ATIV_LABEL[ativ]||ativ} ${dataISO===REF()?"hoje":"neste dia"}. O treino sugerido (<b>${letraSchedule}</b>) é de pernas — pode sobrecarregar antes.`,
+      sugere:"A", ativ, letraAtual: letraSchedule
+    };
+  }
+  return null;
+}
+function schedHoje(p){
+  const s = getSchedule(p); if(!s) return null;
+  const iso = REF(); const d = new Date(iso+"T12:00");
+  const orig = s[WDK[d.getDay()]];
+  if(!orig) return null;
+  const merged = Object.assign({}, orig);
+  const plan = getPlanejado(p, iso);
+  if(plan){
+    if(Object.prototype.hasOwnProperty.call(plan,'musc')) merged.musc = plan.musc;
+    if(plan.jiu) merged.jiu = true;
+    if(plan.corrida) merged.corrida = true;
+    if(plan.futebol) merged.futebol = true;
+    if(plan.bike) merged.bike = true;
+  }
+  return merged;
+}
+function tipoDiaHoje(p){
+  const dd = getDietaDias(p); if(!dd) return null;
+  const iso = REF(); const d = new Date(iso+"T12:00");
+  let tipo = dd[WDK[d.getDay()]] || null;
+  // Se planejou jiu/corrida hoje, promove tipo pro combinado (musc_jiu / musc_corrida)
+  const plan = getPlanejado(p, iso);
+  if(plan){
+    // v27: jejum sobrepõe outros tipos. Se combinado com jiu à noite (Gabriel) → jejum_jiu
+    if(plan.jejum){
+      if(p==="gabriel" && plan.jiu) return "jejum_jiu";
+      return "jejum";
+    }
+    if(p==="gabriel" && plan.jiu){
+      if(tipo==="musc") tipo = "musc_jiu";
+      else if(tipo==="descanso") tipo = "jiu";
+    }
+    if(p==="eduarda" && plan.corrida){
+      if(tipo==="musc") tipo = "musc_corrida";
+      else if(tipo==="descanso") tipo = "corrida";
+    }
+  }
+  return tipo;
+}
+
+const DIETA = {
+  gabriel:{
+    alvo:{kcal:"2700",prot:"175 g",carb:"290 g",gord:"70 g"},
+    nota:"Recomposição: manter peso entre 79 e 81 kg e reduzir gordura. Proteína em peso cru, carboidrato em peso pronto.",
+    refs:[
+      {id:"r1",nome:"Refeição 1",hora:"07:00",itens:"Pão de forma fatiado, 3 unidades\nOvos, 3 unidades\nRequeijão light, 30 g\nFrutas variadas, 200 g"},
+      {id:"r2",nome:"Refeição 2",hora:"12:00",itens:"Frango, carne magra, suíno ou peixe branco, 200 g\nArroz ou macarrão, 200 g\nFeijão ou lentilha, 150 g\nSalada variada com 15 g de azeite"},
+      {id:"r3",nome:"Refeição 3",hora:"16:00",itens:"Iogurte zero ou leite desnatado, 200 g\nAveia em farelo, 60 g\nWhey protein, 40 g\nFrutas variadas, 200 g\nCastanhas, 20 g"},
+      {id:"r4",nome:"Refeição 4",hora:"20:00",itens:"Frango, carne magra, suíno ou peixe branco, 200 g\nArroz ou macarrão, 200 g, ou 250 g nos dias de tatame\nFeijão ou lentilha, 100 g\nSalada variada com 20 g de azeite"}],
+    extras:[{id:"x3",nome:"Vitamina D3 e ômega 3"}]},
+  eduarda:{
+    alvo:{kcal:"1900-2100",prot:"130 g",carb:"220-260 g",gord:"55 g"},
+    nota:"Objetivo: emagrecimento — redução de gordura corporal. Prescrição da nutricionista Giovanna Buarque. Regra dos 80% (parar quando saciar) e jantar até 19:30h. Cada refeição tem várias opções — escolha 1 de cada linha.",
+    refs:[
+      {id:"r1",nome:"Desjejum",hora:"07:00",itens:"Em jejum: 500 ml de água (auxilia intestino)\n1 dose de SuperCoffee + 1 dose de creatina (5 g)"},
+      {id:"r2",nome:"Almoço",hora:"12:00",itens:"PRATO 1 (à vontade): folhas + legumes crus — alface, rúcula, tomate, palmito, agrião, ervilha, vagem, couve-flor, berinjela, espinafre, abobrinha, aspargos, moranga, cenoura, brócolis, pimentão, repolho\nTemperar com 1 colher chá azeite extravirgem + 1 colher sopa gergelim + sal e pimenta\n\nPRATO 2:\n• Carboidrato (1 opção): 3 colheres sopa cheias arroz (75 g) OU 2 batatas médias (100 g) OU 1 aipim cozido (90 g) OU 1 pegador macarrão integral (70 g)\n• Leguminosa: 1 concha feijão ou lentilha (80 g)\n• Proteína (1 opção): 100 g frango grelhado OU 120 g peixe grelhado OU 90 g mignon OU 3 colheres sopa carne moída (95 g)\n• Legumes: metade do prato à vontade\n\nSOBREMESA (1 opção, até ~95 kcal): 1 mariola zero · 1 brownie fudge Santa Porção · 1 chocolate Gold Ko · 1 Biscoittino · 1 bombom Haoma · 1 colher sopa leite condensado + frutas · 100 g morango/melão · ½ laranja · 1 kiwi · 2 rodelas abacaxi\n\nAguardar 40 min para café/chá após almoço (taninos atrapalham ferro). Evitar leite/queijos/chocolate com refeições ricas em ferro."},
+      {id:"r3",nome:"Lanche da tarde",hora:"16:00",itens:"OPÇÃO 1 — Sanduíche natural (alta saciedade): 2 fatias pão integral (50 g) + 3 colheres sopa rasas frango desfiado OU atum (60 g) + 1 colher sopa creme ricota light (30 g) + 1 fatia mussarela light + cenoura ralada, alface e tomate\n\nOPÇÃO 2 — Iogurte proteico com frutas: 1 pote iogurte natural sem açúcar (160 g) + 50 g banana + 20 g Corn Flakes Australia + ½ dose whey isolado (15 g) + frutas vermelhas à vontade\n\nOPÇÃO 3 — Bolinho banana com cacau: 1 ovo + 1 banana média (70 g) + ½ scoop whey isolado (15 g) + 1 colher sopa farelo de aveia (15 g) + 1 colher café cacau 100% (opcional). Assar em forminhas.\n\nOPÇÃO 4 — Sorvete proteico (Ninja): 200 ml leite desnatado ou vegetal (Almond Breeze/Ades) + ½ dose whey isolado (15 g) + 1 banana pequena (50 g) + frutas vermelhas à vontade"},
+      {id:"r4",nome:"Jantar",hora:"19:00",itens:"OPÇÃO 1 — Prato montado:\n• Carbo: 70 g batata assada/cozida OU 50 g arroz integral OU 50 g macarrão integral\n• Proteína: 100 g frango OU 120 g peixe OU 3 colheres sopa carne moída (75 g) OU 2 ovos\n• Legumes: metade do prato à vontade\n\nOPÇÃO 2 — Veritá: 1 Super Coxinha de Frango OU 4 Verichicken OU 2 quibes low carb + salada e legumes à vontade\n\nOPÇÃO 3 — Santa Porção: 1 empada frango low carb OU 1 empada moranga+ricota OU 2 coxinhas frango OU 1 empada carne moída + salada e legumes à vontade\n\nOPÇÃO 4 — Hambúrguer saudável: 1 pão francês + 3 colheres sopa carne moída patinho (90 g) + 1 fatia mussarela light + alface e tomate\n\nOPÇÃO 5 — Pastinha + bolacha: 2 bolachas de arroz grandes OU 1 pacote magic toast + 100 g frango desfiado OU 1 lata atum + 1 colher sopa creme ricota light (30 g)\n\nOPÇÃO 6 — Bowl salada + proteína: folhas/tomate/palmito à vontade + 100 g frango ou 2 ovos + 50 g milho + 100 g moranga + brócolis e abobrinha grelhados\n\nOPÇÃO 7 — Omelete com legumes: 2 ovos (1 spray azeite) + 2 biscoitos de arroz grandes + espinafre/tomate cereja/abobrinha/brócolis\n\nOPÇÃO 8 — Wrap: 1 Rap10Fit + 3 colheres sopa frango desfiado (75 g) + 1 colher sopa creme ricota light (30 g) + 1 fatia mussarela light + molho de tomate e salada"}],
+    extras:[
+      {id:"x1",nome:"Água — no mínimo 2,5 L por dia (começar com 1 copo ao acordar)"},
+      {id:"x2",nome:"Creatina — 5 g/dia (no SuperCoffee do desjejum)"},
+      {id:"x3",nome:"Chá pra vontade de doce — casca de abacaxi + 1 pau canela + gengibre + carqueja (ferver, 10 min infusão)"},
+      {id:"x4",nome:"Rotina noturna — 1h antes de deitar: telefone em modo avião, luzes fracas, chá camomila/melissa + 10 gotas própolis"},
+      {id:"x5",nome:"Regra 80% — sair da mesa satisfeita, não estufada"},
+      {id:"x6",nome:"Compensação — jantou fora? 30 min caminhada em jejum no dia seguinte"},
+      {id:"x7",nome:"Comer devagar, mastigar bem, não beber líquido nas refeições"}]}
+};
+
+/* ================================================================= estado */
+let S = { events:[], draft:{}, plan:null, dieta:null, check:{}, metas:{} };
+
+/* ============================================================ auth */
+const AUTH_KEY = "gt-auth-v1";
+const CREDS = { gabriel:"gabriel123", eduarda:"eduarda123" };
+function getAuth(){
+  try{ const s = localStorage.getItem(AUTH_KEY); if(!s) return null;
+    const o = JSON.parse(s); if(!o || !CREDS[o.perfil]) return null; return o;
+  }catch(e){ return null; }
+}
+function setAuth(perfil){
+  try{ localStorage.setItem(AUTH_KEY, JSON.stringify({perfil, ts:Date.now()})); }catch(e){}
+}
+function clearAuth(){ try{ localStorage.removeItem(AUTH_KEY); }catch(e){} }
+function mostraLogin(msg){
+  document.getElementById("tabs").innerHTML = "";
+  document.getElementById("app").outerHTML =
+    '<div class="login-wrap" id="app">'+
+    '  <div class="login-card">'+
+    '    <div class="login-brand">'+
+    '      <div class="logo"><span>p</span></div>'+
+    '      <div class="nm">Pac<em>e</em></div>'+
+    '    </div>'+
+    '    <div class="login-sub">Registre o ritmo dos seus treinos.</div>'+
+    '    <label for="li-user">Usu&aacute;rio</label>'+
+    '    <input id="li-user" placeholder="Gabriel ou Eduarda" autocomplete="username" autocapitalize="none">'+
+    '    <label for="li-pass">Senha</label>'+
+    '    <input id="li-pass" type="password" placeholder="Senha" autocomplete="current-password">'+
+    '    <div class="login-err" id="li-err">'+(msg||"")+'</div>'+
+    '    <button class="login-btn" id="li-go">Entrar</button>'+
+    '    <div class="login-hint">Acesso privado &middot; sincroniza entre voc&ecirc;s dois</div>'+
+    '  </div>'+
+    '</div>';
+  const doLogin = ()=>{
+    const u = (document.getElementById("li-user").value||"").trim().toLowerCase();
+    const p = (document.getElementById("li-pass").value||"");
+    if(!CREDS[u]){ document.getElementById("li-err").textContent = "usuário inválido"; return; }
+    if(CREDS[u] !== p){ document.getElementById("li-err").textContent = "senha incorreta"; return; }
+    setAuth(u);
+    location.reload();
+  };
+  document.getElementById("li-go").onclick = doLogin;
+  document.getElementById("li-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+  document.getElementById("li-user").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("li-pass").focus(); });
+  setTimeout(()=>document.getElementById("li-user").focus(), 30);
+}
+function logout(){
+  clearAuth();
+  location.reload();
+}
+
+let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editDate:null };
+
+const iso = d => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+};
+const shift = n => { const d=new Date(); d.setDate(d.getDate()+Number(n)); return iso(d); };
+const REF = () => shift(ui.off);
+const dias = a => Math.round((new Date(REF()) - new Date(a))/86400000);
+const brd = s => s ? s.slice(8,10)+"/"+s.slice(5,7) : "";
+const WD = ["dom","seg","ter","qua","qui","sex","sáb"];
+const MES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const WDL = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+
+const meta = p => BASE[p];
+const dayset = p => S.plan[p];
+const evs = (p,t) => S.events.filter(e=>e.perfil===p && (!t||e.tipo===t)).sort((a,b)=> a.data<b.data?1:-1);
+const mainSport = p => (meta(p).extra || "").toLowerCase();
+const isMainExtra = (p,e) => e.tipo==="extra" && (!e.atividade || String(e.atividade).toLowerCase()===mainSport(p));
+const temExtra = (p,off) => S.events.some(e=>e.perfil===p && e.data===shift(ui.off+Number(off)) && isMainExtra(p,e));
+const temSkip = (p,off) => S.events.some(e=>e.perfil===p && e.tipo==="skip" && e.data===shift(ui.off+Number(off)));
+const extrasDoDia = (p,data) => S.events.filter(e=>e.perfil===p && e.tipo==="extra" && e.data===data);
+const skipDoDia = (p,data) => S.events.find(e=>e.perfil===p && e.tipo==="skip" && e.data===data);
+const ATIV_EMOJI = { "bike":"🚴","futebol":"⚽","corrida":"🏃","natação":"🏊","natacao":"🏊","caminhada":"🚶","jiu-jitsu":"🥋","jiujitsu":"🥋","jejum":"🌙" };
+const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return ATIV_EMOJI[k] || "🏅"; };
+
+/* ========================================================= recomendação */
+/* ============================================================================
+   sugestaoTreino(perfil, dataISO) — v30
+   ---------------------------------------------------------------------------
+   Função UNIVERSAL de sugestão de treino pra qualquer data (passado, hoje,
+   amanhã, futuro). Substitui os fixes pontuais das v24/v28 (que só cobriam
+   cenários específicos) por uma regra única aplicada em toda leitura.
+
+   Regras (nesta ordem):
+     1. Se o usuário JÁ TREINOU nesse dia → devolve o treino registrado com
+        jaTreinou:true. Sem tentativa de "sugerir por cima".
+     2. Calcula a LETRA BASE = override manual (S.planejado[perfil][data].musc)
+        OU o schedule fixo do dia da semana.
+     3. Sem letra base (dia de descanso) → schedRest:true, musc:null.
+     4. ANTI-REPETIÇÃO UNIVERSAL: olha os eventos musc dos ÚLTIMOS 3 DIAS
+        antes de dataISO. Se a letra base foi feita em algum deles, escolhe a
+        alternativa A/B/C/D parada há mais tempo (excluindo todas que
+        aparecem nesses 3 dias). Isso resolve o bug recorrente: "Gabriel fez
+        B ontem, hoje o schedule pede B → app continuava mostrando B".
+
+   Retorno estável:
+     { musc, motivo, jaTreinou, override, letraOriginal,
+       schedRest, schedJiu, schedNota }
+============================================================================ */
+function sugestaoTreino(perfil, dataISO){
+  const days = dayset(perfil);
+
+  // 1) Já treinou nesse dia?
+  const evJa = S.events.find(e=>e.perfil===perfil && e.data===dataISO && e.tipo==='musc');
+  if(evJa){
+    return {
+      musc: evJa.dia,
+      motivo: `Você registrou o treino <b>${evJa.dia}</b> neste dia.`,
+      jaTreinou: true, override: false, letraOriginal: null,
+      schedRest: false, schedJiu: false, schedNota: ''
+    };
+  }
+
+  // 2) Letra base = override manual OU schedule fixo do dia da semana
+  const d = new Date(dataISO+'T12:00:00');
+  const sched = getSchedule(perfil);
+  const diaSched = sched ? (sched[WDK[d.getDay()]] || null) : null;
+  const plan = (S.planejado && S.planejado[perfil] && S.planejado[perfil][dataISO]) || null;
+  const muscOverride = (plan && Object.prototype.hasOwnProperty.call(plan,'musc')) ? plan.musc : null;
+  const jiu  = !!(diaSched && diaSched.jiu) || !!(plan && plan.jiu);
+  const nota = (diaSched && diaSched.nota) || '';
+  const letraBase = (muscOverride !== null ? muscOverride : (diaSched ? diaSched.musc : null));
+
+  // 3) Sem letra base → descanso
+  if(!letraBase){
+    const diaSem = WDL[d.getDay()];
+    return {
+      musc: null,
+      motivo: `Schedule fixa desta ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu à noite':''}.`,
+      jaTreinou: false, override: false, letraOriginal: null,
+      schedRest: true, schedJiu: jiu, schedNota: nota
+    };
+  }
+
+  // 4) Anti-repetição: verifica os 3 dias anteriores
+  const recentes = [];
+  for(let i=1; i<=3; i++){
+    const dPrev = new Date(d); dPrev.setDate(dPrev.getDate()-i);
+    const isoPrev = iso(dPrev);
+    const ev = S.events.find(e=>e.perfil===perfil && e.data===isoPrev && e.tipo==='musc');
+    if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
+  }
+  const recSet = new Set(recentes.map(x=>x.dia));
+
+  if(recSet.has(letraBase)){
+    // Escolhe alternativa parada há mais tempo (excluindo letras dos 3 dias)
+    const alternativas = ORDER.filter(L => !recSet.has(L) && days[L]);
+    if(alternativas.length > 0){
+      const rank = alternativas.map(L => {
+        const ultEv = S.events
+          .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
+          .sort((a,b)=> a.data<b.data?1:-1)[0];
+        const diasParado = ultEv
+          ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000)
+          : 999;
+        return {L, diasParado};
+      }).sort((a,b)=> b.diasParado-a.diasParado || ORDER.indexOf(a.L)-ORDER.indexOf(b.L));
+      const escolhida = rank[0];
+      const rec = recentes.find(x=>x.dia===letraBase);
+      const qdo = rec.distancia===1 ? 'ontem'
+                : rec.distancia===2 ? 'anteontem'
+                : `há ${rec.distancia} dias`;
+      const desdeTxt = escolhida.diasParado===999 ? 'nunca feito'
+                     : (escolhida.diasParado===1 ? 'parado há 1 dia'
+                                                 : `parado há ${escolhida.diasParado} dias`);
+      const diaSem = WDL[d.getDay()];
+      return {
+        musc: escolhida.L,
+        motivo: `Você fez <b>${letraBase}</b> ${qdo}. Schedule de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${desdeTxt}) pra não repetir.`,
+        jaTreinou: false, override: true, letraOriginal: letraBase,
+        schedRest: false, schedJiu: jiu, schedNota: nota
+      };
+    }
+  }
+
+  // 5) Letra base OK — sem repetição recente
+  const diaSem = WDL[d.getDay()];
+  let motivo;
+  if(muscOverride !== null){
+    motivo = `Override manual: treino <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
+  } else {
+    motivo = `Schedule fixa desta ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
+  }
+  if(jiu) motivo += ' Jiu à noite — mantenha RIR 2-3 nos compostos.';
+  return {
+    musc: letraBase, motivo,
+    jaTreinou: false, override: false, letraOriginal: null,
+    schedRest: false, schedJiu: jiu, schedNota: nota
+  };
+}
+
+function avaliar(p){
+  const ref = REF();
+  const musc = evs(p,"musc").filter(e=>e.data<=ref);
+  const ultimo = musc[0];
+  const days = dayset(p);
+  const eH = temExtra(p,0), eO = temExtra(p,-1), eA = temExtra(p,1);
+
+  /* ==== v30: Schedule fixo delega pra sugestaoTreino (anti-repetição universal) ==== */
+  const sched = getSchedule(p);
+  if(sched){
+    const sug = sugestaoTreino(p, ref);
+    if(!sug.musc){
+      // Dia sem musc (recuperação/descanso)
+      const fallbackD = ORDER[0];
+      const win = { d:fallbackD, score:0, bloq:"sem musc hoje", notas:[], desde:0,
+                    motivo: sug.motivo, schedJiu: sug.schedJiu, schedNota: sug.schedNota, schedRest: true };
+      const resto = ORDER.filter(d=>d!==fallbackD).map(d=>({d,score:0,notas:[],desde:0}));
+      return { win, resto, descanso:true, schedRest:true, schedJiu:sug.schedJiu };
+    }
+    const win = {
+      d: sug.musc, score: 0,
+      bloq: sug.jaTreinou ? "já treinou neste dia" : null,
+      notas: sug.schedNota ? [sug.schedNota] : [],
+      desde: 0,
+      motivo: sug.motivo,
+      schedJiu: sug.schedJiu, schedNota: sug.schedNota,
+      antiRepeticao: sug.override, letraOriginal: sug.letraOriginal
+    };
+    const resto = ORDER.filter(d=>d!==sug.musc).map(d=>({d,score:0,notas:[],desde:0}));
+    return { win, resto, descanso:false, schedRest:false, schedJiu:sug.schedJiu };
+  }
+
+
+  const desde = {};
+  ORDER.forEach(d=>{ const u = musc.find(e=>e.dia===d); desde[d] = u ? dias(u.data) : 99; });
+
+  const cand = ORDER.map(d=>{
+    const c = days[d].cat;
+    let score = Math.min(desde[d],14);
+    const notas = []; let bloq = null;
+
+    if(ultimo && ultimo.data===ref) bloq = "já treinou neste dia";
+    else if(ultimo && days[ultimo.dia].cat===c && dias(ultimo.data) < 2)
+      bloq = (c==="sup"?"superiores":"inferiores") + " em recuperação do " + ultimo.dia;
+
+    if(p==="gabriel"){
+      if(eA && d==="C"){ score -= 7; notas.push("tatame no dia seguinte e puxada pesada entrega a pegada morta para o kimono"); }
+      else if(eH && d==="C"){ score -= 6; notas.push("puxada pesada não combina com o tatame do dia"); }
+      else if(eO && d==="C"){ score -= 2; notas.push("pegada vem cansada do tatame da véspera, use straps"); }
+      if((eH||eA) && d==="A"){ score += 3; notas.push("empurrar quase não usa pegada, é o que menos compromete o tatame"); }
+      if(eA && d==="B"){ score += 1; notas.push("perna na véspera do tatame é aceitável, só não force a última série"); }
+      if(d==="D"){
+        if(eA){ score -= 3; notas.push("pule o farmer walk, tem tatame no dia seguinte"); }
+        else if(eH||eO){ score -= 1; notas.push("farmer walk leve, a pegada já está em uso"); }
+        else notas.push("dias livres à frente, bom momento para o trabalho de pegada");
+      }
+    }else{
+      if(c==="inf"){
+        if(eA){ score -= 6; notas.push("corrida no dia seguinte, perna hoje derruba o ritmo"); }
+        else if(eH){ score -= 6; notas.push("correu no dia, perna logo depois atrapalha as duas coisas"); }
+        else if(eO){ score -= 6; notas.push("correu na véspera, dê 48 h antes de perna"); }
+      }else if(eH||eO||eA){ score += 2; notas.push("superiores não conflita com a corrida"); }
+    }
+    return {d,score,bloq,notas,desde:desde[d]};
+  });
+
+  const livres = cand.filter(x=>!x.bloq);
+  const lista = (livres.length?livres:cand).sort((a,b)=> b.score-a.score || ORDER.indexOf(a.d)-ORDER.indexOf(b.d));
+  const resto = cand.filter(x=>x.d!==lista[0].d).sort((a,b)=> (a.bloq?1:0)-(b.bloq?1:0) || b.score-a.score);
+  const win = lista[0];
+
+  const marcas = [eO&&"na véspera", eH&&"no dia", eA&&"no dia seguinte"].filter(Boolean);
+  let motivo;
+  if(win.notas.length) motivo = win.notas[0].charAt(0).toUpperCase()+win.notas[0].slice(1)+".";
+  else if(ultimo) motivo = `Último treino foi o <b>${ultimo.dia}</b>${dias(ultimo.data)===0?" neste dia":" há "+dias(ultimo.data)+(dias(ultimo.data)===1?" dia":" dias")}. O ${win.d} é o que está parado há mais tempo.`;
+  else motivo = "Sem registros ainda. Comece pelo A e siga a rotação.";
+  if(marcas.length) motivo += ` <b>${meta(p).extra} marcado ${marcas.join(", ")}.</b>`;
+
+  return { win:Object.assign({},win,{motivo}), resto, descanso: livres.length===0 };
+}
+
+/* ==========================================================================
+   PaceScoring (v31) — histórico real dos últimos 14 dias + IA validadora
+   -----------------------------------------------------------------------
+   Módulo puro determinístico que:
+     - carrega histórico de 14 dias (S.events)
+     - calcula fadiga por grupo com decay meia-vida 2 dias
+     - conta dias desde último estímulo por grupo
+     - jiu conta como cardio + core + 30% fadiga em perna (MI leve)
+     - devolve top-1 candidato + evita 48h entre grupos grandes
+   Depois entrega tudo pra IA (edge function pace-sugestao-ia).
+   ========================================================================== */
+const PACE_IA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/pace-sugestao-ia';
+
+const PACE_GRUPOS_LETRA = {
+  gabriel: {
+    A: ['peito','costas','triceps','biceps','core'],
+    B: ['perna_ant','core'],
+    C: ['costas','ombro','triceps','biceps'],
+    D: ['perna_post','core','antebraco']
+  },
+  eduarda: {
+    A: ['peito','costas','biceps','core'],
+    B: ['perna_ant','core','panturrilha'],
+    C: ['costas','ombro','biceps','core'],
+    D: ['perna_post','core']
+  }
+};
+const PACE_META_SEMANAL = {
+  gabriel: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:2, triceps:2, core:2, cardio:2, antebraco:1, panturrilha:0 },
+  eduarda: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:2, triceps:1, core:3, cardio:2, panturrilha:1, antebraco:0 }
+};
+function _paceContribMusc(perfil, letra){
+  const grupos = (PACE_GRUPOS_LETRA[perfil]||{})[letra] || [];
+  const c = {};
+  grupos.forEach(g=>{ c[g] = (g==='core'||g==='panturrilha'||g==='antebraco') ? 0.5 : 1.0; });
+  return c;
+}
+function _paceContribJiu(){
+  // v31.2: impactos ajustados — pesa na decisão, mas não zera. Consciência > bloqueio.
+  return { cardio: 1.0, core: 0.7, perna_ant: 0.5, perna_post: 0.5, panturrilha: 0.4 };
+}
+function _paceContribAtiv(atividade){
+  atividade = String(atividade||'').toLowerCase();
+  if(atividade==='jiu') return _paceContribJiu();
+  if(atividade==='corrida') return { cardio: 1.0, perna_ant: 0.4, perna_post: 0.4, panturrilha: 0.5 };
+  if(atividade==='bike')    return { cardio: 0.8, perna_ant: 0.3, perna_post: 0.2 };
+  if(atividade==='futebol') return { cardio: 1.0, perna_ant: 0.5, perna_post: 0.5, core: 0.3 };
+  if(atividade==='caminhada') return { cardio: 0.4 };
+  if(atividade==='natacao')   return { cardio: 1.0, costas: 0.3, ombro: 0.4, core: 0.3 };
+  return {};
+}
+const PaceScoring = {
+  carregarHistorico(perfil, n){
+    n = Number(n||14);
+    const hoje = REF();
+    const limite = shift(-n);
+    return (S.events||[])
+      .filter(e=>e.perfil===perfil && e.data>=limite && e.data<=hoje)
+      .sort((a,b)=> a.data<b.data ? 1 : -1);
+  },
+  calcularFadiga(perfil, hist){
+    const hoje = new Date(REF()+'T12:00:00');
+    const fad = {};
+    (hist||[]).forEach(e=>{
+      const dEv = new Date(e.data+'T12:00:00');
+      const dias = Math.max(0, Math.floor((hoje - dEv)/86400000));
+      const decay = Math.pow(0.5, dias/2);
+      let contrib = {};
+      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia);
+      else if(e.tipo==='extra')    contrib = _paceContribAtiv(e.atividade);
+      Object.entries(contrib).forEach(([g,peso])=>{ fad[g] = (fad[g]||0) + peso*decay; });
+    });
+    return fad;
+  },
+  diasDesde(perfil, hist){
+    const hoje = new Date(REF()+'T12:00:00');
+    const all = new Set();
+    Object.values(PACE_GRUPOS_LETRA[perfil]||{}).forEach(gs=> gs.forEach(g=> all.add(g)));
+    all.add('cardio');
+    const gap = {};
+    all.forEach(g=>{ gap[g] = 999; });
+    (hist||[]).forEach(e=>{
+      let contrib = {};
+      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia);
+      else if(e.tipo==='extra')    contrib = _paceContribAtiv(e.atividade);
+      const dEv = new Date(e.data+'T12:00:00');
+      const dias = Math.max(0, Math.floor((hoje - dEv)/86400000));
+      Object.keys(contrib).forEach(g=>{
+        if(contrib[g] >= 0.5 && dias < gap[g]) gap[g] = dias;
+      });
+    });
+    return gap;
+  },
+  scoreCandidato(perfil){
+    const hist = this.carregarHistorico(perfil, 14);
+    const fad  = this.calcularFadiga(perfil, hist);
+    const gap  = this.diasDesde(perfil, hist);
+    const meta = PACE_META_SEMANAL[perfil] || {};
+    const gruposDia = PACE_GRUPOS_LETRA[perfil] || {};
+    const GRANDES = new Set(['peito','costas','perna_ant','perna_post']);
+
+    // v31.2: pós-jiu vira consciência (não bloqueio). Fadiga já penaliza o score
+    // via _paceContribJiu; a IA + flag avisoJiu cuidam da justificativa.
+    const MS_GROUPS = new Set(['peito','costas','ombro','biceps','triceps','antebraco']);
+    const MI_CORE   = new Set(['perna_ant','perna_post','panturrilha','core']);
+    const hoje0 = new Date(REF()+'T12:00:00');
+    const jiuDias = (hist||[])
+      .filter(e=>e.tipo==='extra' && String(e.atividade||'').toLowerCase()==='jiu')
+      .map(e=>Math.max(0, Math.floor((hoje0 - new Date(e.data+'T12:00:00'))/86400000)));
+    const jiu24  = jiuDias.some(d=>d<=1);       // treinou jiu nas últimas 24h
+    const jiu72_2x = jiuDias.filter(d=>d<=3).length >= 2; // sinal informativo, não bloqueio
+    const jiu48    = jiuDias.some(d=>d<=2);
+
+    const scores = ORDER.map(letra=>{
+      const grupos = gruposDia[letra] || [];
+      let s = 0, bloq = null;
+      grupos.forEach(g=>{
+        const w = meta[g] || 1;
+        const gapG = gap[g]==null ? 999 : gap[g];
+        const fadG = fad[g] || 0;
+        s += (Math.min(gapG,7) * w) - fadG;
+        if(GRANDES.has(g) && (fadG > 0.6 || gapG < 2)) bloq = g;
+      });
+      return { letra, score: s, bloq, grupos };
+    });
+
+    // Preferir letras livres. Se todas bloqueadas por regra pós-jiu, cair pra MS
+    // ordenado por maior dias_desde; se nada de MS, sinalizar descanso.
+    let livres = scores.filter(x=>!x.bloq);
+    let fallbackDescanso = false;
+    if(!livres.length){
+      const somenteMS = scores.filter(x=>{
+        const gs = x.grupos || [];
+        return gs.length && gs.every(g=> MS_GROUPS.has(g));
+      });
+      if(somenteMS.length){
+        // reordena MS por maior dias_desde do grupo primário
+        somenteMS.sort((a,b)=>{
+          const ga = Math.max(...a.grupos.map(g=> gap[g]==null?0:gap[g]));
+          const gb = Math.max(...b.grupos.map(g=> gap[g]==null?0:gap[g]));
+          return gb - ga;
+        });
+        livres = somenteMS;
+      } else {
+        fallbackDescanso = true;
+      }
+    }
+    const lista = (livres.length ? livres : scores).sort((a,b)=> b.score - a.score);
+    const win = lista[0];
+    // v31.2: se o vencedor toca MI/core E houve jiu nas últimas 24h → marca aviso
+    const winGrupos = fallbackDescanso ? [] : (win.grupos || []);
+    const avisoJiu = !fallbackDescanso && jiu24 && winGrupos.some(g=>MI_CORE.has(g));
+    const intensidade = fallbackDescanso ? 'descanso'
+      : (avisoJiu ? 'leve'
+        : (win.bloq ? 'leve' : (Object.values(fad).some(v=>v>1.5) ? 'moderada' : 'forte')));
+    return {
+      candidato: {
+        letra: fallbackDescanso ? 'DESCANSO' : win.letra,
+        grupos_alvo: winGrupos,
+        intensidade,
+        avisoJiu,
+        descricao_sugerida: avisoJiu ? 'curto e leve (volume reduzido pós-jiu)' : null,
+        bloqueio_pos_jiu: null,
+        jiu_recente: { jiu24, jiu48, jiu72_2x }
+      },
+      fadiga: fad,
+      dias_desde: gap,
+      score_detalhado: scores,
+      historico: hist.map(e=>({
+        data: e.data,
+        tipo: e.tipo,
+        grupos: e.tipo==='musc' ? (gruposDia[e.dia]||[]) : Object.keys(_paceContribAtiv(e.atividade||'')),
+        duracao_min: e.duracao || null,
+        intensidade: e.intensidade || null,
+        atividade: e.atividade || null,
+        dia_musc: e.dia || null
+      }))
+    };
+  }
+};
+
+const PaceIA = {
+  cache: {},
+  _boundOnce: false,
+  async hydrate(){
+    const holder = document.getElementById('pace-ia-card');
+    if(!holder) return;
+    const perfil = ui.perfil;
+    const hoje = REF();
+
+    let s;
+    try { s = PaceScoring.scoreCandidato(perfil); }
+    catch(err){ console.warn('[PaceScoring]', err); return; }
+    const meta = PACE_META_SEMANAL[perfil] || {};
+
+    const gaps = Object.entries(s.dias_desde)
+      .filter(([g,d])=>d<99 && (meta[g]||0)>0)
+      .sort((a,b)=> b[1]-a[1])
+      .slice(0,3);
+    const gapsHtml = gaps.map(([g,d])=>`<span class="pace-gap-chip">${g}: ${d}d</span>`).join('');
+    const detTxt = `Regra: <b>${s.candidato.letra}</b> · alvo ${s.candidato.grupos_alvo.join(', ')} · ${s.candidato.intensidade}`;
+
+    holder.innerHTML = `
+      <div class="pace-ia-box">
+        <div class="pace-ia-head">
+          <div class="pace-ia-t">🧠 Por que esse treino hoje?</div>
+          <button class="pace-ia-toggle" type="button" data-pace-toggle>▾</button>
+        </div>
+        <div class="pace-ia-body">
+          <div class="pace-ia-det">${detTxt}</div>
+          <div class="pace-ia-gaps">${gapsHtml || '<span class="pace-ia-muted">sem gaps grandes</span>'}</div>
+          <div class="pace-ia-ai"><span class="pace-ia-muted">IA analisando os últimos 14 dias…</span></div>
+        </div>
+      </div>`;
+
+    const tog = holder.querySelector('[data-pace-toggle]');
+    if(tog) tog.onclick = (ev)=>{
+      const box = holder.querySelector('.pace-ia-box');
+      if(!box) return;
+      box.classList.toggle('collapsed');
+      ev.currentTarget.textContent = box.classList.contains('collapsed') ? '▸' : '▾';
+    };
+
+    const key = perfil+':'+hoje;
+    if(this.cache[key]){ this._render(this.cache[key]); return; }
+
+    const payload = {
+      perfil, hoje,
+      ultimos_14_dias: s.historico,
+      meta_semanal: meta,
+      candidato_regras: s.candidato,
+      fadiga_atual: s.fadiga,
+      dias_desde: s.dias_desde
+    };
+    try {
+      const resp = await fetch(PACE_IA_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(!resp.ok){ this._renderErr('IA indisponível ('+resp.status+') — usando só as regras.'); return; }
+      const j = await resp.json();
+      this.cache[key] = j;
+      this._render(j);
+    } catch(e){
+      this._renderErr('Offline ou rede falhou — usando só as regras.');
+    }
+  },
+  _render(j){
+    const holder = document.getElementById('pace-ia-card'); if(!holder) return;
+    const aiEl = holder.querySelector('.pace-ia-ai'); if(!aiEl) return;
+    const t = j.treino_hoje || {};
+    const th = `<div class="pace-ia-th"><b>IA:</b> ${esc(String(t.letra||'?'))} — ${esc(String(t.nome||''))} · ${esc(String(t.intensidade||''))}</div>`;
+    const jus = j.justificativa ? `<div class="pace-ia-jus">${esc(j.justificativa)}</div>` : '';
+    const alerta = j.alerta ? `<div class="pace-ia-alerta">⚠️ ${esc(j.alerta)}</div>` : '';
+    const prox = Array.isArray(j.proximos_3_dias) && j.proximos_3_dias.length
+      ? '<div class="pace-ia-prox"><div class="pace-ia-prox-t">Próximos 3 dias</div>' +
+        j.proximos_3_dias.map(d=>`<div class="pace-ia-prox-l"><b>${esc(String(d.data||''))}</b> · ${esc(String(d.letra||''))} ${esc(String(d.nome||''))} <span class="pace-ia-muted">— ${esc(String(d.por_que||''))}</span></div>`).join('') +
+        '</div>'
+      : '';
+    aiEl.innerHTML = th + jus + alerta + prox;
+  },
+  _renderErr(msg){
+    const holder = document.getElementById('pace-ia-card'); if(!holder) return;
+    const aiEl = holder.querySelector('.pace-ia-ai'); if(!aiEl) return;
+    aiEl.innerHTML = `<span class="pace-ia-muted">${esc(msg)}</span>`;
+  }
+};
+
+/* ==================================================================== ui */
+function campo(v,ph,suf,exId,i,k){
+  return `<div class="fw"><input class="cs" type="text" data-cex="${exId}" data-ci="${i}" data-ck="${k}" value="${esc(String(v==null?"":v))}" placeholder="${ph||""}" inputmode="decimal" pattern="[0-9.,]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next"><span>${suf}</span></div>`;
+}
+function campoObs(v,exId,i){
+  return `<input class="obs-in" type="text" data-cex="${exId}" data-ci="${i}" data-ck="obs" value="${esc(String(v==null?"":v))}" placeholder="obs (opcional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">`;
+}
+function resumo(ex,sets){
+  if(!sets) return null;
+  const a = sets.map(s=>{
+    if(!s) return null;
+    if(ex.ty==="time") return s.sec?s.sec+"s":null;
+    if(ex.ty==="reps") return s.reps||null;
+    if(!s.kg&&!s.reps) return null;
+    return (s.kg||"?")+"x"+(s.reps||"?");
+  }).filter(Boolean);
+  return a.length?a.join("  "):null;
+}
+const ultimaSessao = (p,d) => { const e = evs(p,"musc").filter(x=>x.data<=REF()).find(x=>x.dia===d); return e?e.entries:{}; };
+const esc = s => (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+
+/* icons ------- */
+const ICON = {
+  logo:'<svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="18.5" font-family="Georgia,serif" font-size="20" font-style="italic" text-anchor="middle">p</text></svg>',
+  hoje:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>',
+  treino:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M20 9v6M7 6v12M17 6v12M7 12h10"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  dieta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a3 3 0 006 0V3M9 11v10M17 3c-1.5 2-2 4-2 6s.5 3 2 3 2-1 2-3-.5-4-2-6zM17 12v9"/></svg>',
+  config:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>',
+  run:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="4" r="2"/><path d="M4 22l4-5 2-3-3-3 4-4 3 4 3 1M10 14l2 3v5"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  auto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"/></svg>'
+};
+
+function render(){
+  const p = ui.perfil, m = meta(p);
+  document.documentElement.style.setProperty("--ac", m.ac);
+  const dref = new Date(REF()+"T12:00");
+  const rel = ui.off===0?"hoje":ui.off===1?"amanhã":ui.off===-1?"ontem":(ui.off>0?"em "+ui.off+" dias":"há "+(-ui.off)+" dias");
+
+  let out = `<div class="head2">
+      <div class="who"><span class="logo">${ICON.logo}</span>Pace<small>${esc(m.label)} · ${WDL[dref.getDay()]}</small></div>
+      <button class="cfg" data-view="config" aria-label="Configurações">${ICON.config}</button>
+    </div>`;
+
+  if(ui.view!=="config"){
+    out += `<div class="datenav">
+      <button class="arw" data-off="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="dt"><div class="d1">${dref.getDate()} de ${MES[dref.getMonth()]}</div>
+        <div class="d2">${ui.off===0?"hoje":`<b>${rel}</b> · toque para voltar a hoje`}</div></div>
+      <button class="arw" data-off="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>`;
+  }
+
+  if(ui.view==="hoje") out += viewHoje(p,m);
+  if(ui.view==="treino") out += viewTreino(p,m);
+  if(ui.view==="cal") out += viewCal(p,m);
+  if(ui.view==="dieta") out += viewDieta(p,m);
+  if(ui.view==="config") out += viewConfig(p,m);
+  if(ui.toast) out += `<div class="toast">${ui.toast}</div>`;
+  document.getElementById("app").innerHTML = out;
+
+  document.getElementById("tabs").innerHTML =
+    [["hoje","Hoje"],["treino","Registrar"],["cal","Calendário"],["dieta","Dieta"],["config","Config"]].map(([k,l])=>
+      `<button class="tb ${ui.view===k?"on":""}" data-view="${k}">${ICON[k==="config"?"config":k]}<span>${l}</span></button>`).join("");
+  ligar();
+}
+
+/* Render seguro contra digitação: se o usuário está com foco num input
+   editável (kg/reps/obs de série, campos [data-f] de exercício, [data-meta]
+   de perfil), adia o render pra não destruir o DOM debaixo do teclado do
+   iOS — que fecha silenciosamente e faz "focou mas não digita". */
+function safeRender(){
+  try{
+    const ae = document.activeElement;
+    if(ae && ae.matches && (
+        ae.matches('input[data-cex]') ||
+        ae.matches('input[data-cob]') ||
+        ae.matches('input[data-f]')   ||
+        ae.matches('[data-meta]')     ||
+        ae.matches('textarea')
+    )){
+      clearTimeout(safeRender._t);
+      safeRender._t = setTimeout(safeRender, 800);
+      return;
+    }
+  }catch(e){}
+  render();
+}
+
+/* --------------------------- Aviso pré-treino: conflito com schedule/plan --- */
+function verificarConflitoIniciar(p, dEscolhido){
+  const dataRef = REF();
+  const sch = schedHoje(p);
+  const avisos = [];
+  if(sch){
+    if(sch.musc && sch.musc !== dEscolhido){
+      const diaSem = WDL[new Date(dataRef+"T12:00").getDay()];
+      let av = `Schedule de ${diaSem} sugere treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu ${dEscolhido}.`;
+      if(sch.jiu && (dEscolhido==="B" || dEscolhido==="D")) av += " Tem jiu à noite — pernas pesadas antes podem prejudicar o tatame.";
+      avisos.push(av);
+    } else if(!sch.musc && (dEscolhido==="B" || dEscolhido==="D") && sch.jiu){
+      avisos.push(`Hoje é dia de recuperação + jiu à noite. Treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
+    }
+  }
+  // v30: passa a letra escolhida efetiva pra conflitoPlan (não schedule bruto),
+  // consistente com o card principal que também usa a letra pós-anti-repetição.
+  const conf = (typeof conflitoPlan==="function") ? conflitoPlan(p, dataRef, dEscolhido) : null;
+  if(conf && (dEscolhido==="B" || dEscolhido==="D") && (!sch || sch.musc===dEscolhido)){
+    avisos.push(conf.msg.replace(/<[^>]+>/g,""));
+  }
+  return avisos.length ? "\u26A0\uFE0F " + avisos.join("\n\n") + "\n\nContinuar mesmo assim?" : null;
+}
+
+/* --------------------------------------------------------------------- HOJE */
+function viewHoje(p,m){
+  const days = dayset(p);
+  const treinoDoDia = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===REF());
+  // Preview de "amanhã · próximo treino" só faz sentido quando o usuário está
+  // vendo o dia de HOJE (ui.off===0) e o treino de hoje já foi concluído.
+  // Em datas passadas/futuras navegadas pelas setas, não mostrar preview.
+  const modoAmanha = !!(treinoDoDia && ui.off === 0);
+  let r, dRefAmanha = null;
+  if(modoAmanha){
+    const savedOff = ui.off; ui.off = savedOff + 1;
+    r = avaliar(p);
+    dRefAmanha = new Date(REF()+"T12:00");
+    ui.off = savedOff;
+  } else {
+    r = avaliar(p);
+  }
+  // v30: Anti-repetição agora é UNIVERSAL, aplicada dentro de sugestaoTreino()/avaliar().
+  // Todos os cenários (hoje, amanhã via modoAmanha, futuro via ui.off>0, passado)
+  // recebem a mesma regra: olhar 3 dias anteriores → se letra base foi feita,
+  // trocar pra alternativa mais atrasada. Não há mais blocos ad-hoc aqui.
+  const d = days[r.win.d];
+  let out = "";
+
+  // Se já treinou nesse dia -> mostra card "concluído" (Hevy-style hero verde)
+  if(treinoDoDia){
+    const diaFeito = days[treinoDoDia.dia];
+    if(diaFeito){
+      const lblDia = ui.off===0 ? "✓ Treino concluído"
+        : (ui.off<0 ? "✓ Treino registrado neste dia" : "✓ Treino registrado neste dia futuro");
+      out += `<div class="hero done">
+        <div class="top">
+          <div class="letter">${treinoDoDia.dia}</div>
+          <div class="info">
+            <div class="lbl" style="color:var(--ok)">${lblDia}</div>
+            <div class="ttl">${esc(diaFeito.t)}</div>
+            <div class="sub">${diaFeito.ex.length} exercícios · ${diaFeito.ex.reduce((a,e)=>a+e.s,0)} séries</div>
+          </div>
+        </div>
+      </div>`;
+      out += `<button class="go" data-edittoday="${treinoDoDia.dia}" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">Ver / editar treino registrado</button>`;
+    }
+  }
+
+  // Card do próximo treino (ou do dia)
+  // Em datas passadas/futuras com treino já registrado, não mostrar o card de próximo treino
+  // (o "concluído" já resume o dia; a próxima recomendação vive na tela de HOJE).
+  const escondeProxCard = !!treinoDoDia && ui.off !== 0;
+  const jiuChip = r.schedJiu ? `<span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:rgba(58,216,121,.14);color:var(--ac);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">Jiu à noite</span>` : "";
+  const descansoChip = r.schedRest ? `<span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">Sem musc</span>` : "";
+  if(!escondeProxCard){
+    // Se o schedule diz que o dia é sem musc (recuperação/descanso), renderiza card diferente
+    if(r.schedRest && ui.off===0 && !treinoDoDia){
+      const notaTxt = r.win.schedNota || "Descanso";
+      const isDescCompleto = /descanso completo/i.test(notaTxt);
+      const emo = isDescCompleto ? "😴" : (r.schedJiu ? "🥋" : "🧘");
+      const titulo = r.schedJiu ? `${notaTxt} · Jiu à noite` : notaTxt;
+      out += `<div class="hero">
+        <div class="top">
+          <div class="letter" style="font-size:26px">${emo}</div>
+          <div class="info">
+            <div class="lbl">Hoje</div>
+            <div class="ttl">${esc(titulo)}</div>
+            <div class="sub">Sem musculação · schedule fixa</div>
+          </div>
+        </div>
+        <div class="why">${r.win.motivo}${jiuChip}</div>
+      </div>`;
+    } else {
+      const diaSemanaAmanha = dRefAmanha ? WDL[dRefAmanha.getDay()] : "amanhã";
+      const eyebrow = modoAmanha
+        ? `Amanhã · ${diaSemanaAmanha}`
+        : (ui.off===0?"Próximo treino":"Treino do dia");
+      const msg = modoAmanha
+        ? `${r.win.motivo}`
+        : `${r.descanso&&!r.schedRest?"<b>Neste dia o melhor é descansar.</b> ":""}${r.win.motivo}`;
+
+      out += `<div class="hero">
+        <div class="top">
+          <div class="letter">${r.win.d}</div>
+          <div class="info">
+            <div class="lbl">${eyebrow}${jiuChip}${descansoChip}</div>
+            <div class="ttl">${esc(d.t)}</div>
+            <div class="sub">${d.ex.length} exercícios · ${d.ex.reduce((a,e)=>a+e.s,0)} séries</div>
+          </div>
+        </div>
+        <div class="why">${msg}</div>
+      </div>`;
+    }
+  }
+
+  // v31: Card IA "Por que esse treino?" — populado por PaceIA.hydrate() após render.
+  if(ui.off === 0 && !treinoDoDia){
+    out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
+  }
+
+  // Botão Iniciar treino — SEMPRE visível (mesmo em dias de descanso).
+  // Schedule é sugestão, não bloqueio. Em dia de descanso abre seletor A/B/C/D.
+  if(!treinoDoDia){
+    if(r.schedRest){
+      out += `<button class="go" data-picktreino="1" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">${ICON.play} Iniciar treino mesmo assim…</button>`;
+    } else {
+      out += `<button class="go" data-abrir="${r.win.d}">${ICON.play} Iniciar treino ${r.win.d}</button>`;
+    }
+  }
+
+  // ============ Quick actions: planejar atividade do dia ============
+  const dataRef = REF();
+  const planHoje = getPlanejado(p, dataRef) || {};
+  const quicks = ATIV_QUICK[p] || ["jiu","corrida","futebol","bike"];
+  out += `<div class="qa-title" style="margin-top:18px">Planejar hoje</div>
+    <div class="chips" style="margin-bottom:10px">
+      ${quicks.map(a=>{
+        const on = !!planHoje[a];
+        const emo = emojiAtiv(a==="jiu"?"jiu-jitsu":a);
+        const lbl = ATIV_LABEL[a] || a;
+        // v27: jejum usa laranja/âmbar em vez de verde
+        const isJejum = a==="jejum";
+        const activeStyle = isJejum
+          ? "background:#f59e0b;color:#000;border-color:#f59e0b"
+          : "background:var(--ac);color:#000;border-color:var(--ac)";
+        return `<button class="chip ${on?"on":""}" data-planq="${a}" style="${on?activeStyle:""}">${emo} ${on?"✓ ":"+ "}${esc(lbl)}</button>`;
+      }).join("")}
+    </div>`;
+
+  // Chips de atividades PLANEJADAS
+  const planKeys = Object.keys(planHoje).filter(k=>k!=="musc" && planHoje[k]);
+  if(planKeys.length){
+    out += `<div class="extras-list" style="margin-bottom:8px">`;
+    planKeys.forEach(k=>{
+      const emo = emojiAtiv(k==="jiu"?"jiu-jitsu":k);
+      // v27: chip de jejum planejado com destaque âmbar
+      const rowStyle = k==="jejum"
+        ? ' style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.35)"'
+        : '';
+      const lblExtra = k==="jejum" ? " planejado 🌙" : " planejado";
+      out += `<div class="row"${rowStyle}><span>${emo} ${esc(ATIV_LABEL[k]||k)}${lblExtra}</span><button class="rm" data-planq="${k}">remover</button></div>`;
+    });
+    out += `</div>`;
+  }
+
+  // Aviso de conflito (jiu/corrida planejado em dia de pernas)
+  // v29: passa r.win.d (letra EFETIVA após anti-repetição) — não schedule bruto.
+  const conflito = conflitoPlan(p, dataRef, r.win.d);
+  if(conflito && !treinoDoDia){
+    out += `<div class="hero" style="border:1px solid rgba(255,196,0,.35);background:linear-gradient(135deg,rgba(255,196,0,.08),rgba(255,120,0,.04))">
+      <div class="why" style="padding:2px 0 8px">⚠️ ${conflito.msg} Recomendamos trocar pro <b>${conflito.sugere}</b> (upper leve).</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="chip on" data-plansugmusc="${conflito.sugere}">Trocar pra ${conflito.sugere}</button>
+        <button class="chip" data-plansugmusc="${conflito.letraAtual}" data-planforce="1">Manter ${conflito.letraAtual}</button>
+      </div>
+    </div>`;
+  }
+
+  out += `<button class="coach-btn" data-coach="1">${ICON.spark} <span>Pergunte ao <span class="cbr">coach</span></span></button>`;
+
+  // Ações grandes
+  const skipAtivo = temSkip(p,0);
+  const extrasHoje = extrasDoDia(p, REF()).filter(e=>e.atividade && String(e.atividade).toLowerCase()!==mainSport(p));
+  const extraPrinc = temExtra(p,0);
+
+  out += `<div class="acts2">
+    <button class="act2 ${skipAtivo?"on":""}" data-skip="1">
+      ${ICON.moon}<span>${skipAtivo?"Descansei":"Não treinei"}</span>
+    </button>
+    <button class="act2 ${extraPrinc?"on":""}" data-atv="1">
+      ${ICON.run}<span>${extrasHoje.length?"Atividade (+"+extrasHoje.length+")":(extraPrinc?"✓ "+m.extra:"Atividade extra")}</span>
+    </button>
+  </div>`;
+
+  if(extrasHoje.length){
+    out += `<div class="extras-list">`;
+    extrasHoje.forEach(e=>{
+      const emo = emojiAtiv(e.atividade);
+      const dur = e.duracao?` · ${e.duracao} min`:"";
+      const nota = e.nota?` — ${esc(e.nota)}`:"";
+      out += `<div class="row"><span>${emo} ${esc(e.atividade)}${dur}${nota}</span><button class="rm" data-rmatv="${e.id}">remover</button></div>`;
+    });
+    out += `</div>`;
+  }
+
+  return out;
+}
+
+/* ------------------------------------------------------------------ REGISTRAR */
+function viewTreino(p,m){
+  const d = ui.dia, days = dayset(p), treino = days[d];
+  const ant = ultimaSessao(p,d);
+  const _dkey = p+":"+d;
+  const _draftVazio = !S.draft[_dkey] || !Object.values(S.draft[_dkey]).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)));
+  if(!ui.edit && _draftVazio && Object.keys(ant).length){
+    S.draft[_dkey] = clone(ant);
+    /* NÃO chamar salvaSoft() aqui — dispara push→pullAndMerge que
+       pode re-renderizar o DOM enquanto o usuário está no input. */
+  }
+  const dr = S.draft[_dkey] || {};
+  let out = `<div class="segs">`;
+  ORDER.forEach(k=>{
+    const u = evs(p,"musc").find(e=>e.dia===k);
+    const t = u ? (dias(u.data)===0?"neste dia":"há "+dias(u.data)+"d") : "nunca";
+    out += `<button class="sg ${k===d?"on":""}" data-dia="${k}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
+  });
+  out += `</div><div class="tbar">${ui.edit
+      ? `<input class="ed-f" style="margin:0" data-f="titulo" value="${esc(treino.t)}">`
+      : `<div class="t">${esc(treino.t)}</div>`}
+    ${ui.edit ? `<button class="edt on" data-edit="1">Concluir</button>` : ""}
+    </div>`;
+
+  if(!ui.edit && Object.keys(ant).length){
+    out += `<button class="reset" data-loadlast="1" style="margin-bottom:12px;color:var(--ac);border-color:rgba(58,216,121,.35);background:rgba(58,216,121,.06)">&#128260; usar valores da &uacute;ltima vez</button>`;
+  }
+
+  treino.ex.forEach((ex,idx)=>{
+    if(ui.edit){
+      out += `<div class="card ed">
+        <input class="ed-f" data-ex="${ex.id}" data-f="n" value="${esc(ex.n)}" placeholder="nome do exercício">
+        <input class="ed-f" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação">
+        <div class="ed-row">
+          <input class="ed-f" style="margin:0;flex:1" data-ex="${ex.id}" data-f="p" value="${esc(ex.p)}" placeholder="repetições">
+          <div class="step"><button data-step="${ex.id}:-1">−</button><span class="v">${ex.s}</span><button data-step="${ex.id}:1">+</button></div>
+        </div>
+        <div class="ed-row tys">
+          ${[["load","carga e reps"],["time","tempo"],["reps","só reps"]].map(([k,l])=>
+            `<button class="ty ${ex.ty===k?"on":""}" data-ty="${ex.id}:${k}">${l}</button>`).join("")}
+        </div>
+        <div class="ed-row" style="margin-bottom:0">
+          <button class="del" data-mv="${ex.id}:-1" style="width:44px">↑</button>
+          <button class="del" data-mv="${ex.id}:1" style="width:44px">↓</button>
+          <button class="del" data-del="${ex.id}">Remover exercício</button></div></div>`;
+    }else{
+      const sets = dr[ex.id]||[], a = ant[ex.id]||[], rs = resumo(ex,a);
+      const _dnMeta = [ex.descanso?"descanso "+esc(ex.descanso):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" · ");
+      out += `<div class="card"><div class="ex-h"><div class="ex-n">${esc(ex.n)}</div>
+        <div class="ex-p">${ex.s} x ${esc(ex.p)}</div></div>
+        ${_dnMeta?`<div style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:2px 0 6px;font-family:var(--sans)">${_dnMeta}</div>`:""}
+        <div class="ex-a ${rs?"has":""}">${rs?"última: "+rs:"primeira vez neste exercício"}</div>
+        <input class="ap" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação">`;
+      for(let i=0;i<ex.s;i++){
+        const s = sets[i]||{}, av = a[i]||{};
+        out += `<div class="set"><div class="i">${i+1}</div>`;
+        if(ex.ty==="load"){
+          out += campo(s.kg,av.kg||"kg","kg",ex.id,i,"kg");
+          out += campo(s.reps,av.reps||"reps","rep",ex.id,i,"reps");
+        }else if(ex.ty==="time"){
+          out += campo(s.sec,av.sec||"segundos","s",ex.id,i,"sec");
+        }else{
+          out += campo(s.reps,av.reps||"repetições","rep",ex.id,i,"reps");
+        }
+        out += `</div><div class="obs-row">${campoObs(s.obs,ex.id,i)}</div>`;
+      }
+      out += `</div>`;
+    }
+  });
+
+  if(ui.edit){
+    out += `<button class="addx" data-add="1">+ Adicionar exercício</button>
+      <button class="reset" data-reset="1">Restaurar o treino ${d} original</button>
+      <div style="height:70px"></div>`;
+  }else{
+    out += `<div style="font-size:12px;color:var(--faint);line-height:1.55;padding:2px 4px 0">
+      Compostos param a 2 repetições da falha. Isoladores, última série a 1.</div>`;
+    const cheio = Object.values(dr).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)));
+    out += `<div class="save-wrap"><button class="save ${ui.saved?"done":cheio?"on":""}" id="salvar">
+      ${ui.saved?"Treino salvo":"Salvar treino "+d+(ui.off?" em "+brd(REF()):"")}</button></div>`;
+  }
+  return out;
+}
+
+function sessaoCard(s,days){
+  const t = days[s.dia]; if(!t) return "";
+  return `<div class="card"><div class="h-h"><span class="h-d">${s.dia} · ${esc(t.t)}</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">${brd(s.data)}</span></div>` +
+    t.ex.map(ex=>{ const r = resumo(ex,s.entries[ex.id]);
+      return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") + `</div>`;
+}
+
+/* ------------------------------------------------------------------ CAL */
+function viewCal(p,m){
+  const days = dayset(p);
+  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
+  const ano = base.getFullYear(), mes = base.getMonth();
+  const prim = new Date(ano,mes,1), nd = new Date(ano,mes+1,0).getDate();
+  const inicio = (prim.getDay()+6)%7;
+  const sel = REF(), hj = shift(0);
+
+  let out = `<div class="cal"><div class="cal-h">
+      <button class="arw" data-mes="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="m">${MES[mes]} de ${ano}</div>
+      <button class="arw" data-mes="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div><div class="grid">
+    ${["seg","ter","qua","qui","sex","sáb","dom"].map(x=>`<div class="gh">${x}</div>`).join("")}`;
+
+  for(let i=0;i<inicio;i++) out += `<div class="cell out"></div>`;
+  let nT=0, nX=0, nS=0;
+  for(let d=1;d<=nd;d++){
+    const dt = `${ano}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const mm = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===dt);
+    const xx = S.events.find(e=>e.perfil===p&&e.tipo==="extra"&&e.data===dt);
+    const sk = skipDoDia(p,dt);
+    if(mm) nT++; if(xx) nX++; if(sk) nS++;
+    const skipCls = (!mm && !xx && sk) ? " skipd" : "";
+    out += `<button class="cell${skipCls} ${dt===sel?"sel":""} ${dt===hj?"hoje":""}" data-dt="${dt}">
+      <span class="n">${d}</span>
+      ${mm?`<span class="l">${mm.dia}</span>`
+         :(sk&&!xx?`<span class="l skip" style="font-size:11px">—</span>`
+                  :`<span class="l" style="color:transparent">·</span>`)}
+      ${xx?`<span class="dot"></span>`:`<span class="dot" style="background:transparent"></span>`}</button>`;
+  }
+  out += `</div></div>`;
+
+  out += `<div class="sum">
+    <div><div class="v">${nT}</div><div class="k">musculação</div></div>
+    <div><div class="v">${nX}</div><div class="k">extras</div></div>
+    <div><div class="v">${nS}</div><div class="k">descansos</div></div></div>`;
+
+  const s = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
+  const xs = extrasDoDia(p,sel);
+  const sk = skipDoDia(p,sel);
+  const dref = new Date(sel+"T12:00");
+  out += `<div class="eyebrow" style="margin-bottom:9px">${WDL[dref.getDay()]}, ${dref.getDate()} de ${MES[dref.getMonth()]}</div>`;
+  if(sk) out += `<div class="card" style="padding:13px 15px;font-size:13px;color:var(--muted);background:var(--surface-2);border-color:var(--hair-2)">😴 Marcado como descanso${sk.motivo?` — ${esc(sk.motivo)}`:""}</div>`;
+  xs.forEach(e=>{
+    const nome = e.atividade ? esc(e.atividade) : m.extra;
+    const emo = e.atividade ? emojiAtiv(e.atividade) : "·";
+    const dur = e.duracao?` · ${e.duracao} min`:"";
+    const nota = e.nota?`<div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5">${esc(e.nota)}</div>`:"";
+    out += `<div class="card" style="padding:13px 15px;font-size:13px;color:var(--blue);border-color:rgba(47,107,255,.25);background:rgba(47,107,255,.06)">${emo} ${nome}${dur}${nota}</div>`;
+  });
+  if(s) out += sessaoCard(s,days);
+  if(!s && !xs.length && !sk) out += `<div class="empty"><div class="icon">🏋️</div><div class="ttl">Ainda sem registro</div><div class="sub">A letra indica a divisão treinada, o ponto azul marca extras e o traço marca descanso.</div></div>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ DIETA */
+function viewDieta(p,m){
+  const D = S.dieta[p], sel = REF();
+  const marc = S.check[p+":"+sel] || {};
+  const st = id => marc[id] || null;
+  const cls = id => st(id)==="ok" ? "on" : st(id)==="no" ? "no" : "";
+  const sim = id => st(id)==="ok" ? "✓" : st(id)==="no" ? "✕" : "";
+
+  // Modo edição (via config)
+  if(ui.edieta){
+    let out = `<div class="tbar"><div class="t">Editar dieta</div>
+      <button class="edt on" data-edieta="1">Concluir</button></div>`;
+    out += `<div class="card ed">
+      <div class="eyebrow" style="margin-bottom:9px">Alvo diário</div>
+      ${[["kcal","calorias"],["prot","proteína"],["carb","carboidrato"],["gord","gordura"]].map(([k,l])=>
+        `<input class="ed-f" data-dieta="alvo.${k}" value="${esc(D.alvo[k])}" placeholder="${l}">`).join("")}
+      <textarea class="ta" data-dieta="nota" placeholder="observações">${esc(D.nota)}</textarea></div>`;
+    D.refs.forEach(r=>{
+      out += `<div class="card ed">
+        <div style="display:flex;gap:8px">
+          <input class="ed-f" data-dieta="ref.${r.id}.nome" value="${esc(r.nome)}" style="flex:1" placeholder="nome da refeição">
+          <input class="ed-f" data-dieta="ref.${r.id}.hora" value="${esc(r.hora||'')}" placeholder="HH:mm" style="width:90px;text-align:center;font-family:var(--mono)">
+        </div>
+        <textarea class="ta" data-dieta="ref.${r.id}.itens" placeholder="um alimento por linha">${esc(r.itens)}</textarea></div>`;
+    });
+    out += `<div class="card ed"><div class="eyebrow" style="margin-bottom:9px">Itens fixos do dia</div>
+      ${D.extras.map(x=>`<input class="ed-f" data-dieta="extra.${x.id}.nome" value="${esc(x.nome)}">`).join("")}</div>
+      <div style="height:70px"></div>`;
+    return out;
+  }
+
+  // ---------- Novo layout Dietbox ----------
+  const nome = m.label || (p==="gabriel"?"Gabriel":"Eduarda");
+  const inic = (nome[0]||"?").toUpperCase();
+  const hoje = new Date(REF()+"T12:00");
+  const diaSemana = WDL[hoje.getDay()];
+  const dataFmt = hoje.getDate()+" de "+MES[hoje.getMonth()];
+  const totRefs = D.refs.length;
+  const feitasHoje = D.refs.filter(r=>st(r.id)==="ok").length;
+
+  // Tipo de dia + alvos dinâmicos
+  const tipo = tipoDiaHoje(p);
+  const alvos = getAlvosDia(p);
+  const alvoHoje = (tipo && alvos && alvos[tipo]) ? alvos[tipo] : null;
+  const tipoLbl = tipo ? (TIPO_DIA_LABEL[tipo]||tipo) : "";
+  const alvoKcalHoje = alvoHoje ? alvoHoje.kcal : (D.alvo && D.alvo.kcal) || "—";
+  // v27: chip âmbar quando dia é jejum
+  const isJejumDia = tipo==="jejum" || tipo==="jejum_jiu";
+  const chipStyleBg = isJejumDia
+    ? "background:rgba(245,158,11,.16);color:#f59e0b"
+    : "background:rgba(58,216,121,.14);color:var(--ac)";
+  const chipTipo = tipo ? `<span style="display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;${chipStyleBg};font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:600">${esc(tipoLbl)}${alvoHoje?` · ${alvoHoje.kcal} kcal`:""}</span>` : "";
+
+  let out = `<div class="diet-hero">
+    <div class="row">
+      <div class="avatar">${esc(inic)}</div>
+      <div class="greet">
+        <div class="hi">Olá,</div>
+        <div class="nm">${esc(nome)}</div>
+      </div>
+    </div>
+    <div class="today"><b>${esc(diaSemana)}</b>${chipTipo} · ${esc(dataFmt)} &nbsp;·&nbsp; ${feitasHoje}/${totRefs} refeições registradas</div>
+  </div>`;
+
+  // Acessos rápidos
+  out += `<div class="qa-title">Acessos rápidos</div>
+    <div class="qa-grid">
+      <button class="qa-btn accent" data-diario="1"><div class="ic">📔</div><div class="lb">Diário</div></button>
+      <button class="qa-btn" data-openia="1"><div class="ic">🤖</div><div class="lb">Sugestão IA</div></button>
+      <button class="qa-btn" data-metas="1"><div class="ic">🎯</div><div class="lb">Metas</div></button>
+      <button class="qa-btn" data-editdieta="1"><div class="ic">✎</div><div class="lb">Editar</div></button>
+    </div>`;
+
+  // Macros
+  out += `<div class="macros-lite">
+    ${[[D.alvo.kcal||"—","kcal"],[D.alvo.prot||"—","proteína"],[D.alvo.carb||"—","carbo"],[D.alvo.gord||"—","gordura"]]
+      .map(([v,k])=>`<div><div class="v">${esc(v)}</div><div class="k">${k}</div></div>`).join("")}</div>`;
+
+  // v27: banner de jejum
+  if(isJejumDia){
+    const jTxt = tipo==="jejum_jiu"
+      ? "🌙 <b>Jejum matinal hoje (até o almoço)</b> — pular café/pré-treino/lanches da manhã. SuperCoffee 05h45 liberado se houver musc/jiu (jejum modificado). Primeira refeição sólida às 12h. Depois seguir o resto do plano normal (lanche 15h, jantar). Hidratação intensa até o almoço."
+      : "🌙 <b>Jejum matinal hoje (até o almoço)</b> — pular refeições da manhã. Primeira refeição sólida às 12h. Depois seguir o resto do plano normal (lanche 15h, jantar). Hidratação intensa até o almoço.";
+    out += `<div class="hero" style="border:1px solid rgba(245,158,11,.35);background:linear-gradient(135deg,rgba(245,158,11,.10),rgba(245,120,0,.04));margin:8px 0 6px"><div class="why" style="padding:2px 0 8px">${jTxt}</div></div>`;
+  }
+
+  // Plano alimentar
+  out += `<div class="plan-head"><div class="t">Plano alimentar</div>
+    <button class="a" data-editdieta="1">Editar</button></div>`;
+
+  D.refs.forEach(r=>{
+    const stat = st(r.id);
+    const doneCls = stat==="ok" ? "done" : (stat==="no" ? "faltou" : "");
+    const chkCls = stat==="ok" ? "on" : (stat==="no" ? "no" : "");
+    const chkSim = stat==="ok" ? "✓" : (stat==="no" ? "✕" : "");
+    const regTxt = stat==="ok" ? "Registrado" : "Registrar";
+    const regCls = stat==="ok" ? "done" : "";
+    const hora = r.hora || "";
+    const itens = r.itens ? esc(r.itens) : `<span style='color:var(--faint)'>vazio — toque em Editar para preencher</span>`;
+
+    // v27: em jejum, refs antes das 12h ficam com opacity reduzida + tag "pular"
+    const horaNum = /^\d{2}/.test(hora) ? parseInt(hora.slice(0,2),10) : null;
+    const isManha = isJejumDia && horaNum!==null && horaNum < 12;
+    const skipStyle = isManha ? 'opacity:.42;filter:grayscale(.35)' : '';
+    const skipTag = isManha ? ' <span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background:#f59e0b;color:#000;font-size:9.5px;font-weight:700;letter-spacing:.05em;vertical-align:middle;text-transform:uppercase">pular</span>' : '';
+
+    out += `<div class="mealx ${doneCls}" style="${skipStyle}">
+      <div class="mx-head">
+        <span class="badge"></span>
+        <div class="mx-name">${esc(r.nome)}${skipTag}</div>
+        ${hora?`<div class="mx-hora">${esc(hora)}${(r.kcal!=null&&r.kcal!=="")?" · "+r.kcal+" kcal":""}</div>`:((r.kcal!=null&&r.kcal!=="")?`<div class="mx-hora">${r.kcal} kcal</div>`:"")}
+        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações">⋯</button>
+      </div>
+      <div class="mx-items">${itens}</div>
+      <div class="mx-foot">
+        <button class="mx-check-mini ${chkCls}" data-chk="${r.id}" title="marcar feito / faltou">${chkSim||"○"}</button>
+        <button class="mx-reg ${regCls}" data-mealmenu="${r.id}">
+          ${stat==="ok"?"✓ Registrado":"📝 Registrar"}
+        </button>
+      </div>
+    </div>`;
+  });
+
+  // Extras / itens fixos
+  if(D.extras && D.extras.length){
+    out += `<div class="extras-card">
+      <div class="eh">Itens fixos do dia</div>
+      ${D.extras.map(x=>{
+        const chkCls = st(x.id)==="ok" ? "on" : (st(x.id)==="no" ? "no" : "");
+        const chkSim = st(x.id)==="ok" ? "✓" : (st(x.id)==="no" ? "✕" : "○");
+        return `<div class="ei">
+          <button class="mx-check-mini ${chkCls}" style="width:28px;height:28px;font-size:13px" data-chk="${x.id}">${chkSim}</button>
+          <span style="flex:1">${esc(x.nome)}</span>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }
+
+  // Nota do nutricionista
+  if(D.nota){
+    out += `<div class="diet-nota">${esc(D.nota)}</div>`;
+  }
+
+  // Diário — últimos registros
+  const logRecentes = (D.log||[]).slice(0,3);
+  out += `<div class="diary-title"><span>Atualizações do diário</span>${(D.log||[]).length?`<button data-diario="1">Ver tudo →</button>`:""}</div>`;
+  if(!logRecentes.length){
+    out += `<div class="diary-empty">Ainda sem registros. Toque em <b>Registrar</b> numa refeição pra começar a alimentar o coach.</div>`;
+  } else {
+    logRecentes.forEach(l=>{
+      out += `<div class="diary-mini">
+        <div class="top"><span class="rn">${esc(l.refNome||"")}</span><span class="dm">${_fmtDataDiario(l.data)} · ${esc(l.hora||"")}</span></div>
+        <div class="tx">${esc(l.texto||"")}</div>
+      </div>`;
+    });
+  }
+
+  out += `<div style="height:16px"></div>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ CONFIG */
+function viewConfig(p,m){
+  const AUTHNOW = getAuth();
+  const meLabel = AUTHNOW ? BASE[AUTHNOW.perfil].label : "";
+  const themeAtual = getTheme();
+  const metas = (S.metas && S.metas[p]) || {};
+
+  let out = `<div class="tbar" style="margin-bottom:20px"><div class="t">Configurações</div></div>`;
+
+  // Perfil ativo
+  out += `<div class="cfg-sec">
+    <div class="lbl">👤 Perfil ativo</div>
+    <div class="cfg-list"><div class="cfg-perfil">
+      ${Object.keys(BASE).map(k=>`<button class="${k===p?"on":""}" data-cfp="${k}">${BASE[k].label}</button>`).join("")}
+    </div></div>
+  </div>`;
+
+  // Tema
+  out += `<div class="cfg-sec">
+    <div class="lbl">🎨 Tema</div>
+    <div class="cfg-list"><div class="cfg-theme">
+      <button class="${themeAtual==="auto"?"on":""}" data-theme="auto">${ICON.auto}<span>Auto</span></button>
+      <button class="${themeAtual==="light"?"on":""}" data-theme="light">${ICON.sun}<span>Claro</span></button>
+      <button class="${themeAtual==="dark"?"on":""}" data-theme="dark">${ICON.moon}<span>Escuro</span></button>
+    </div></div>
+  </div>`;
+
+  // Meus treinos e Dieta
+  out += `<div class="cfg-sec">
+    <div class="lbl">Plano de treino e dieta</div>
+    <div class="cfg-list">
+      <button class="cfg-row" data-editplan="A"><span class="em">🏋️</span>
+        <span class="lb"><span class="tt">Meus treinos</span><span class="st">editar exercícios, séries, repetições dos blocos A · B · C · D</span></span>
+        <span class="caret">›</span></button>
+      <button class="cfg-row" data-editdieta="1"><span class="em">🍽️</span>
+        <span class="lb"><span class="tt">Minha dieta</span><span class="st">alvos, refeições e itens fixos</span></span>
+        <span class="caret">›</span></button>
+      <button class="cfg-row" data-diario="1"><span class="em">📔</span>
+        <span class="lb"><span class="tt">Diário de refeições</span><span class="st">registros dos últimos 30 dias</span></span>
+        <span class="caret">›</span></button>
+    </div>
+  </div>`;
+
+  // Metas
+  const kcal = metas.kcal || "";
+  const peso = metas.peso || "";
+  const prot = metas.prot || "";
+  out += `<div class="cfg-sec">
+    <div class="lbl">📊 Metas</div>
+    <div class="cfg-list" style="padding:14px 16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">Peso alvo (kg)</div>
+          <input class="ed-f" style="margin:0;height:42px" data-meta="peso" value="${esc(peso)}" placeholder="ex: 80" inputmode="decimal">
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">Kcal/dia</div>
+          <input class="ed-f" style="margin:0;height:42px" data-meta="kcal" value="${esc(kcal)}" placeholder="ex: 2700" inputmode="numeric">
+        </div>
+      </div>
+      <div style="margin-top:4px">
+        <div class="eyebrow" style="margin-bottom:6px">Proteína (g/dia)</div>
+        <input class="ed-f" style="margin:0;height:42px" data-meta="prot" value="${esc(prot)}" placeholder="ex: 175" inputmode="numeric">
+      </div>
+    </div>
+  </div>`;
+
+  // Conta
+  out += `<div class="cfg-sec">
+    <div class="lbl">🔒 Conta</div>
+    <div class="cfg-list">
+      <div class="cfg-row" style="cursor:default">
+        <span class="em">👤</span>
+        <span class="lb"><span class="tt">Logado como ${esc(meLabel)}</span><span class="st">sessão privada</span></span>
+      </div>
+      <button class="cfg-row danger" data-logout="1"><span class="em">⎋</span>
+        <span class="lb"><span class="tt">Sair</span></span>
+        <span class="caret">›</span></button>
+    </div>
+  </div>`;
+
+  // Sobre
+  out += `<div class="cfg-sec">
+    <div class="lbl">ℹ️ Sobre</div>
+    <div class="cfg-list">
+      <div class="cfg-row" style="cursor:default">
+        <span class="em">📦</span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v30 · anti-repetição universal</span></span>
+      </div>
+      <div class="cfg-row" style="cursor:default">
+        <span class="em">☁️</span>
+        <span class="lb"><span class="tt">Sincronização</span><span class="st">Supabase — automático em todos dispositivos</span></span>
+      </div>
+    </div>
+  </div>`;
+
+  return out;
+}
+
+/* =============================================================== ações */
+function upd(p,d,exId,i,k,v){
+  const key = p+":"+d;
+  S.draft[key] = S.draft[key]||{};
+  S.draft[key][exId] = S.draft[key][exId]||[];
+  S.draft[key][exId][i] = Object.assign({}, S.draft[key][exId][i], {[k]:v});
+  ui.saved = false; salvaSoft();
+}
+async function salvar(){
+  const p = ui.perfil, d = ui.dia, key = p+":"+d, dr = S.draft[key]||{};
+  if(!Object.values(dr).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)))) return;
+  // Sempre grava com a data REAL de hoje, exceto ao editar um treino já registrado
+  // (nesse caso ui.editDate preserva a data original do evento). Isso evita gravar
+  // treino de hoje como se fosse de amanhã quando ui.off≠0.
+  const dataEv = ui.editDate || iso(new Date());
+  ui.editDate = null;
+  S.events.unshift({id:Date.now(),perfil:p,tipo:"musc",data:dataEv,dia:d,entries:dr});
+  S.draft[key] = {};
+  const ok = await store.set(S);
+  ui.saved = true; ui.toast = ok?null:"Não deu para salvar. Anote as cargas e tente de novo.";
+  render();
+  setTimeout(()=>{ ui.saved=false; ui.view="hoje"; render(); window.scrollTo(0,0); },1300);
+}
+async function marcarExtra(off){
+  const p = ui.perfil, data = shift(ui.off+Number(off));
+  const i = S.events.findIndex(e=>e.perfil===p && e.tipo==="extra" && e.data===data && isMainExtra(p,e));
+  if(i>=0) S.events.splice(i,1);
+  else S.events.unshift({id:Date.now(),perfil:p,tipo:"extra",data, atividade: meta(p).extra});
+  await store.set(S); render();
+}
+async function toggleSkip(){
+  const p = ui.perfil, data = REF();
+  const i = S.events.findIndex(e=>e.perfil===p && e.tipo==="skip" && e.data===data);
+  if(i>=0) S.events.splice(i,1);
+  else S.events.unshift({id:Date.now(),perfil:p,tipo:"skip",data});
+  await store.set(S); render();
+}
+async function removerExtra(id){
+  const i = S.events.findIndex(e=>e.id==id);
+  if(i<0) return;
+  S.events.splice(i,1);
+  await store.set(S); render();
+}
+async function salvarAtividadeExtra(ativ, dur, nota){
+  const p = ui.perfil, data = REF();
+  if(!ativ) return;
+  // Se selecionar o esporte principal, marca como principal (não duplica)
+  const isPrinc = String(ativ).toLowerCase() === mainSport(p);
+  if(isPrinc){
+    const existente = S.events.findIndex(e=>e.perfil===p && e.tipo==="extra" && e.data===data && isMainExtra(p,e));
+    if(existente>=0){ fecharSugestao(); return; } // já marcado
+  }
+  S.events.unshift({
+    id: Date.now(), perfil: p, tipo: "extra", data,
+    atividade: ativ,
+    duracao: dur ? Number(dur) : undefined,
+    nota: nota || undefined
+  });
+  await store.set(S);
+  fecharSugestao();
+  render();
+}
+function abrirPickTreino(){
+  const p = ui.perfil, days = dayset(p);
+  const body = `
+    <div class="eyebrow" style="margin-bottom:8px">Escolher treino</div>
+    <div class="chips" id="pickTreinoChips">
+      ${ORDER.map(d=>`<button class="chip" data-pickabrir="${d}"><b>${d}</b> · ${_escSug(days[d].t)}</button>`).join("")}
+    </div>
+    <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.55">
+      Schedule sugerido não tem musc hoje. Você pode escolher qualquer treino — o registro conta normal.
+    </div>
+  `;
+  _renderSugestaoShell("Iniciar treino", "Escolha qual bloco vai treinar", body);
+  document.querySelectorAll("[data-pickabrir]").forEach(b=>b.onclick=()=>{
+    const d = b.dataset.pickabrir;
+    const aviso = verificarConflitoIniciar(ui.perfil, d);
+    if(aviso && !confirm(aviso)) return;
+    fecharSugestao();
+    ui.dia = d; ui.view = "treino"; ui.saved = false; ui.edit = false; ui.editDate = null; ui.off = 0;
+    render(); window.scrollTo(0,0);
+  });
+}
+function abrirAtividadeExtra(){
+  const p = ui.perfil, mainAt = meta(p).extra;
+  const presets = ["Bike","Futebol","Corrida","Natação","Caminhada","Jiu-jitsu","Outro"];
+  const body = `
+    <div class="eyebrow" style="margin-bottom:8px">Atividade</div>
+    <div class="chips" id="atvChips">
+      ${presets.map(x=>`<button class="chip" data-atvpick="${_escSug(x)}">${emojiAtiv(x)} ${_escSug(x)}</button>`).join("")}
+    </div>
+    <input class="ed-f" id="atvCustom" placeholder="Especifique (se escolheu Outro)" style="display:none">
+    <div class="eyebrow" style="margin:6px 0 6px">Duração (opcional)</div>
+    <input class="ed-f" id="atvDur" inputmode="numeric" placeholder="minutos">
+    <div class="eyebrow" style="margin:6px 0 6px">Nota (opcional)</div>
+    <textarea class="ta" id="atvNota" placeholder="Como foi? Intensidade, local, sensações..."></textarea>
+    <button class="sug-save" id="atvSalvar" disabled>Salvar atividade</button>
+    <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.55">
+      Registra uma atividade extra no dia (${brd(REF())||"hoje"}). ${mainAt} é seu esporte principal.</div>
+  `;
+  _renderSugestaoShell("Nova atividade extra", "Registrar treino fora do plano", body);
+
+  let escolhido = null;
+  const chipEls = document.querySelectorAll("#atvChips [data-atvpick]");
+  const salvarBtn = document.getElementById("atvSalvar");
+  const customEl = document.getElementById("atvCustom");
+  const updateBtn = () => {
+    const custom = customEl.value.trim();
+    const valido = escolhido && (escolhido!=="Outro" || custom.length>0);
+    salvarBtn.disabled = !valido;
+  };
+  chipEls.forEach(b=>b.onclick=()=>{
+    chipEls.forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    escolhido = b.dataset.atvpick;
+    customEl.style.display = escolhido==="Outro" ? "block" : "none";
+    if(escolhido==="Outro") setTimeout(()=>customEl.focus(),50);
+    updateBtn();
+  });
+  customEl.oninput = updateBtn;
+  salvarBtn.onclick = () => {
+    const dur = document.getElementById("atvDur").value.trim();
+    const nota = document.getElementById("atvNota").value.trim();
+    const final = escolhido==="Outro" ? customEl.value.trim() : escolhido;
+    if(!final) return;
+    salvarAtividadeExtra(final, dur, nota);
+  };
+}
+const acha = id => dayset(ui.perfil)[ui.dia].ex.find(e=>e.id===id);
+
+/* ================================================================ menu ⋯ dieta */
+function abrirMealMenu(refId){
+  const p = ui.perfil, D = S.dieta[p], r = D.refs.find(x=>x.id===refId);
+  if(!r) return;
+  const nRegs = (D.log||[]).filter(l=>l.refId===r.id).length;
+  const body = `
+    <button class="cfg-row" style="border-radius:0" data-mealact="reg"><span class="em">📝</span>
+      <span class="lb"><span class="tt">Registrar o que comi</span><span class="st">${nRegs?nRegs+" registros dessa refeição":"anotar hoje"}</span></span>
+      <span class="caret">›</span></button>
+    <button class="cfg-row" style="border-radius:0" data-mealact="sug"><span class="em">💡</span>
+      <span class="lb"><span class="tt">Sugestões IA</span><span class="st">alternativas para essa refeição</span></span>
+      <span class="caret">›</span></button>
+    <button class="cfg-row" style="border-radius:0;border-bottom:none" data-mealact="edit"><span class="em">✏️</span>
+      <span class="lb"><span class="tt">Editar refeição</span><span class="st">itens e nome (via Config)</span></span>
+      <span class="caret">›</span></button>
+  `;
+  _renderSugestaoShell(r.nome, "O que fazer com essa refeição?",
+    `<div class="cfg-list">${body}</div>
+     <div style="height:8px"></div>
+     <button class="reset" data-sugclose="1">Fechar</button>`);
+
+  document.querySelectorAll("[data-mealact]").forEach(b=>b.onclick=()=>{
+    const act = b.dataset.mealact;
+    fecharSugestao();
+    if(act==="reg") abrirRegistroRefeicao(refId);
+    else if(act==="sug") abrirSugestao(refId);
+    else if(act==="edit"){ ui.view="dieta"; ui.edieta=true; render(); window.scrollTo(0,0); }
+  });
+}
+
+/* ================================================================ sugestão IA */
+const SUGESTAO_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/treino-sugestao';
+function fecharSugestao(){
+  const m = document.getElementById('sugModal'); if(m) m.innerHTML='';
+  document.body.style.overflow='';
+}
+function _escSug(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function _renderSugestaoShell(titulo, subtitulo, corpoHTML){
+  const m = document.getElementById('sugModal');
+  m.innerHTML = `<div class="sug-overlay" data-sugclose="1">
+    <div class="sug-sheet" onclick="event.stopPropagation()">
+      <div class="sug-head">
+        <div><div class="t">${_escSug(titulo)}</div><div class="s">${_escSug(subtitulo)}</div></div>
+        <button class="sug-close" data-sugclose="1" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="sugCorpo">${corpoHTML}</div>
+    </div>
+  </div>`;
+  document.body.style.overflow='hidden';
+  m.querySelectorAll('[data-sugclose]').forEach(el=>el.onclick=fecharSugestao);
+}
+async function abrirSugestao(refId){
+  const p = ui.perfil, D = S.dieta[p], r = D.refs.find(x=>x.id===refId);
+  if(!r) return;
+  const perfilNome = p==='gabriel'?'Gabriel':'Eduarda';
+  _renderSugestaoShell(r.nome||'Sugestões', 'Alternativas para essa refeição', `<div class="sug-load">Buscando 3 sugestões com IA...</div>`);
+  try{
+    const resp = await fetch(SUGESTAO_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ perfil: perfilNome, refeicao: r.nome||'', itens_atuais: r.itens||'' })
+    });
+    const j = await resp.json();
+    if(!resp.ok || !j.sugestoes){
+      document.getElementById('sugCorpo').innerHTML = `<div class="sug-err">Não consegui buscar sugestões agora. ${_escSug(j.error||'')}</div>`;
+      return;
+    }
+    const html = j.sugestoes.map((s,i)=>`<div class="sug-card">
+      <div class="n">&#127869;&#65039; ${_escSug(s.nome)}</div>
+      <div class="i">${_escSug(s.itens)}</div>
+      <button class="u" data-usar="${i}">Usar essa</button>
+    </div>`).join('');
+    document.getElementById('sugCorpo').innerHTML = html;
+    document.querySelectorAll('#sugCorpo [data-usar]').forEach(b=>b.onclick=async ()=>{
+      const idx = Number(b.dataset.usar);
+      const s = j.sugestoes[idx];
+      if(!s) return;
+      const rNow = S.dieta[p].refs.find(x=>x.id===refId);
+      if(!rNow) return;
+      if(!confirm(`Substituir os itens de "${rNow.nome}" pela sugestão "${s.nome}"?`)) return;
+      rNow.itens = s.itens;
+      if(s.nome && !rNow.nome) rNow.nome = s.nome;
+      await store.set(S);
+      fecharSugestao();
+      render();
+    });
+  }catch(e){
+    const c = document.getElementById('sugCorpo');
+    if(c) c.innerHTML = `<div class="sug-err">Erro de rede: ${_escSug(String(e&&e.message||e))}</div>`;
+  }
+}
+
+/* ================================================================ diário de refeições */
+function _agoraHM(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function _fmtDataDiario(iso){
+  if(!iso) return '';
+  const d = new Date(iso+'T12:00');
+  return d.getDate()+' '+MES[d.getMonth()].slice(0,3);
+}
+async function salvarRegistroRefeicao(refId, texto){
+  const p = ui.perfil, D = S.dieta[p];
+  const r = D.refs.find(x=>x.id===refId); if(!r) return;
+  if(!texto || !texto.trim()) return;
+  if(!D.log) D.log = [];
+  D.log.unshift({
+    id: Date.now(),
+    data: shift(0),
+    hora: _agoraHM(),
+    refId: r.id,
+    refNome: r.nome,
+    texto: texto.trim(),
+    criadoEm: new Date().toISOString()
+  });
+  await store.set(S);
+  fecharSugestao();
+  render();
+}
+async function apagarRegistroRefeicao(logId){
+  const p = ui.perfil, D = S.dieta[p];
+  if(!D.log) return;
+  const i = D.log.findIndex(l=>l.id==logId);
+  if(i<0) return;
+  if(!confirm('Apagar esse registro do diário?')) return;
+  D.log.splice(i,1);
+  await store.set(S);
+  render();
+}
+function abrirRegistroRefeicao(refId){
+  const p = ui.perfil, D = S.dieta[p], r = D.refs.find(x=>x.id===refId);
+  if(!r) return;
+  const historico = (D.log||[]).filter(l=>l.refId===refId).slice(0,5);
+  const hoje = shift(0);
+  const jaHoje = (D.log||[]).find(l=>l.refId===refId && l.data===hoje);
+  const histHTML = historico.length
+    ? historico.map(l=>`<div class="log-item" data-logfill="${_escSug(l.texto)}">
+        <div class="log-meta">${_fmtDataDiario(l.data)} &middot; ${_escSug(l.hora||'')}</div>
+        <div class="log-txt">${_escSug(l.texto)}</div></div>`).join('')
+    : `<div style="font-size:12px;color:var(--faint);padding:8px 4px">Sem registros anteriores dessa refei&ccedil;&atilde;o.</div>`;
+  const body = `
+    <textarea class="ta" id="regTexto" placeholder="o que voc&ecirc; comeu? (ex: 3 ovos mexidos, 2 fatias de p&atilde;o, 1 banana)" style="min-height:120px">${jaHoje?_escSug(jaHoje.texto):''}</textarea>
+    <button class="sug-save" id="regSalvar">${jaHoje?'Adicionar novo registro':'Salvar'}</button>
+    <div style="font-size:11px;color:var(--faint);margin:12px 2px 6px;letter-spacing:.3px;text-transform:uppercase">&Uacute;ltimos registros dessa refei&ccedil;&atilde;o</div>
+    <div id="regHist">${histHTML}</div>
+    <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5">Toque num registro para copiar o texto no campo acima.</div>
+  `;
+  _renderSugestaoShell(`📝 ${r.nome} · hoje`, `${brd(hoje)} · ${_agoraHM()}`, body);
+  const ta = document.getElementById('regTexto');
+  const bt = document.getElementById('regSalvar');
+  bt.onclick = () => salvarRegistroRefeicao(refId, ta.value);
+  document.querySelectorAll('#regHist [data-logfill]').forEach(el=>{
+    el.onclick = () => { ta.value = el.dataset.logfill; ta.focus(); };
+  });
+  setTimeout(()=>{ if(ta && !jaHoje) ta.focus(); }, 100);
+}
+function abrirDiario(){
+  const p = ui.perfil, D = S.dieta[p];
+  const log = (D.log||[]).slice();
+  const limite = shift(-30);
+  const recentes = log.filter(l=>l.data>=limite).sort((a,b)=> (a.data<b.data)?1:(a.data>b.data)?-1:(a.hora<b.hora?1:-1));
+  const grupos = {};
+  recentes.forEach(l=>{ (grupos[l.data]=grupos[l.data]||[]).push(l); });
+  const datas = Object.keys(grupos).sort((a,b)=> a<b?1:-1);
+  const refsDisp = D.refs.slice();
+  const filtroAtual = ui.diarioFiltro || '';
+  const chipsHTML = `<div class="chips" id="diarioChips" style="grid-template-columns:repeat(${Math.min(refsDisp.length+1,4)},1fr);margin-bottom:12px">
+      <button class="chip ${!filtroAtual?'on':''}" data-diaroffiltro="">Todas</button>
+      ${refsDisp.map(r=>`<button class="chip ${filtroAtual===r.id?'on':''}" data-diaroffiltro="${_escSug(r.id)}">${_escSug(r.nome)}</button>`).join('')}
+    </div>`;
+  let corpo = '';
+  if(!datas.length){
+    corpo = `<div style="padding:30px 10px;text-align:center;color:var(--muted);font-size:13px">Nenhum registro nos &uacute;ltimos 30 dias.<br><span style="font-size:11px;color:var(--faint)">Toque em ⋯ em qualquer refei&ccedil;&atilde;o e escolha "Registrar" para come&ccedil;ar.</span></div>`;
+  } else {
+    datas.forEach(dt=>{
+      const itens = grupos[dt].filter(l=>!filtroAtual || l.refId===filtroAtual);
+      if(!itens.length) return;
+      const d = new Date(dt+'T12:00');
+      const rel = dt===shift(0)?'hoje':(dt===shift(-1)?'ontem':`${WD[d.getDay()]}`);
+      corpo += `<div style="margin-bottom:14px">
+        <div class="eyebrow" style="margin-bottom:6px">${_fmtDataDiario(dt)} · ${rel}</div>`;
+      itens.forEach(l=>{
+        corpo += `<div class="sug-card" style="padding:10px 12px;margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px">
+            <span style="font-size:12.5px;font-weight:600;color:var(--ac)">${_escSug(l.refNome||'')}</span>
+            <span style="font-size:10.5px;color:var(--faint);font-family:var(--mono)">${_escSug(l.hora||'')}</span>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.55;white-space:pre-line">${_escSug(l.texto)}</div>
+          <button data-rmlog="${l.id}" style="margin-top:6px;font-size:10.5px;color:var(--danger);background:none;border:0;padding:0">apagar</button>
+        </div>`;
+      });
+      corpo += `</div>`;
+    });
+    if(!corpo) corpo = `<div style="padding:30px 10px;text-align:center;color:var(--faint);font-size:12.5px">Nenhum registro dessa refei&ccedil;&atilde;o.</div>`;
+  }
+  _renderSugestaoShell('📔 Diário de refeições', `últimos 30 dias · ${log.length} registros no total`, chipsHTML + corpo);
+  document.querySelectorAll('#diarioChips [data-diaroffiltro]').forEach(b=>b.onclick=()=>{
+    ui.diarioFiltro = b.dataset.diaroffiltro || '';
+    abrirDiario();
+  });
+  document.querySelectorAll('[data-rmlog]').forEach(b=>b.onclick=()=>{
+    apagarRegistroRefeicao(b.dataset.rmlog).then(()=>abrirDiario());
+  });
+}
+
+/* ================================================================ coach IA */
+const COACH_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/treino-coach';
+
+function _resumoSeries(ex, sets){
+  if(!Array.isArray(sets) || !sets.length) return '';
+  return sets.map(s=>{
+    if(!s) return null;
+    if(ex && ex.ty==='time') return s.sec ? s.sec+'s' : null;
+    if(ex && ex.ty==='reps') return s.reps || null;
+    if(!s.kg && !s.reps) return null;
+    return (s.kg||'?')+'x'+(s.reps||'?');
+  }).filter(Boolean).join(' ');
+}
+
+function _historicoParaCoach(p, n){
+  n = n || 20;
+  const evts = S.events.filter(e=>e.perfil===p).sort((a,b)=> a.data<b.data?1:-1).slice(0,n);
+  const plan = dayset(p);
+  return evts.map(e=>{
+    const base = { data: e.data, tipo: e.tipo };
+    if(e.tipo==='musc'){
+      const dia = plan[e.dia];
+      const exArr = [];
+      if(dia && dia.ex){
+        dia.ex.forEach(ex=>{
+          const sets = (e.entries||{})[ex.id];
+          const s = _resumoSeries(ex, sets);
+          if(s) exArr.push({ nome: ex.n, series: s });
+        });
+      }
+      return Object.assign(base, { dia: e.dia, titulo: dia ? dia.t : '', exercicios: exArr });
+    }
+    if(e.tipo==='extra'){
+      return Object.assign(base, { atividade: e.atividade||'', duracao: e.duracao||null, nota: e.nota||'' });
+    }
+    if(e.tipo==='skip'){
+      return Object.assign(base, { motivo: e.motivo||'' });
+    }
+    return base;
+  });
+}
+
+let _coachUltimo = null;
+
+async function abrirCoach(){
+  const p = ui.perfil, m = meta(p);
+  const r = avaliar(p);
+  const days = dayset(p);
+  const d = days[r.win.d];
+  const perfilNome = p==='gabriel' ? 'Gabriel' : 'Eduarda';
+  const D = S.dieta[p] || {};
+  const check = (S.check && S.check[p+':'+REF()]) || {};
+
+  const limiteLog = shift(-14);
+  const dieta_log = (D.log||[])
+    .filter(l=>l.data>=limiteLog)
+    .slice()
+    .sort((a,b)=> (a.data<b.data)?1:(a.data>b.data)?-1:(a.hora<b.hora?1:-1))
+    .slice(0,30)
+    .map(l=>({ data:l.data, hora:l.hora, refeicao:l.refNome, texto:l.texto }));
+
+  const payload = {
+    perfil: p,
+    hoje: REF(),
+    plano_dia_sugerido: {
+      id: r.win.d,
+      nome: d.t,
+      ex: d.ex.map(x=>({ n:x.n, p:x.p, s:x.s, ty:x.ty }))
+    },
+    historico_recente: _historicoParaCoach(p, 20),
+    dieta_atual: {
+      alvo: D.alvo || {},
+      refs: (D.refs||[]).map(r=>({ nome:r.nome, itens:r.itens })),
+      extras: (D.extras||[]).map(x=>({ nome:x.nome })),
+      nota: D.nota || ''
+    },
+    dieta_log,
+    checks: check,
+    schedule: getSchedule(p) || null,
+    dias_tipo: getDietaDias(p) || null,
+    alvos_dia: getAlvosDia(p) || null,
+    planejado_hoje: getPlanejado(p, REF()) || {},
+    planejado_amanha: getPlanejado(p, shift(1)) || {},
+    planejado_semana: (function(){
+      const out = {};
+      for(let i=0;i<7;i++){
+        const iso = shift(i);
+        const pl = getPlanejado(p, iso);
+        if(pl && Object.keys(pl).length){
+          const d = new Date(iso+"T12:00");
+          out[WDK[d.getDay()]+"_"+iso] = pl;
+        }
+      }
+      return out;
+    })()
+  };
+
+  _renderSugestaoShell(
+    'Análise do coach',
+    `${perfilNome} · ${brd(REF())||'hoje'}`,
+    `<div class="sug-load">🤖 O coach está analisando seu histórico, dieta e recuperação...<br><br><span style="font-size:11px;color:var(--faint)">isso leva uns 5–10 segundos</span></div>`
+  );
+
+  try{
+    const resp = await fetch(COACH_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const j = await resp.json();
+    if(!resp.ok){
+      document.getElementById('sugCorpo').innerHTML = `<div class="sug-err">Não consegui buscar a análise agora. ${_escSug(j.error||resp.status)}</div>`;
+      return;
+    }
+    _coachUltimo = j;
+    _renderCoach(j);
+  }catch(e){
+    const c = document.getElementById('sugCorpo');
+    if(c) c.innerHTML = `<div class="sug-err">Erro de rede: ${_escSug(String(e&&e.message||e))}</div>`;
+  }
+}
+
+function _extraiLetraDia(reco){
+  const m = String(reco||'').match(/[A-D]/);
+  return m ? m[0] : null;
+}
+
+function _renderCoach(j){
+  const letra = _extraiLetraDia(j.recomendacao_treino);
+  const nomeSemLetra = String(j.recomendacao_treino||'').replace(/^[^A-Za-z0-9]*[A-D][^A-Za-z0-9]*/, '').trim();
+  const cargas = Array.isArray(j.cargas_sugeridas) ? j.cargas_sugeridas : [];
+  let html = '';
+
+  html += `<div class="coach-sec coach-treino">
+    <div class="hd"><span class="em">&#127947;&#65039;</span><span>Treino recomendado</span></div>
+    <div class="row">
+      ${letra ? `<div class="letter">${_escSug(letra)}</div>` : ''}
+      <div class="nome">${_escSug(nomeSemLetra || j.recomendacao_treino || '')}</div>
+    </div>
+    <div class="coach-body">${_escSug(j.por_que||'')}</div>
+    ${letra ? `<button class="coach-apply" data-coachapply="${_escSug(letra)}">Aplicar treino recomendado</button>` : ''}
+  </div>`;
+
+  if(cargas.length){
+    html += `<div class="coach-sec coach-cargas">
+      <div class="hd"><span class="em">&#128170;</span><span>Ajustes de carga</span></div>
+      ${cargas.map(c=>`<div class="item">
+        <span class="nm">${_escSug(c.exercicio||'')}</span>
+        <span class="sg">${_escSug(c.sugestao||'')}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if(j.dieta_hoje){
+    html += `<div class="coach-sec">
+      <div class="hd"><span class="em">&#129382;</span><span>Dieta hoje</span></div>
+      <div class="coach-body">${_escSug(j.dieta_hoje)}</div>
+    </div>`;
+  }
+
+  if(j.alerta_recuperacao && String(j.alerta_recuperacao).trim()){
+    html += `<div class="coach-sec coach-alert">
+      <div class="hd"><span class="em">&#9888;&#65039;</span><span>Recuperação</span></div>
+      <div class="coach-body">${_escSug(j.alerta_recuperacao)}</div>
+    </div>`;
+  }
+
+  if(j.motivacional){
+    html += `<div class="coach-sec coach-motiv">&#128293; ${_escSug(j.motivacional)}</div>`;
+  }
+
+  const el = document.getElementById('sugCorpo');
+  if(el){
+    el.innerHTML = html;
+    el.querySelectorAll('[data-coachapply]').forEach(b=>b.onclick=()=>{
+      const letraSel = b.dataset.coachapply;
+      ui.dia = letraSel;
+      ui.view = 'treino';
+      ui.saved = false;
+      b.textContent = '✓ Aplicado';
+      b.classList.add('done');
+      setTimeout(()=>{ fecharSugestao(); render(); window.scrollTo(0,0); }, 400);
+    });
+  }
+}
+
+/* ================================================================ ligar */
+function ligar(){
+  document.querySelectorAll("[data-off]").forEach(b=>b.onclick=()=>{
+    ui.off += Number(b.dataset.off); ui.saved=false;
+    if(ui.view==="hoje") ui.dia = avaliar(ui.perfil).win.d; render();});
+  const dt = document.querySelector(".dt"); if(dt) dt.onclick=()=>{ ui.off=0; ui.dia=avaliar(ui.perfil).win.d; render(); };
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.view==="treino" && ui.view!=="treino") ui.dia = avaliar(ui.perfil).win.d;
+    ui.view=b.dataset.view; ui.saved=false;
+    if(ui.view!=="treino") ui.edit=false;
+    if(ui.view!=="dieta") ui.edieta=false;
+    render(); window.scrollTo(0,0);});
+  document.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>{
+    // Registrar novo treino sempre volta pra HOJE — treino registrado é evento real,
+    // não pode ser agendado pra data futura.
+    const dEscolhido = b.dataset.abrir;
+    const aviso = verificarConflitoIniciar(ui.perfil, dEscolhido);
+    if(aviso && !confirm(aviso)) return;
+    ui.dia=dEscolhido; ui.view="treino"; ui.saved=false; ui.edit=false; ui.editDate=null; ui.off=0; render(); window.scrollTo(0,0);});
+  document.querySelectorAll("[data-edittoday]").forEach(b=>b.onclick=async ()=>{
+    const dia = b.dataset.edittoday, p = ui.perfil, data = REF();
+    const i = S.events.findIndex(e=>e.perfil===p && e.tipo==="musc" && e.data===data);
+    if(i<0){ ui.dia=dia; ui.view="treino"; ui.saved=false; ui.editDate=null; render(); return; }
+    const ev = S.events[i];
+    if(!confirm("Editar o treino registrado neste dia? Os valores atuais viram rascunho e você salva de novo.")) return;
+    S.draft[p+":"+dia] = clone(ev.entries||{});
+    S.events.splice(i,1);
+    await store.set(S);
+    // Preserva a data original do evento editado (pode ser passado/futuro).
+    ui.editDate = ev.data;
+    ui.dia=dia; ui.view="treino"; ui.saved=false;
+    render(); window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-loadlast]").forEach(b=>b.onclick=async ()=>{
+    const p = ui.perfil, d = ui.dia, ant = ultimaSessao(p,d);
+    if(!Object.keys(ant).length){ ui.toast="Sem sessão anterior deste bloco."; render(); setTimeout(()=>{ui.toast=null;render();},1800); return; }
+    S.draft[p+":"+d] = clone(ant);
+    await store.set(S);
+    ui.saved=false; render();
+  });
+  document.querySelectorAll("[data-dia]").forEach(b=>b.onclick=()=>{ui.dia=b.dataset.dia;ui.saved=false;render();});
+  document.querySelectorAll("[data-skip]").forEach(b=>b.onclick=()=>toggleSkip());
+  document.querySelectorAll("[data-atv]").forEach(b=>b.onclick=()=>abrirAtividadeExtra());
+  document.querySelectorAll("[data-coach]").forEach(b=>b.onclick=()=>abrirCoach());
+  document.querySelectorAll("[data-rmatv]").forEach(b=>b.onclick=()=>removerExtra(b.dataset.rmatv));
+  document.querySelectorAll("[data-picktreino]").forEach(b=>b.onclick=()=>abrirPickTreino());
+  /* v26: NÃO registrar onclick direto pros chips [data-planq]/[data-plansugmusc].
+     A delegação global em ligarDelegacaoUmaVez() já cobre esses cliques.
+     Registrar aqui causava DUPLA execução do togglePlanejado (chip vira e desvira). */
+  const sv = document.getElementById("salvar"); if(sv) sv.onclick=salvar;
+
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ui.edit=!ui.edit;render();});
+  /* input[data-f] tratado pela delegação global (ligarDelegacaoUmaVez) */
+  /* handler de kg/reps/obs registrado UMA vez no bootstrap via delegação
+     (ver ligarDelegacaoUmaVez()). NÃO re-registra aqui por render. */
+  document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{
+    const [id,n] = b.dataset.step.split(":"); const ex = acha(id);
+    if(ex){ ex.s = Math.max(1, Math.min(10, ex.s + Number(n))); store.set(S); render(); }});
+  document.querySelectorAll("[data-ty]").forEach(b=>b.onclick=()=>{
+    const [id,t] = b.dataset.ty.split(":"); const ex = acha(id);
+    if(ex){ ex.ty = t; store.set(S); render(); }});
+  document.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{
+    const [id,n] = b.dataset.mv.split(":"); const arr = dayset(ui.perfil)[ui.dia].ex;
+    const i = arr.findIndex(e=>e.id===id), j = i + Number(n);
+    if(i>=0 && j>=0 && j<arr.length){ const t=arr[i]; arr[i]=arr[j]; arr[j]=t; store.set(S); render(); }});
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    const id = b.dataset.del; const arr = dayset(ui.perfil)[ui.dia].ex;
+    const ex = arr.find(e=>e.id===id);
+    if(ex && confirm(`Remover "${ex.n}" do treino ${ui.dia}?`)){
+      dayset(ui.perfil)[ui.dia].ex = arr.filter(e=>e.id!==id); store.set(S); render(); }});
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{
+    dayset(ui.perfil)[ui.dia].ex.push({id:"x"+Date.now(),n:"Novo exercício",p:"8-12",s:3,ty:"load",ap:""});
+    store.set(S); render(); window.scrollTo(0,document.body.scrollHeight);});
+  document.querySelectorAll("[data-reset]:not([data-sugclose])").forEach(b=>b.onclick=()=>{
+    if(confirm(`Restaurar o treino ${ui.dia} como estava no plano original?`)){
+      S.plan[ui.perfil][ui.dia] = clone(BASE[ui.perfil].days[ui.dia]); store.set(S); render(); }});
+
+  document.querySelectorAll("[data-mes]").forEach(b=>b.onclick=()=>{ ui.mes += Number(b.dataset.mes); render(); });
+  document.querySelectorAll("[data-dt]").forEach(b=>b.onclick=()=>{
+    const alvo = new Date(b.dataset.dt+"T12:00"), h = new Date(shift(0)+"T12:00");
+    ui.off = Math.round((alvo-h)/86400000); render(); });
+  document.querySelectorAll("[data-edieta]").forEach(b=>b.onclick=()=>{ui.edieta=!ui.edieta;render();});
+  document.querySelectorAll("[data-chk]").forEach(b=>b.onclick=()=>{
+    const k = ui.perfil+":"+REF(), id = b.dataset.chk;
+    const mk = S.check[k] || {};
+    const atual = mk[id] || null;
+    if(atual===null) mk[id] = "ok";
+    else if(atual==="ok") mk[id] = "no";
+    else delete mk[id];
+    S.check[k] = mk; store.set(S); render(); });
+  document.querySelectorAll("[data-mealmenu]").forEach(b=>b.onclick=()=>abrirMealMenu(b.dataset.mealmenu));
+  document.querySelectorAll("[data-diario]").forEach(b=>b.onclick=()=>abrirDiario());
+  document.querySelectorAll("[data-openia]").forEach(b=>b.onclick=()=>{ if(typeof abrirCoach==='function') abrirCoach(); });
+  document.querySelectorAll("[data-metas]").forEach(b=>b.onclick=()=>{ ui.view="config"; render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-dieta]").forEach(el=>el.oninput=()=>{
+    const D = S.dieta[ui.perfil], parts = el.dataset.dieta.split(".");
+    if(parts[0]==="alvo") D.alvo[parts[1]] = el.value;
+    else if(parts[0]==="nota") D.nota = el.value;
+    else if(parts[0]==="ref"){ const r = D.refs.find(x=>x.id===parts[1]); if(r) r[parts[2]] = el.value; }
+    else if(parts[0]==="extra"){ const x = D.extras.find(y=>y.id===parts[1]); if(x) x[parts[2]] = el.value; }
+    salvaSoft(); });
+
+  /* ---- Config handlers ---- */
+  document.querySelectorAll("[data-cfp]").forEach(b=>b.onclick=()=>{
+    const alvo = b.dataset.cfp;
+    if(alvo === ui.perfil) return;
+    ui.perfil = alvo; ui.dia = avaliar(alvo).win.d; ui.edit=false; ui.edieta=false;
+    render();
+  });
+  /* IMPORTANTE: filtrar por button[data-theme]. Sem o `button` prefixo, o
+     selector pega também <html data-theme="dark">, e como esse elemento é
+     ancestral de TUDO, qualquer click no app bubbles até ele e dispara
+     render() — destruindo o input embaixo do dedo do usuário. Era o bug
+     do "tap curto não foca, long-press foca". */
+  document.querySelectorAll("button[data-theme]").forEach(b=>b.onclick=()=>{
+    setTheme(b.dataset.theme); render();
+  });
+  document.querySelectorAll("[data-editplan]").forEach(b=>b.onclick=()=>{
+    ui.dia = avaliar(ui.perfil).win.d; ui.view="treino"; ui.edit=true; render(); window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-editdieta]").forEach(b=>b.onclick=()=>{
+    ui.view="dieta"; ui.edieta=true; render(); window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=()=>{
+    if(confirm("Sair da conta?")) logout();
+  });
+  /* [data-meta] tratado pela delegação global (ligarDelegacaoUmaVez) */
+}
+
+/* Delegação global de INPUT nas séries — registrada UMA vez.
+   Corrige bug em que oninput deixava de disparar após re-renders (pull remoto,
+   store.set etc). Como o listener vive no document, novos inputs criados por
+   render() automaticamente são cobertos — sem race, sem re-registro. */
+let _delegacaoInputLigada = false;
+function ligarDelegacaoUmaVez(){
+  if(_delegacaoInputLigada) return;
+  _delegacaoInputLigada = true;
+  // v25: delegação global de clique pros chips de Planejar hoje (garantia extra
+  // além dos onclick registrados em ligar()). Cobre casos em que o re-render
+  // ainda não rodou ou o listener direto foi perdido.
+  document.addEventListener('click', function(e){
+    const el = e.target && e.target.closest ? e.target.closest('[data-planq]') : null;
+    if(el){
+      e.preventDefault();
+      const ativ = el.getAttribute('data-planq');
+      try{ togglePlanejado(ui.perfil, REF(), ativ); }catch(err){ console.error('[deleg planq]', err); }
+      return;
+    }
+    const el2 = e.target && e.target.closest ? e.target.closest('[data-plansugmusc]') : null;
+    if(el2){
+      e.preventDefault();
+      const letra = el2.getAttribute('data-plansugmusc');
+      try{ setPlanejadoMusc(ui.perfil, REF(), letra); }catch(err){ console.error('[deleg plansugmusc]', err); }
+      return;
+    }
+  }, false);
+  document.addEventListener('input', function(e){
+    const el = e.target;
+    if(!el || !el.matches) return;
+    // kg / reps / obs de série
+    if(el.matches('input[data-cex]')){
+      const exId = el.dataset.cex, i = Number(el.dataset.ci), k = el.dataset.ck;
+      const raw = el.value;
+      const v = (k==="obs") ? raw : String(raw).replace(",",".");
+      upd(ui.perfil, ui.dia, exId, i, k, v);
+      return;
+    }
+    // título do treino / campos de exercício em modo edit
+    if(el.matches('input[data-f]')){
+      const f = el.dataset.f;
+      if(f==="titulo"){ dayset(ui.perfil)[ui.dia].t = el.value; }
+      else { const ex = acha(el.dataset.ex); if(ex) ex[f] = el.value; }
+      salvaSoft();
+      return;
+    }
+    // config de perfil (peso/kcal/prot etc)
+    if(el.matches('[data-meta]')){
+      if(!S.metas) S.metas={};
+      if(!S.metas[ui.perfil]) S.metas[ui.perfil] = {};
+      S.metas[ui.perfil][el.dataset.meta] = el.value;
+      salvaSoft();
+      return;
+    }
+  }, false); // bubble phase — safer on iOS
+
+  // v31: se a tela do dia tem o slot PaceIA, hidrata (determinístico já cai imediato + IA async)
+  try { if(ui.view==='hoje' && document.getElementById('pace-ia-card')) PaceIA.hydrate(); }
+  catch(err){ console.warn('[PaceIA hydrate]', err); }
+}
+
+/* ================================================================ início */
+(async function(){
+  const AUTH = getAuth();
+  if(!AUTH){ mostraLogin(); return; }
+  ligarDelegacaoUmaVez();
+  await syncEngine.bootstrap();
+  if(!S.events) S.events = [];
+  if(!S.draft) S.draft = {};
+  if(!S.plan) S.plan = { gabriel: clone(BASE.gabriel.days), eduarda: clone(BASE.eduarda.days) };
+  if(!S.dieta) S.dieta = clone(DIETA);
+  if(!S.check) S.check = {};
+  if(!S.metas) S.metas = {};
+  Object.keys(S.check).forEach(k=>{
+    if(Array.isArray(S.check[k])){
+      const novo = {}; S.check[k].forEach(id=>novo[id]="ok"); S.check[k] = novo;
+    }
+  });
+  ["gabriel","eduarda"].forEach(p=>{
+    if(!S.dieta[p]) S.dieta[p] = clone(DIETA[p]);
+    if(!Array.isArray(S.dieta[p].log)) S.dieta[p].log = [];
+    if(Array.isArray(S.dieta[p].refs)) S.dieta[p].refs.forEach(r=>{ if(typeof r.hora !== 'string') r.hora = ''; });
+  });
+  ORDER.forEach(d=>{ ["gabriel","eduarda"].forEach(p=>{
+    if(!S.plan[p][d]) S.plan[p][d] = clone(BASE[p].days[d]);
+    S.plan[p][d].ex.forEach(e=>{ if(e.ap===undefined) e.ap=""; }); }); });
+  // Seed schedule/dias/alvos_dia se faltarem (v22)
+  if(S.plan.gabriel && !S.plan.gabriel.schedule) S.plan.gabriel.schedule = clone(SCHED_GABRIEL);
+  if(S.plan.eduarda && !S.plan.eduarda.schedule) S.plan.eduarda.schedule = clone(SCHED_EDUARDA);
+  if(S.dieta.gabriel){
+    if(!S.dieta.gabriel.dias) S.dieta.gabriel.dias = clone(DIETA_DIAS_GABRIEL);
+    if(!S.dieta.gabriel.alvos_dia) S.dieta.gabriel.alvos_dia = clone(DIETA_ALVOS_DIA_GABRIEL);
+    // v27: garante presença dos novos tipos de dia jejum / jejum_jiu
+    if(S.dieta.gabriel.alvos_dia){
+      if(!S.dieta.gabriel.alvos_dia.jejum) S.dieta.gabriel.alvos_dia.jejum = clone(DIETA_ALVOS_DIA_GABRIEL.jejum);
+      if(!S.dieta.gabriel.alvos_dia.jejum_jiu) S.dieta.gabriel.alvos_dia.jejum_jiu = clone(DIETA_ALVOS_DIA_GABRIEL.jejum_jiu);
+    }
+    // Migração: remove extras x1/x2 (água/creatina) — agora só r1 tem hidratação
+    if(Array.isArray(S.dieta.gabriel.extras)){
+      S.dieta.gabriel.extras = S.dieta.gabriel.extras.filter(x=>x && x.id!=='x1' && x.id!=='x2');
+    }
+  }
+  if(S.dieta.eduarda){
+    if(!S.dieta.eduarda.dias) S.dieta.eduarda.dias = clone(DIETA_DIAS_EDUARDA);
+    if(!S.dieta.eduarda.alvos_dia) S.dieta.eduarda.alvos_dia = clone(DIETA_ALVOS_DIA_EDUARDA);
+  }
+  // v23: Sistema de atividades planejadas (jiu/corrida/futebol/bike + override musc por dia)
+  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
+  if(!S.planejado.gabriel) S.planejado.gabriel = {};
+  if(!S.planejado.eduarda) S.planejado.eduarda = {};
+  ui.perfil = AUTH.perfil;
+  ui.dia = avaliar(ui.perfil).win.d;
+  render();
+  syncEngine.start();
+})();
+</script>
+</body>
+</html>
