@@ -6,10 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Pace">
+<meta name="apple-mobile-web-app-title" content="pace">
 <meta name="theme-color" content="#0A0B0F" id="themeColor">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230A0B0F'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='96' font-style='italic' fill='%23E85D3F' text-anchor='middle'%3Ep%3C/text%3E%3C/svg%3E">
-<title>Pace</title>
+<title>pace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -278,6 +278,8 @@
   .h-d{font-family:var(--serif);font-size:17px;color:var(--ink);letter-spacing:-.01em}
   .hist{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;font-size:13px;padding:2px 0}
   .hist .n{color:var(--muted)}
+  .hist .n{min-width:0;overflow-wrap:anywhere}
+  @media (max-width:360px){ .hist{flex-wrap:wrap;gap:2px 12px} .hist .v{white-space:normal} }
   .hist .v{font-family:var(--mono);white-space:nowrap;font-size:12.5px;color:var(--ink);font-weight:500;
     font-variant-numeric:tabular-nums}
 
@@ -320,7 +322,8 @@
     padding:18px 16px 16px;margin-bottom:16px;box-shadow:var(--sh-1)}
   .cal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
   .cal-h .m{font-family:var(--serif);font-size:20px;color:var(--ink);letter-spacing:-.012em}
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  @media (max-width:340px){ .grid .cell{min-width:0} }
   .gh{font-size:9px;text-align:center;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;
     padding-bottom:6px;font-weight:600}
   .cell{aspect-ratio:1;border-radius:10px;background:transparent;display:flex;flex-direction:column;
@@ -1011,6 +1014,7 @@
   .pc-sh{color:var(--muted);font-size:13px;font-weight:600;padding:0 6px 8px;border-bottom:1px solid var(--hair)}
   .pc-sh .c{text-align:center}
   .pc-sr{padding:8px 6px;border-bottom:1px solid var(--hair);border-radius:12px;margin:0}
+  @media (max-width:340px){ .pc-sh,.pc-sr{grid-template-columns:1.4rem minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr) var(--tap);gap:6px} .pc-sr input{min-width:0} }
   .pc-sr.cur{outline:2px solid var(--ac);outline-offset:-2px;border-bottom-color:transparent}
   .pc-sr .ix{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
   .pc-sr .pv{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1064,6 +1068,18 @@
   .cfg-seg button{min-height:44px;height:44px}
   .mx-dots{min-width:44px;min-height:44px}
   .pc-bottom .note{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .login-brand .nm{font-family:var(--sans);font-weight:800;font-size:44px;letter-spacing:-.04em;color:var(--ink)}
+  .login-sub{font-family:var(--sans);font-style:normal;color:var(--muted)}
+  .cfg-row .em svg,.cfg-row .em .pc-ic{width:18px;height:18px}
+  .cfg-row{min-height:56px}
+  .pc-exf .pc-link{display:inline-flex;align-items:center;gap:6px}
+  .chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px}
+  .chip .pc-ic{width:16px;height:16px}
+  .mx-dots .pc-ic{width:20px;height:20px}
+  .cfg-row .caret{display:inline-flex}
+  .cfg-theme button .pc-ic{width:20px;height:20px}
+  .pace-ia-alerta{display:flex;gap:8px;align-items:flex-start}
+  .sync-badge{font-size:11px}
   .pc-jejum{border:1.5px solid var(--warn);border-radius:14px;padding:14px;margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--ink)}
 
 </style>
@@ -1208,11 +1224,11 @@ const syncEngine = (function(){
   }
 
   async function pushNow(){
-    if(!client){ setStatus('offline','⚠ offline'); return; }
+    if(!client){ setStatus('offline','offline'); return; }
     if(pushInflight){ pendingWhile = true; return; }
-    if(!navigator.onLine){ setStatus('offline','⚠ offline'); return; }
+    if(!navigator.onLine){ setStatus('offline','offline'); return; }
     pushInflight = true;
-    setStatus('saving','⏳ salvando');
+    setStatus('saving','salvando…');
     try {
       for(let tentativa=0; tentativa<4; tentativa++){
         const remote = await pullOnce();
@@ -1239,16 +1255,16 @@ const syncEngine = (function(){
         if(gravou){
           setLocalVersion(nextVersion);
           setBase(snap);
-          setStatus('ok','☁ sincronizado');
+          setStatus('ok','sincronizado');
           return;
         }
         // versão mudou no meio do caminho: busca de novo e combina
       }
-      setStatus('offline','⚠ tentando sincronizar');
+      setStatus('offline','tentando sincronizar…');
       pendingWhile = true;
     } catch(e){
       console.warn('push falhou', e);
-      setStatus('offline','⚠ offline');
+      setStatus('offline','offline');
     } finally {
       pushInflight = false;
       if(pendingWhile){ pendingWhile = false; schedulePush(); }
@@ -1277,15 +1293,15 @@ const syncEngine = (function(){
           aplicar(cl(remote.data));
           setBase(remote.data); setLocalVersion(rv);
         }
-        setStatus('ok','☁ sincronizado');
+        setStatus('ok','sincronizado');
       } else if(temAlteracaoLocal()){
         schedulePush();
       } else {
-        setStatus('ok','☁ sincronizado');
+        setStatus('ok','sincronizado');
       }
     } catch(e){
       console.warn('pull falhou', e);
-      setStatus('offline','⚠ offline');
+      setStatus('offline','offline');
     }
   }
 
@@ -1308,20 +1324,20 @@ const syncEngine = (function(){
       setBase(remote.data);
       setLocalVersion(rv);
       try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
-      setStatus('ok','☁ sincronizado');
+      setStatus('ok','sincronizado');
     } else if(local){
       Object.assign(S, local);
       if(local.events && local.events.length) enviar = true;
     }
     if(enviar) schedulePush();
-    if(!navigator.onLine) setStatus('offline','⚠ offline');
+    if(!navigator.onLine) setStatus('offline','offline');
   }
 
   function start(){
     setInterval(pullAndMerge, 15000);
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) pullAndMerge(); });
-    window.addEventListener('online', ()=>{ setStatus('saving','⏳ reconectando'); pullAndMerge().then(()=>schedulePush()); });
-    window.addEventListener('offline', ()=>setStatus('offline','⚠ offline'));
+    window.addEventListener('online', ()=>{ setStatus('saving','reconectando…'); pullAndMerge().then(()=>schedulePush()); });
+    window.addEventListener('offline', ()=>setStatus('offline','offline'));
   }
 
   return { schedulePush, pushNow, pullAndMerge, bootstrap, start, getVersion };
@@ -1640,8 +1656,7 @@ function mostraLogin(msg){
     '<div class="login-wrap" id="app">'+
     '  <div class="login-card">'+
     '    <div class="login-brand">'+
-    '      <div class="logo"><span>p</span></div>'+
-    '      <div class="nm">Pac<em>e</em></div>'+
+    '      <div class="nm">pace</div>'+
     '    </div>'+
     '    <div class="login-sub">Registre o ritmo dos seus treinos.</div>'+
     '    <label for="li-user">Usu&aacute;rio</label>'+
@@ -1700,8 +1715,8 @@ const temExtra = (p,off) => S.events.some(e=>e.perfil===p && e.data===shift(ui.o
 const temSkip = (p,off) => S.events.some(e=>e.perfil===p && e.tipo==="skip" && e.data===shift(ui.off+Number(off)));
 const extrasDoDia = (p,data) => S.events.filter(e=>e.perfil===p && e.tipo==="extra" && e.data===data);
 const skipDoDia = (p,data) => S.events.find(e=>e.perfil===p && e.tipo==="skip" && e.data===data);
-const ATIV_EMOJI = { "bike":"🚴","futebol":"⚽","corrida":"🏃","natação":"🏊","natacao":"🏊","caminhada":"🚶","jiu-jitsu":"🥋","jiujitsu":"🥋","jejum":"🌙" };
-const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return ATIV_EMOJI[k] || "🏅"; };
+const ATIV_ICON = { bike:"bike", corrida:"run", caminhada:"run", "natação":"swim", natacao:"swim", "jiu-jitsu":"belt", jiujitsu:"belt", jiu:"belt", jejum:"moon" };
+const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typeof pic==="function") ? pic(ATIV_ICON[k]||"spark","sm") : ""; };
 
 /* ========================================================= recomendação */
 /* ============================================================================
@@ -2106,7 +2121,7 @@ const PaceIA = {
     holder.innerHTML = `
       <div class="pace-ia-box">
         <div class="pace-ia-head">
-          <div class="pace-ia-t">🧠 Por que esse treino hoje?</div>
+          <div class="pace-ia-t">Por que esse treino hoje?</div>
           <button class="pace-ia-toggle" type="button" data-pace-toggle>▾</button>
         </div>
         <div class="pace-ia-body">
@@ -2154,7 +2169,7 @@ const PaceIA = {
     const t = j.treino_hoje || {};
     const th = `<div class="pace-ia-th"><b>IA:</b> ${esc(String(t.letra||'?'))} — ${esc(String(t.nome||''))} · ${esc(String(t.intensidade||''))}</div>`;
     const jus = j.justificativa ? `<div class="pace-ia-jus">${esc(j.justificativa)}</div>` : '';
-    const alerta = j.alerta ? `<div class="pace-ia-alerta">⚠️ ${esc(j.alerta)}</div>` : '';
+    const alerta = j.alerta ? `<div class="pace-ia-alerta">${pic("alert","sm")} ${esc(j.alerta)}</div>` : '';
     const prox = Array.isArray(j.proximos_3_dias) && j.proximos_3_dias.length
       ? '<div class="pace-ia-prox"><div class="pace-ia-prox-t">Próximos 3 dias</div>' +
         j.proximos_3_dias.map(d=>`<div class="pace-ia-prox-l"><b>${esc(String(d.data||''))}</b> · ${esc(String(d.letra||''))} ${esc(String(d.nome||''))} <span class="pace-ia-muted">— ${esc(String(d.por_que||''))}</span></div>`).join('') +
@@ -2270,7 +2285,7 @@ function verificarConflitoIniciar(p, dEscolhido){
   if(conf && (dEscolhido==="B" || dEscolhido==="D") && (!sch || sch.musc===dEscolhido)){
     avisos.push(conf.msg.replace(/<[^>]+>/g,""));
   }
-  return avisos.length ? "\u26A0\uFE0F " + avisos.join("\n\n") + "\n\nContinuar mesmo assim?" : null;
+  return avisos.length ? avisos.join("\n\n") + "\n\nContinuar mesmo assim?" : null;
 }
 
 function sessaoCard(s,days,acoes){
@@ -2392,7 +2407,7 @@ function viewDietaEdicao(p,m){
         <span class="badge"></span>
         <div class="mx-name">${esc(r.nome)}${skipTag}</div>
         ${hora?`<div class="mx-hora">${esc(hora)}${(r.kcal!=null&&r.kcal!=="")?" · "+r.kcal+" kcal":""}</div>`:((r.kcal!=null&&r.kcal!=="")?`<div class="mx-hora">${r.kcal} kcal</div>`:"")}
-        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações">⋯</button>
+        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações">${pic("more")}</button>
       </div>
       <div class="mx-items">${itens}</div>
       <div class="mx-foot">
@@ -2465,7 +2480,23 @@ const PI = {
   moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
   run:'<circle cx="15" cy="4" r="2"/><path d="M4 22l4-5 2-3-3-3 4-4 3 4 3 1M10 14l2 3v5"/>',
   note:'<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/>',
-  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>'
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  phone:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/>',
+  cloud:'<path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"/>',
+  logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
+  refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>',
+  bike:'<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9 8.5 6H7M13 9l-2.5 7"/>',
+  belt:'<path d="M3 10h18v4H3z"/><path d="M10 14l-2 6M14 14l2 6"/>',
+  swim:'<path d="M3 17c2 0 2-1.5 4.5-1.5S9.5 17 12 17s2-1.5 4.5-1.5S19 17 21 17"/><path d="M8 13l3-5 4 2 2 3"/><circle cx="17" cy="7" r="2"/>',
+  more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+  contrast:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/>',
+  alert:'<path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/>', list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>'
 };
 const pic = (k, cls) => `<svg class="pc-ic ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${PI[k]||""}</svg>`;
 const cap = s => String(s||"").charAt(0).toUpperCase() + String(s||"").slice(1);
@@ -2651,7 +2682,7 @@ function viewHoje(p,m){
   out += pcSec(ui.off===0 ? "Planejar hoje" : "Atividades do dia");
   out += `<div class="chips" style="margin-bottom:10px">${quicks.map(a=>{
     const on = !!planHoje[a];
-    return `<button class="chip ${on?"on":""}" data-planq="${a}" aria-pressed="${on}">${on?"✓ ":"+ "}${esc(ATIV_LABEL[a]||a)}</button>`;
+    return `<button class="chip ${on?"on":""}" data-planq="${a}" aria-pressed="${on}">${pic(on?"check":"plus","sm")}<span>${esc(ATIV_LABEL[a]||a)}</span></button>`;
   }).join("")}</div>`;
   const skipAtivo = temSkip(p,0);
   const extrasHoje = extrasDoDia(p, REF()).filter(e=>e.atividade && String(e.atividade).toLowerCase()!==mainSport(p));
@@ -2718,7 +2749,7 @@ function viewTreino(p,m){
       <button class="pc-ib" data-minimizar="1" aria-label="Minimizar treino (o rascunho fica salvo)">${pic("down")}</button>
       <div class="mid">Treino ${d}</div>
       ${ui.edit ? `<button class="end" data-edit="1">Concluir edição</button>`
-        : `<button class="end" id="salvar" ${ui.saving?"disabled":""}>${ui.saved?"Salvo ✓":(ui.editId!=null?"Atualizar":"Encerrar")}</button>`}
+        : `<button class="end" id="salvar" ${ui.saving?"disabled":""}>${ui.saved?"Salvo":(ui.editId!=null?"Atualizar":"Encerrar")}</button>`}
     </div>
     ${ui.edit ? `<input class="ed-f" style="margin:6px 0 0" data-f="titulo" value="${esc(treino.t)}" aria-label="Nome do treino">`
       : `<h1 class="pc-stitle">${esc(treino.t)}</h1><p class="pc-sub" id="pcProg">${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}</p>`}
@@ -2726,16 +2757,16 @@ function viewTreino(p,m){
       <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
         <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
       <div class="db-nav">
-        <button class="db-arw" data-off="-1" aria-label="Dia anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button class="db-arw" data-off="-1" aria-label="Dia anterior">${pic("left","sm")}</button>
         <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
-        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}>${pic("right","sm")}</button>
       </div>
     </div>`;
   if(ui.editId!=null) out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
   out += `<div class="segs">`;
   ORDER.forEach(k=>{
     const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
-    const t = u ? (dias(u.data)===0?"✓ feito":"há "+dias(u.data)+"d") : "nunca";
+    const t = u ? (dias(u.data)===0?"feito":"há "+dias(u.data)+"d") : "nunca";
     out += `<button class="sg ${k===d?"on":""}" data-dia="${k}" aria-label="Treino ${k}, ${t}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
   });
   out += `</div>`;
@@ -2780,8 +2811,9 @@ function viewTreino(p,m){
       const temObs = !!(s.obs && String(s.obs).trim());
       if(temObs || obsAberto || ui.obsOpen[ex.id+":"+i]) out += `<div class="pc-obs">${campoObs(s.obs,ex.id,i)}</div>`;
     }
-    out += `<div class="pc-exf"><button class="pc-link" data-exobs="${ex.id}">${obsAberto?"Ocultar observações":"+ Observação por série"}</button></div></section>`;
+    out += `<div class="pc-exf"><button class="pc-link" data-exobs="${ex.id}">${obsAberto?"Ocultar observações":pic("plus","sm")+"<span>Observação por série</span>"}</button></div></section>`;
   });
+  if(temValores(dr) && ui.editId==null) out += `<div class="pc-exf" style="justify-content:flex-start;margin-top:8px"><button class="pc-link" style="color:var(--danger)" data-descartar="1">Descartar rascunho deste treino</button></div>`;
   out += `<p class="pc-note">“Anterior” = ${antEv?`último treino ${d} (${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão, não execução. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.</p>`;
   // barra inferior: opera sobre o MESMO estado do ✓ da linha
   const btn = atual
@@ -2820,13 +2852,13 @@ function viewCal(p,m){
 
   // por exercício — só exercícios presentes nas sessões do período
   const todos = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L}, ex)));
-  const presentes = todos.filter(ex=>ses.some(e=>pcMelhor(ex,(e.entries||{})[ex.id])));
+  const presentes = todos.filter(ex=>ses.some(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])));
   if(!presentes.find(x=>x.id===ui.evoEx)) ui.evoEx = presentes.length ? presentes[0].id : null;
   out += pcSec("Por exercício");
   if(!ui.evoEx){ out += `<p class="pc-note" style="font-size:15px">Nenhum treino concluído neste período.</p>`; }
   else{
     const ex = presentes.find(x=>x.id===ui.evoEx);
-    const comE = ses.filter(e=>pcMelhor(ex,(e.entries||{})[ex.id]));
+    const comE = ses.filter(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id]));
     const un = ex.ty==="time" ? "segundos" : ex.ty==="reps" ? "repetições" : "kg (como anotado no treino)";
     out += `<button class="pc-sel" data-evoex="1" aria-label="Escolher exercício"><span>${esc(ex.n)}</span>${pic("down")}</button>
       <p class="pc-note" style="font-size:14px">Treino ${ex.L} · unidade: ${un} · ${comE.length} ${comE.length===1?"sessão":"sessões"} no período</p>`;
@@ -2952,7 +2984,7 @@ function viewDietaPlano(p,m,R){
     out += `<div class="mealx ${st==="ok"?"done":st==="no"?"faltou":""}">
       <div class="mx-head"><span class="badge"></span><div class="mx-name">${esc(r.nome)}</div>
         ${(r.hora||r.kcal)?`<div class="mx-hora">${esc(r.hora||"")}${(r.kcal!=null&&r.kcal!=="")?(r.hora?" · ":"")+r.kcal+" kcal":""}</div>`:""}
-        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações de ${esc(r.nome)}">⋯</button></div>
+        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações de ${esc(r.nome)}">${pic("more")}</button></div>
       <div class="mx-items">${r.itens?esc(r.itens):`<span style="color:var(--faint)">vazio — toque em Editar para preencher</span>`}</div></div>`;
   });
   return out;
@@ -3026,7 +3058,7 @@ function viewConfig(p,m){
 
   // Perfil ativo
   out += `<div class="cfg-sec">
-    <div class="lbl">👤 Perfil ativo</div>
+    <div class="lbl">Perfil ativo</div>
     <div class="cfg-list"><div class="cfg-perfil">
       ${Object.keys(BASE).map(k=>`<button class="${k===p?"on":""}" data-cfp="${k}">${BASE[k].label}</button>`).join("")}
     </div></div>
@@ -3036,23 +3068,23 @@ function viewConfig(p,m){
   const temWake = typeof navigator!=="undefined" && "wakeLock" in navigator;
   const autoMeta = (()=>{ const sch = getSchedule(p); return sch ? (Object.values(sch).filter(x=>x && x.musc).length || 4) : 4; })();
   out += `<div class="cfg-sec">
-    <div class="lbl">⏱️ Durante o treino<span class="hint">só para ${esc(m.label)}</span></div>
+    <div class="lbl">Durante o treino<span class="hint">só para ${esc(m.label)}</span></div>
     <div class="cfg-list">
-      ${cfgSwitch("descanso","⏱️","Cronômetro de descanso","começa sozinho quando você marca ✓ numa série")}
-      ${pref("descanso") ? cfgSwitch("descansoDoEx","🎯","Usar o descanso de cada exercício","quando o exercício tem tempo próprio (ex.: 120 s no agachamento)")
+      ${cfgSwitch("descanso",pic("clock"),"Cronômetro de descanso","começa sozinho quando você conclui uma série")}
+      ${pref("descanso") ? cfgSwitch("descansoDoEx",pic("target"),"Usar o descanso de cada exercício","quando o exercício tem tempo próprio (ex.: 120 s no agachamento)")
         + cfgSeg("descansoSeg", pref("descansoDoEx") ? "Descanso padrão (exercícios sem tempo próprio)" : "Descanso entre séries", [[60,"60 s"],[90,"90 s"],[120,"2 min"],[180,"3 min"]]) : ""}
-      ${cfgSwitch("autoPreencher","↺","Preencher com a última vez ao tocar ✓","se a série estiver vazia, usa a carga e as repetições da última sessão")}
-      ${cfgSwitch("vibrar","📳","Vibração","ao marcar série, no fim do descanso e ao salvar")}
-      ${cfgSwitch("telaLigada","🔆","Manter a tela ligada no treino", temWake ? "a tela não apaga enquanto a aba Registrar está aberta" : "este aparelho/navegador não permite", !temWake)}
-      ${cfgSwitch("resumo","🏆","Resumo ao salvar","volume, séries e recordes do treino")}
+      ${cfgSwitch("autoPreencher",pic("refresh"),"Preencher com a última vez ao concluir","se a série estiver vazia, usa a carga e as repetições da última sessão")}
+      ${cfgSwitch("vibrar",pic("phone"),"Vibração","ao marcar série, no fim do descanso e ao salvar")}
+      ${cfgSwitch("telaLigada",pic("sun"),"Manter a tela ligada no treino", temWake ? "a tela não apaga durante o treino" : "este aparelho/navegador não permite", !temWake)}
+      ${cfgSwitch("resumo",pic("trophy"),"Resumo ao salvar","volume, séries e recordes do treino")}
     </div>
   </div>`;
 
   // Tela Hoje
   out += `<div class="cfg-sec">
-    <div class="lbl">📅 Tela Hoje</div>
+    <div class="lbl">Tela Hoje</div>
     <div class="cfg-list">
-      ${cfgSwitch("semana","◔","Resumo da semana","anel com treinos feitos, sequência e os 7 dias")}
+      ${cfgSwitch("semana",pic("cal"),"Resumo da semana","treinos concluídos, em andamento e os 7 dias")}
       ${cfgSeg("metaSemana","Meta de treinos por semana", [[0,`Auto (${autoMeta})`],[2,"2"],[3,"3"],[4,"4"],[5,"5"],[6,"6"]])}
     </div>
     <div class="cfg-note">“Auto” usa os dias de musculação do seu cronograma semanal.</div>
@@ -3062,15 +3094,15 @@ function viewConfig(p,m){
   out += `<div class="cfg-sec">
     <div class="lbl">Plano de treino e dieta</div>
     <div class="cfg-list">
-      <button class="cfg-row" data-editplan="A"><span class="em">🏋️</span>
+      <button class="cfg-row" data-editplan="A"><span class="em">${pic("dumbbell")}</span>
         <span class="lb"><span class="tt">Meus treinos</span><span class="st">editar exercícios, séries, repetições dos blocos A · B · C · D</span></span>
-        <span class="caret">›</span></button>
-      <button class="cfg-row" data-editdieta="1"><span class="em">🍽️</span>
+        <span class="caret">${pic("right","sm")}</span></button>
+      <button class="cfg-row" data-editdieta="1"><span class="em">${pic("fork")}</span>
         <span class="lb"><span class="tt">Minha dieta</span><span class="st">alvos, refeições e itens fixos</span></span>
-        <span class="caret">›</span></button>
-      <button class="cfg-row" data-diario="1"><span class="em">📔</span>
+        <span class="caret">${pic("right","sm")}</span></button>
+      <button class="cfg-row" data-diario="1"><span class="em">${pic("note")}</span>
         <span class="lb"><span class="tt">Diário de refeições</span><span class="st">registros dos últimos 30 dias</span></span>
-        <span class="caret">›</span></button>
+        <span class="caret">${pic("right","sm")}</span></button>
     </div>
   </div>`;
 
@@ -3079,59 +3111,59 @@ function viewConfig(p,m){
   const peso = metas.peso || "";
   const prot = metas.prot || "";
   out += `<div class="cfg-sec">
-    <div class="lbl">📊 Metas</div>
+    <div class="lbl">Metas</div>
     <div class="cfg-list" style="padding:14px 16px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
         <div>
           <div class="eyebrow" style="margin-bottom:6px">Peso alvo (kg)</div>
-          <input class="ed-f" style="margin:0;height:42px" data-meta="peso" value="${esc(peso)}" placeholder="ex: 80" inputmode="decimal">
+          <input class="ed-f" style="margin:0;height:48px" data-meta="peso" value="${esc(peso)}" placeholder="ex: 80" inputmode="decimal">
         </div>
         <div>
           <div class="eyebrow" style="margin-bottom:6px">Kcal/dia</div>
-          <input class="ed-f" style="margin:0;height:42px" data-meta="kcal" value="${esc(kcal)}" placeholder="ex: 2700" inputmode="numeric">
+          <input class="ed-f" style="margin:0;height:48px" data-meta="kcal" value="${esc(kcal)}" placeholder="ex: 2700" inputmode="numeric">
         </div>
       </div>
       <div style="margin-top:4px">
         <div class="eyebrow" style="margin-bottom:6px">Proteína (g/dia)</div>
-        <input class="ed-f" style="margin:0;height:42px" data-meta="prot" value="${esc(prot)}" placeholder="ex: 175" inputmode="numeric">
+        <input class="ed-f" style="margin:0;height:48px" data-meta="prot" value="${esc(prot)}" placeholder="ex: 175" inputmode="numeric">
       </div>
     </div>
   </div>`;
 
   // Aparência
   out += `<div class="cfg-sec">
-    <div class="lbl">🎨 Aparência</div>
+    <div class="lbl">Aparência</div>
     <div class="cfg-list"><div class="cfg-theme">
-      <button class="${themeAtual==="auto"?"on":""}" data-theme="auto">${ICON.auto}<span>Auto</span></button>
-      <button class="${themeAtual==="light"?"on":""}" data-theme="light">${ICON.sun}<span>Claro</span></button>
-      <button class="${themeAtual==="dark"?"on":""}" data-theme="dark">${ICON.moon}<span>Escuro</span></button>
+      <button class="${themeAtual==="auto"?"on":""}" data-theme="auto">${pic("contrast")}<span>Auto</span></button>
+      <button class="${themeAtual==="light"?"on":""}" data-theme="light">${pic("sun")}<span>Claro</span></button>
+      <button class="${themeAtual==="dark"?"on":""}" data-theme="dark">${pic("moon")}<span>Escuro</span></button>
     </div></div>
   </div>`;
 
   // Conta
   out += `<div class="cfg-sec">
-    <div class="lbl">🔒 Conta</div>
+    <div class="lbl">Conta</div>
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
-        <span class="em">👤</span>
+        <span class="em">${pic("user")}</span>
         <span class="lb"><span class="tt">Logado como ${esc(meLabel)}</span><span class="st">sessão privada</span></span>
       </div>
-      <button class="cfg-row danger" data-logout="1"><span class="em">⎋</span>
+      <button class="cfg-row danger" data-logout="1"><span class="em">${pic("logout")}</span>
         <span class="lb"><span class="tt">Sair</span></span>
-        <span class="caret">›</span></button>
+        <span class="caret">${pic("right","sm")}</span></button>
     </div>
   </div>`;
 
   // Sobre
   out += `<div class="cfg-sec">
-    <div class="lbl">ℹ️ Sobre</div>
+    <div class="lbl">Sobre</div>
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
-        <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v38 · novo visual pace (Hoje, Treinos, Dieta, Evolução)</span></span>
+        <span class="em">${pic("info")}</span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v39 · revisão do visual e ícones unificados</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
-        <span class="em">☁️</span>
+        <span class="em">${pic("cloud")}</span>
         <span class="lb"><span class="tt">Sincronização</span><span class="st">Supabase — automático em todos dispositivos</span></span>
       </div>
     </div>
@@ -3170,7 +3202,7 @@ function semanaCard(p){
   return `<div class="wk">
     <div class="wk-ring"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="21" class="bg"/><circle cx="25" cy="25" r="21" class="fg" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pctv)}"/></svg><b>${feitos}<small>/${meta}</small></b></div>
     <div class="wk-r"><div class="wk-t">${feitos>=meta?"Meta da semana batida":"Treinos nesta semana"}</div>
-      <div class="wk-s">${seq>0?`🔥 ${seq} ${seq===1?"semana":"semanas"} seguidas na meta`:(meta-feitos===1?"Falta 1 treino para a meta":`Faltam ${Math.max(0,meta-feitos)} treinos para a meta`)}</div>
+      <div class="wk-s">${seq>0?`${seq} ${seq===1?"semana":"semanas"} seguidas na meta`:(meta-feitos===1?"Falta 1 treino para a meta":`Faltam ${Math.max(0,meta-feitos)} treinos para a meta`)}</div>
       <div class="wk-days">${dias}</div></div>
   </div>`;
 }
@@ -3282,9 +3314,9 @@ function mostrarResumo(d, data, r){
       <div><b>${r.series}</b><span>séries</span></div>
       <div><b class="${r.delta==null?"":(r.delta>=0?"up":"down")}">${r.delta==null?"—":(r.delta>0?"+":"")+r.delta+"%"}</b><span>${r.parcial?"treino parcial":(r.dataAnt?"volume vs "+brd(r.dataAnt):"primeira vez")}</span></div>
     </div>
-    ${r.prs.length?`<div class="rs-pr-t">🏆 ${r.prs.length===1?"Novo recorde":"Novos recordes"}</div>${r.prs.map(x=>`<div class="rs-pr"><span>${esc(x.n)}</span><b>${esc(x.txt)}</b><em>+${x.ganho}%</em></div>`).join("")}`:`<div class="rs-nopr">Sem recorde novo hoje. Consistência é o que faz o próximo vir.</div>`}
+    ${r.prs.length?`<div class="rs-pr-t">${r.prs.length===1?"Novo recorde":"Novos recordes"}</div>${r.prs.map(x=>`<div class="rs-pr"><span>${esc(x.n)}</span><b>${esc(x.txt)}</b><em>+${x.ganho}%</em></div>`).join("")}`:`<div class="rs-nopr">Sem recorde novo hoje. Consistência é o que faz o próximo vir.</div>`}
     <button class="sug-save" data-sugclose="1" style="margin-top:14px">Fechar</button>`;
-  _renderSugestaoShell(`Treino ${d} salvo 💪`, dataLonga(data), corpo);
+  _renderSugestaoShell(`Treino ${d} salvo`, dataLonga(data), corpo);
   const m = document.getElementById("sugModal"); if(m) m.querySelectorAll('[data-sugclose]').forEach(el=>el.onclick=fecharSugestao);
 }
 
@@ -3310,6 +3342,8 @@ async function salvar(){
   if(ui.saving) return;
   const p = ui.perfil, d = ui.dia, key = p+":"+d, dr = S.draft[key]||{};
   if(!temValores(dr)){ toast("Preencha pelo menos uma série antes de salvar."); return; }
+  const _c = contaSeries(dayset(p)[d], dr);
+  if(_c.ok>0 && _c.pre>_c.ok && !(await confirmar(`Salvar o treino ${d}?\n\n${_c.ok} ${_c.ok===1?"série concluída":"séries concluídas"} e ${_c.pre-_c.ok} só ${_c.pre-_c.ok===1?"preenchida":"preenchidas"}. As preenchidas também entram no histórico — apague as que não fez.`, {ok:"Salvar"}))) return;
   // O treino é gravado na data mostrada no topo da tela (a que o usuário escolheu).
   const data = REF(), hoje = shift(0);
   if(data > hoje && !(await confirmar(`${dataLonga(data)} é uma data futura.\n\nRegistrar o treino nesse dia mesmo assim?`, {ok:"Registrar assim mesmo"}))) return;
@@ -3460,15 +3494,15 @@ function abrirMealMenu(refId){
   if(!r) return;
   const nRegs = (D.log||[]).filter(l=>l.refId===r.id).length;
   const body = `
-    <button class="cfg-row" style="border-radius:0" data-mealact="reg"><span class="em">📝</span>
+    <button class="cfg-row" style="border-radius:0" data-mealact="reg"><span class="em">${pic("note")}</span>
       <span class="lb"><span class="tt">Registrar o que comi</span><span class="st">${nRegs?nRegs+" registros dessa refeição":"anotar hoje"}</span></span>
-      <span class="caret">›</span></button>
-    <button class="cfg-row" style="border-radius:0" data-mealact="sug"><span class="em">💡</span>
+      <span class="caret">${pic("right","sm")}</span></button>
+    <button class="cfg-row" style="border-radius:0" data-mealact="sug"><span class="em">${pic("spark")}</span>
       <span class="lb"><span class="tt">Sugestões IA</span><span class="st">alternativas para essa refeição</span></span>
-      <span class="caret">›</span></button>
-    <button class="cfg-row" style="border-radius:0;border-bottom:none" data-mealact="edit"><span class="em">✏️</span>
+      <span class="caret">${pic("right","sm")}</span></button>
+    <button class="cfg-row" style="border-radius:0;border-bottom:none" data-mealact="edit"><span class="em">${pic("edit")}</span>
       <span class="lb"><span class="tt">Editar refeição</span><span class="st">itens e nome (via Config)</span></span>
-      <span class="caret">›</span></button>
+      <span class="caret">${pic("right","sm")}</span></button>
   `;
   _renderSugestaoShell(r.nome, "O que fazer com essa refeição?",
     `<div class="cfg-list">${body}</div>
@@ -3602,7 +3636,7 @@ function abrirRegistroRefeicao(refId){
     <div id="regHist">${histHTML}</div>
     <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5">Toque num registro para copiar o texto no campo acima.</div>
   `;
-  _renderSugestaoShell(`📝 ${r.nome} · ${hoje===shift(0)?"hoje":brd(hoje)}`, `${brd(hoje)} · ${_agoraHM()}`, body);
+  _renderSugestaoShell(`${r.nome} · ${hoje===shift(0)?"hoje":brd(hoje)}`, `${brd(hoje)} · ${_agoraHM()}`, body);
   const ta = document.getElementById('regTexto');
   const bt = document.getElementById('regSalvar');
   bt.onclick = () => salvarRegistroRefeicao(refId, ta.value);
@@ -3627,7 +3661,7 @@ function abrirDiario(){
     </div>`;
   let corpo = '';
   if(!datas.length){
-    corpo = `<div style="padding:30px 10px;text-align:center;color:var(--muted);font-size:13px">Nenhum registro nos &uacute;ltimos 30 dias.<br><span style="font-size:11px;color:var(--faint)">Toque em ⋯ em qualquer refei&ccedil;&atilde;o e escolha "Registrar" para come&ccedil;ar.</span></div>`;
+    corpo = `<div style="padding:30px 10px;text-align:center;color:var(--muted);font-size:13px">Nenhum registro nos &uacute;ltimos 30 dias.<br><span style="font-size:11px;color:var(--faint)">Toque em “Ações” em qualquer refei&ccedil;&atilde;o e escolha "Registrar" para come&ccedil;ar.</span></div>`;
   } else {
     datas.forEach(dt=>{
       const itens = grupos[dt].filter(l=>!filtroAtual || l.refId===filtroAtual);
@@ -3650,7 +3684,7 @@ function abrirDiario(){
     });
     if(!corpo) corpo = `<div style="padding:30px 10px;text-align:center;color:var(--faint);font-size:12.5px">Nenhum registro dessa refei&ccedil;&atilde;o.</div>`;
   }
-  _renderSugestaoShell('📔 Diário de refeições', `últimos 30 dias · ${log.length} registros no total`, chipsHTML + corpo);
+  _renderSugestaoShell('Diário de refeições', `últimos 30 dias · ${log.length} registros no total`, chipsHTML + corpo);
   document.querySelectorAll('#diarioChips [data-diaroffiltro]').forEach(b=>b.onclick=()=>{
     ui.diarioFiltro = b.dataset.diaroffiltro || '';
     abrirDiario();
@@ -3760,7 +3794,7 @@ async function abrirCoach(){
   _renderSugestaoShell(
     'Análise do coach',
     `${perfilNome} · ${brd(REF())||'hoje'}`,
-    `<div class="sug-load">🤖 O coach está analisando seu histórico, dieta e recuperação...<br><br><span style="font-size:11px;color:var(--faint)">isso leva uns 5–10 segundos</span></div>`
+    `<div class="sug-load">O coach está analisando seu histórico, dieta e recuperação...<br><br><span style="font-size:11px;color:var(--faint)">isso leva uns 5–10 segundos</span></div>`
   );
 
   try{
@@ -3839,7 +3873,7 @@ function _renderCoach(j){
       ui.dia = letraSel;
       ui.view = 'treino';
       ui.saved = false; ui.editId = null;
-      b.textContent = '✓ Aplicado';
+      b.textContent = 'Aplicado';
       b.classList.add('done');
       setTimeout(()=>{ fecharSugestao(); render(); window.scrollTo(0,0); }, 400);
     });
@@ -3912,6 +3946,13 @@ function ligar(){
     }
   });
   document.querySelectorAll("[data-salvarbottom]").forEach(b=>b.onclick=salvar);
+  document.querySelectorAll("[data-descartar]").forEach(b=>b.onclick=async ()=>{
+    const key = ui.perfil+":"+ui.dia;
+    if(!(await confirmar(`Descartar o rascunho do treino ${ui.dia}?\n\nOs valores digitados somem. Nada do histórico é apagado.`, {ok:"Descartar", perigo:true}))) return;
+    const bakD = clone(S.draft[key]||{}), bakM = S.draftMeta ? clone(S.draftMeta[key]||null) : null;
+    S.draft[key] = {}; limpaDraftMeta(ui.perfil, ui.dia); pararDescanso(); store.set(S); render();
+    toastUndo("Rascunho descartado", ()=>{ S.draft[key] = bakD; if(bakM){ if(!S.draftMeta) S.draftMeta = {}; S.draftMeta[key] = bakM; } store.set(S); render(); });
+  });
   document.querySelectorAll("[data-continuar]").forEach(b=>b.onclick=()=>{
     ui.dia = b.dataset.continuar; ui.off = 0; ui.view = "treino"; ui.edit = false; ui.editId = null; ui.saved = false; render(); window.scrollTo(0,0); });
   document.querySelectorAll("[data-minimizar]").forEach(b=>b.onclick=()=>{
@@ -3926,9 +3967,9 @@ function ligar(){
     const p = ui.perfil, days = dayset(p), base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
     const ym = `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,"0")}`;
     const ses = S.events.filter(e=>e.perfil===p && e.tipo==="musc" && e.data.startsWith(ym));
-    const lista = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L},ex))).filter(ex=>ses.some(e=>pcMelhor(ex,(e.entries||{})[ex.id])));
+    const lista = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L},ex))).filter(ex=>ses.some(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])));
     _renderSugestaoShell("Exercício", "Só aparecem exercícios com registro no período", `<div class="pc-list">${lista.map(ex=>{
-      const n = ses.filter(e=>pcMelhor(ex,(e.entries||{})[ex.id])).length;
+      const n = ses.filter(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])).length;
       return `<button class="pc-row" data-pickex="${ex.id}"><div class="main"><div class="t">${esc(ex.n)}</div><div class="s">Treino ${ex.L} · ${n} ${n===1?"sessão":"sessões"}</div></div>${ex.id===ui.evoEx?`<span style="color:var(--ac)">${pic("check")}</span>`:""}</button>`; }).join("")}</div>`);
     document.querySelectorAll("#sugModal [data-pickex]").forEach(x=>x.onclick=()=>{ ui.evoEx = x.dataset.pickex; fecharSugestao(); render(); });
   });
