@@ -630,6 +630,24 @@
   .cfg-theme button:active{transform:scale(.97)}
   .cfg-theme button.on{background:var(--sunk);color:var(--ink);border-color:var(--hair-2);font-weight:600}
   .cfg-theme button svg{width:18px;height:18px;stroke-width:1.75}
+  /* v36 · switches e seletores das preferências */
+  .cfg-sec .lbl .hint{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint)}
+  .cfg-note{font-size:12px;color:var(--faint);margin:8px 6px 0;line-height:1.45}
+  .sw{position:relative;width:46px;height:28px;border-radius:999px;background:var(--hair-2);flex-shrink:0;
+    transition:background var(--dur-fast) var(--ease)}
+  .sw i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform var(--dur-fast) var(--ease)}
+  .sw.on{background:var(--ac)}
+  .sw.on i{transform:translateX(18px)}
+  .cfg-row[aria-disabled="true"]{opacity:.45;pointer-events:none}
+  .cfg-sub{padding:4px 16px 14px 58px;border-bottom:.5px solid var(--hair)}
+  .cfg-sub:last-child{border-bottom:none}
+  .cfg-sub .eyebrow{margin-bottom:8px}
+  .cfg-seg{display:flex;gap:6px;flex-wrap:wrap}
+  .cfg-seg button{min-width:48px;height:36px;padding:0 12px;border-radius:10px;background:var(--sunk);
+    color:var(--muted);font-size:13px;font-weight:600;border:.5px solid transparent;transition:all var(--dur-fast) var(--ease)}
+  .cfg-seg button:active{transform:scale(.96)}
+  .cfg-seg button.on{background:var(--ac);color:#fff}
 
   /* Login */
   .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -1953,6 +1971,7 @@ function render(){
     [["hoje","Hoje"],["treino","Registrar"],["cal","Calendário"],["dieta","Dieta"],["config","Config"]].map(([k,l])=>
       `<button class="tb ${ui.view===k?"on":""}" data-view="${k}">${ICON[k==="config"?"config":k]}<span>${l}</span></button>`).join("");
   ligar();
+  atualizaTelaLigada();
 }
 
 /* Render seguro contra digitação: se o usuário está com foco num input
@@ -2022,7 +2041,7 @@ function viewHoje(p,m){
   // recebem a mesma regra: olhar 3 dias anteriores → se letra base foi feita,
   // trocar pra alternativa mais atrasada. Não há mais blocos ad-hoc aqui.
   const d = days[r.win.d];
-  let out = semanaCard(p);
+  let out = pref("semana") ? semanaCard(p) : "";
 
   // Se já treinou nesse dia -> mostra card "concluído" (Hevy-style hero verde)
   if(treinoDoDia){
@@ -2516,6 +2535,34 @@ function viewDieta(p,m){
 }
 
 /* ------------------------------------------------------------------ CONFIG */
+/* ===================== v36 · preferências (por pessoa, sincronizadas) ===================== */
+const PREF_PADRAO = { descanso:true, descansoSeg:90, descansoDoEx:true, vibrar:true, autoPreencher:true,
+  resumo:true, semana:true, metaSemana:0, telaLigada:false };
+function pref(k){ const x = S.prefs && S.prefs[ui.perfil]; return (x && Object.prototype.hasOwnProperty.call(x,k)) ? x[k] : PREF_PADRAO[k]; }
+function setPref(k,v){
+  if(!S.prefs) S.prefs = {};
+  if(!S.prefs[ui.perfil]) S.prefs[ui.perfil] = {};
+  S.prefs[ui.perfil][k] = v; store.set(S);
+}
+function vibrar(padrao){ if(!pref("vibrar")) return; try{ navigator.vibrate && navigator.vibrate(padrao); }catch(e){} }
+let WAKE = null;
+async function atualizaTelaLigada(){
+  const quer = ui.view==="treino" && pref("telaLigada") && document.visibilityState==="visible";
+  try{
+    if(quer && !WAKE && navigator.wakeLock){ WAKE = await navigator.wakeLock.request("screen"); WAKE.addEventListener("release", ()=>{ WAKE = null; }); }
+    else if(!quer && WAKE){ const w = WAKE; WAKE = null; await w.release(); }
+  }catch(e){ WAKE = null; }
+}
+document.addEventListener("visibilitychange", atualizaTelaLigada);
+const cfgSwitch = (k, em, tt, st, dis) => {
+  const on = !!pref(k);
+  return `<button class="cfg-row" role="switch" aria-checked="${on}" ${dis?'aria-disabled="true"':""} data-pref="${k}">
+    <span class="em">${em}</span><span class="lb"><span class="tt">${tt}</span>${st?`<span class="st">${st}</span>`:""}</span>
+    <span class="sw ${on?"on":""}"><i></i></span></button>`;
+};
+const cfgSeg = (k, titulo, opcoes) => `<div class="cfg-sub"><div class="eyebrow">${titulo}</div><div class="cfg-seg">${
+  opcoes.map(([v,l])=>`<button class="${String(pref(k))===String(v)?"on":""}" data-prefv="${k}" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+
 function viewConfig(p,m){
   const AUTHNOW = getAuth();
   const meLabel = AUTHNOW ? BASE[AUTHNOW.perfil].label : "";
@@ -2532,14 +2579,30 @@ function viewConfig(p,m){
     </div></div>
   </div>`;
 
-  // Tema
+  // Durante o treino
+  const temWake = typeof navigator!=="undefined" && "wakeLock" in navigator;
+  const autoMeta = (()=>{ const sch = getSchedule(p); return sch ? (Object.values(sch).filter(x=>x && x.musc).length || 4) : 4; })();
   out += `<div class="cfg-sec">
-    <div class="lbl">🎨 Tema</div>
-    <div class="cfg-list"><div class="cfg-theme">
-      <button class="${themeAtual==="auto"?"on":""}" data-theme="auto">${ICON.auto}<span>Auto</span></button>
-      <button class="${themeAtual==="light"?"on":""}" data-theme="light">${ICON.sun}<span>Claro</span></button>
-      <button class="${themeAtual==="dark"?"on":""}" data-theme="dark">${ICON.moon}<span>Escuro</span></button>
-    </div></div>
+    <div class="lbl">⏱️ Durante o treino<span class="hint">só para ${esc(m.label)}</span></div>
+    <div class="cfg-list">
+      ${cfgSwitch("descanso","⏱️","Cronômetro de descanso","começa sozinho quando você marca ✓ numa série")}
+      ${pref("descanso") ? cfgSwitch("descansoDoEx","🎯","Usar o descanso de cada exercício","quando o exercício tem tempo próprio (ex.: 120 s no agachamento)")
+        + cfgSeg("descansoSeg", pref("descansoDoEx") ? "Descanso padrão (exercícios sem tempo próprio)" : "Descanso entre séries", [[60,"60 s"],[90,"90 s"],[120,"2 min"],[180,"3 min"]]) : ""}
+      ${cfgSwitch("autoPreencher","↺","Preencher com a última vez ao tocar ✓","se a série estiver vazia, usa a carga e as repetições da última sessão")}
+      ${cfgSwitch("vibrar","📳","Vibração","ao marcar série, no fim do descanso e ao salvar")}
+      ${cfgSwitch("telaLigada","🔆","Manter a tela ligada no treino", temWake ? "a tela não apaga enquanto a aba Registrar está aberta" : "este aparelho/navegador não permite", !temWake)}
+      ${cfgSwitch("resumo","🏆","Resumo ao salvar","volume, séries e recordes do treino")}
+    </div>
+  </div>`;
+
+  // Tela Hoje
+  out += `<div class="cfg-sec">
+    <div class="lbl">📅 Tela Hoje</div>
+    <div class="cfg-list">
+      ${cfgSwitch("semana","◔","Resumo da semana","anel com treinos feitos, sequência e os 7 dias")}
+      ${cfgSeg("metaSemana","Meta de treinos por semana", [[0,`Auto (${autoMeta})`],[2,"2"],[3,"3"],[4,"4"],[5,"5"],[6,"6"]])}
+    </div>
+    <div class="cfg-note">“Auto” usa os dias de musculação do seu cronograma semanal.</div>
   </div>`;
 
   // Meus treinos e Dieta
@@ -2582,6 +2645,16 @@ function viewConfig(p,m){
     </div>
   </div>`;
 
+  // Aparência
+  out += `<div class="cfg-sec">
+    <div class="lbl">🎨 Aparência</div>
+    <div class="cfg-list"><div class="cfg-theme">
+      <button class="${themeAtual==="auto"?"on":""}" data-theme="auto">${ICON.auto}<span>Auto</span></button>
+      <button class="${themeAtual==="light"?"on":""}" data-theme="light">${ICON.sun}<span>Claro</span></button>
+      <button class="${themeAtual==="dark"?"on":""}" data-theme="dark">${ICON.moon}<span>Escuro</span></button>
+    </div></div>
+  </div>`;
+
   // Conta
   out += `<div class="cfg-sec">
     <div class="lbl">🔒 Conta</div>
@@ -2602,7 +2675,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v35 · treino da Eduarda com foco em costas, ombro e TAF · sem futebol nos extras</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v36 · preferências de treino (descanso, vibração, tela ligada, meta semanal)</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2619,6 +2692,7 @@ function viewConfig(p,m){
 const num = v => { const n = parseFloat(String(v==null?"":v).replace(",", ".")); return isFinite(n) ? n : 0; };
 const e1rm = (kg, reps) => { kg = num(kg); reps = num(reps); return (kg>0 && reps>0) ? kg*(1+reps/30) : 0; };
 function metaSemanal(p){
+  const fixa = Number(pref("metaSemana")); if(fixa > 0) return fixa;
   const sch = getSchedule(p); if(!sch) return 4;
   return Object.values(sch).filter(x=>x && x.musc).length || 4;
 }
@@ -2650,9 +2724,12 @@ function semanaCard(p){
 /* ---- cronômetro de descanso (fica fora do render) ---- */
 const REST = { fim:0, total:0, t:null };
 function segDescanso(ex){
-  const t = String((ex && ex.descanso) || "");
-  const n = parseFloat(t.replace(",", ".")); if(!isFinite(n) || n<=0) return 90;
-  return /min/i.test(t) ? Math.round(n*60) : Math.round(n);
+  if(pref("descansoDoEx") && ex){
+    if(Number(ex.d) > 0) return Math.round(Number(ex.d));
+    const t = String(ex.descanso || ""); const n = parseFloat(t.replace(",", "."));
+    if(isFinite(n) && n > 0) return /min/i.test(t) ? Math.round(n*60) : Math.round(n);
+  }
+  return Number(pref("descansoSeg")) || 90;
 }
 function iniciarDescanso(seg){
   REST.total = seg; REST.fim = Date.now() + seg*1000;
@@ -2675,7 +2752,7 @@ function tickDescanso(){
   el.querySelector(".rb-p i").style.width = (REST.total ? (1 - rest/REST.total)*100 : 100) + "%";
   if(rest<=0){
     clearInterval(REST.t); REST.t=null;
-    try{ navigator.vibrate && navigator.vibrate([220,120,220]); }catch(e){}
+    vibrar([220,120,220]);
     el.classList.add("fim"); el.querySelector("small").textContent = "Descanso concluído";
     setTimeout(()=>{ if(!REST.t) pararDescanso(); }, 2500);
   }
@@ -2688,14 +2765,15 @@ function concluirSerie(exId, i){
   if(cur.ok){ delete cur.ok; S.draft[key][exId][i] = cur; salvaSoft(); render(); return; }
   const vazio = !(cur.kg || cur.reps || cur.sec);
   if(vazio){
+    if(!pref("autoPreencher")){ toast("Preencha a série antes de concluir."); return; }
     const ant = (ultimaSessao(p,d)[exId]||[])[i] || {};
     ["kg","reps","sec"].forEach(k=>{ if(ant[k]) cur[k] = ant[k]; });
     if(!(cur.kg || cur.reps || cur.sec)){ toast("Preencha a série antes de concluir."); return; }
   }
   cur.ok = true; S.draft[key][exId][i] = cur;
-  try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
+  vibrar(12);
   salvaSoft(); render();
-  iniciarDescanso(segDescanso(ex));
+  if(pref("descanso")) iniciarDescanso(segDescanso(ex));
 }
 /* ---- histórico de um exercício ---- */
 function abrirHistoricoEx(exId){
@@ -2798,12 +2876,13 @@ async function salvar(){
   pararDescanso();
   const ok = await store.set(S);
   ui.saved = true; ui.toast = ok?null:"Não deu para salvar. Anote as cargas e tente de novo.";
-  try{ navigator.vibrate && navigator.vibrate([30,60,30]); }catch(e){}
+  vibrar([30,60,30]);
   render();
   setTimeout(()=>{
     ui.saved=false; ui.saving=false; ui.view="hoje"; ui.dia = avaliar(ui.perfil).win.d;
     window.scrollTo(0,0); render();
-    if(ok) mostrarResumo(d, data, rs);
+    if(ok && pref("resumo")) mostrarResumo(d, data, rs);
+    else if(ok) toast(`Treino ${d} salvo.`);
   },700);
 }
 async function marcarExtra(off){
@@ -3451,6 +3530,15 @@ function ligar(){
      do "tap curto não foca, long-press foca". */
   document.querySelectorAll("button[data-theme]").forEach(b=>b.onclick=()=>{
     setTheme(b.dataset.theme); render();
+  });
+  document.querySelectorAll("button[data-pref]").forEach(b=>b.onclick=()=>{
+    const k = b.dataset.pref; setPref(k, !pref(k));
+    if(k==="descanso" && !pref(k)) pararDescanso();
+    if(k==="vibrar" && pref(k)) vibrar(15);
+    render();
+  });
+  document.querySelectorAll("button[data-prefv]").forEach(b=>b.onclick=()=>{
+    setPref(b.dataset.prefv, Number(b.dataset.v)); render();
   });
   document.querySelectorAll("[data-editplan]").forEach(b=>b.onclick=()=>{
     ui.dia = avaliar(ui.perfil).win.d; ui.view="treino"; ui.edit=true; render(); window.scrollTo(0,0);
