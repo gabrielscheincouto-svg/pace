@@ -142,7 +142,8 @@
   .hero .info{flex:1;min-width:0;padding-top:10px}
   .hero .info .lbl{font-family:var(--display);font-size:10.5px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:10px;
-    display:inline-flex;align-items:center;gap:6px}
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px 6px}
+  .hero .info .lbl span{white-space:nowrap}
   .hero .info .ttl{font-family:var(--display);font-size:34px;line-height:1.04;
     letter-spacing:-.028em;color:var(--ink);margin-bottom:10px;font-weight:700;
     font-feature-settings:'ss03','cv11'}
@@ -630,6 +631,35 @@
   .cfg-theme button:active{transform:scale(.97)}
   .cfg-theme button.on{background:var(--sunk);color:var(--ink);border-color:var(--hair-2);font-weight:600}
   .cfg-theme button svg{width:18px;height:18px;stroke-width:1.75}
+  /* v37 · acabamento profissional */
+  html{-webkit-tap-highlight-color:transparent;text-size-adjust:100%}
+  button,.tb,.sg,.cfg-row,.qa-btn{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+  :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:10px}
+  input,textarea{font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  .cfm{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+  .cfm-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .18s ease;pointer-events:auto;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+  .cfm-card{position:relative;width:min(520px,100%);margin:0 10px calc(10px + env(safe-area-inset-bottom));background:var(--surface);
+    border:.5px solid var(--hair-2);border-radius:20px;padding:22px 18px 16px;box-shadow:0 18px 60px rgba(0,0,0,.45);
+    transform:translateY(24px);opacity:0;transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .18s ease;pointer-events:auto}
+  .cfm.on .cfm-bg{opacity:1}.cfm.on .cfm-card{transform:none;opacity:1}
+  .cfm-t{font-size:17px;font-weight:650;color:var(--ink);letter-spacing:-.01em;line-height:1.3}
+  .cfm-x{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .cfm-b{display:flex;gap:10px;margin-top:20px}
+  .cfm-b button{flex:1;height:50px;border-radius:14px;font-size:15px;font-weight:600}
+  .cfm-no{background:var(--sunk);color:var(--ink)}
+  .cfm-ok{background:var(--ac);color:#fff}
+  .cfm-ok.perigo{background:var(--danger);color:#fff}
+  .db-nav{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .db-arw{width:38px;height:38px;border-radius:11px;background:var(--sunk);color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .db-arw svg{width:16px;height:16px}
+  .db-arw:disabled{opacity:.3}
+  .splash{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--faint);font-size:13px}
+  .splash .sp-dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--hair-2);border-top-color:var(--ac);animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .diet-hero .today{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+  .diet-hero .today .dt-sep{color:var(--faint)}
+
   /* v36 · switches e seletores das preferências */
   .cfg-sec .lbl .hint{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint)}
   .cfg-note{font-size:12px;color:var(--faint);margin:8px 6px 0;line-height:1.45}
@@ -802,7 +832,7 @@
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
+<div class="wrap" id="app"><div class="splash"><div class="sp-dot"></div>Carregando seus treinos…</div></div>
 <div class="tabbar"><div class="in" id="tabs"></div></div>
 <div class="sync-badge" id="syncBadge" style="opacity:0">&#9729; sincronizado</div>
 <div id="sugModal"></div>
@@ -1235,7 +1265,7 @@ async function togglePlanejado(p, dataISO, ativ){
         const dia = sch[WDK[d.getDay()]] || {};
         const muscOverride = (atual.musc !== undefined) ? atual.musc : dia.musc;
         if(muscOverride){
-          const ok = confirm("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\nSuperCoffee 05h45 fica liberado como pré-treino (jejum modificado).\n\nConfirmar jejum hoje?");
+          const ok = await confirmar("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\nSuperCoffee 05h45 fica liberado como pré-treino (jejum modificado).\n\nConfirmar jejum hoje?");
           if(!ok) return;
         }
       }
@@ -1489,7 +1519,7 @@ function sugestaoTreino(perfil, dataISO){
     const diaSem = WDL[d.getDay()];
     return {
       musc: null,
-      motivo: `Schedule fixa desta ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu à noite':''}.`,
+      motivo: `Cronograma de ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu à noite':''}.`,
       jaTreinou: false, override: false, letraOriginal: null,
       schedRest: true, schedJiu: jiu, schedNota: nota
     };
@@ -1529,7 +1559,7 @@ function sugestaoTreino(perfil, dataISO){
       const diaSem = WDL[d.getDay()];
       return {
         musc: escolhida.L,
-        motivo: `Você fez <b>${letraBase}</b> ${qdo}. Schedule de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${desdeTxt}) pra não repetir.`,
+        motivo: `Você fez <b>${letraBase}</b> ${qdo}. O cronograma de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${desdeTxt}) pra não repetir.`,
         jaTreinou: false, override: true, letraOriginal: letraBase,
         schedRest: false, schedJiu: jiu, schedNota: nota
       };
@@ -1542,7 +1572,7 @@ function sugestaoTreino(perfil, dataISO){
   if(muscOverride !== null){
     motivo = `Override manual: treino <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
   } else {
-    motivo = `Schedule fixa desta ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
+    motivo = `Cronograma de ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
   }
   if(jiu) motivo += ' Jiu à noite — mantenha RIR 2-3 nos compostos.';
   return {
@@ -1916,7 +1946,7 @@ function resumo(ex,sets){
     if(ex.ty==="time") return s.sec?s.sec+"s":null;
     if(ex.ty==="reps") return s.reps||null;
     if(!s.kg&&!s.reps) return null;
-    return (s.kg||"?")+"x"+(s.reps||"?");
+    return (s.kg||"?")+"×"+(s.reps||"?");
   }).filter(Boolean);
   return a.length?a.join("  "):null;
 }
@@ -1950,7 +1980,7 @@ function render(){
       <button class="cfg" data-view="config" aria-label="Configurações">${ICON.config}</button>
     </div>`;
 
-  if(ui.view!=="config"){
+  if(ui.view!=="config" && ui.view!=="treino"){
     out += `<div class="datenav">
       <button class="arw" data-off="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="dt"><div class="d1">${dref.getDate()} de ${MES[dref.getMonth()]}</div>
@@ -2082,10 +2112,10 @@ function viewHoje(p,m){
           <div class="info">
             <div class="lbl">Hoje</div>
             <div class="ttl">${esc(titulo)}</div>
-            <div class="sub">Sem musculação · schedule fixa</div>
+            <div class="sub">Sem musculação · pelo seu cronograma</div>
           </div>
         </div>
-        <div class="why">${r.win.motivo}${jiuChip}</div>
+        <div class="why">${r.schedJiu ? "Dia de recuperar para o tatame à noite. Se quiser treinar mesmo assim, use o botão abaixo." : (isDescCompleto ? "Aproveite para recuperar. Se quiser treinar mesmo assim, use o botão abaixo." : "Dia leve: mobilidade, alongamento ou caminhada.")}</div>
       </div>`;
     } else {
       const diaSemanaAmanha = dRefAmanha ? WDL[dRefAmanha.getDay()] : "amanhã";
@@ -2222,7 +2252,11 @@ function viewTreino(p,m){
   let out = `<div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
       <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
         <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
-      <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
+      <div class="db-nav">
+        <button class="db-arw" data-off="-1" aria-label="Dia anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
+        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
     </div>`;
   if(ui.editId!=null){
     out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
@@ -2230,7 +2264,7 @@ function viewTreino(p,m){
   out += `<div class="segs">`;
   ORDER.forEach(k=>{
     const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
-    const t = u ? (dias(u.data)===0?"neste dia":"há "+dias(u.data)+"d") : "nunca";
+    const t = u ? (dias(u.data)===0?"✓ feito":"há "+dias(u.data)+"d") : "nunca";
     out += `<button class="sg ${k===d?"on":""}" data-dia="${k}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
   });
   out += `</div><div class="tbar">${ui.edit
@@ -2434,7 +2468,7 @@ function viewDieta(p,m){
         <div class="nm">${esc(nome)}</div>
       </div>
     </div>
-    <div class="today"><b>${esc(diaSemana)}</b>${chipTipo} · ${esc(dataFmt)} &nbsp;·&nbsp; ${feitasHoje}/${totRefs} refeições registradas</div>
+    <div class="today"><b>${esc(diaSemana)}, ${esc(dataFmt)}</b>${chipTipo}<span class="dt-sep">·</span><span>${feitasHoje}/${totRefs} refeições registradas</span></div>
   </div>`;
 
   // Acessos rápidos
@@ -2535,6 +2569,35 @@ function viewDieta(p,m){
 }
 
 /* ------------------------------------------------------------------ CONFIG */
+/* ===================== v37 · confirmação em folha (no lugar da caixa nativa do navegador) ===================== */
+function confirmar(texto, o){
+  o = o || {};
+  return new Promise(res=>{
+    const velho = document.getElementById("cfmSheet");
+    if(velho){ try{ velho._fim && velho._fim(false); }catch(e){} }
+    const partes = String(texto).split("\n\n");
+    const titulo = o.titulo || partes.shift();
+    const corpo = (o.titulo ? String(texto).split("\n\n") : partes).map(x=>esc(x).replace(/\n/g,"<br>")).join("<br><br>");
+    const el = document.createElement("div"); el.id = "cfmSheet"; el.className = "cfm";
+    el.innerHTML = `<div class="cfm-bg" data-c="0"></div>
+      <div class="cfm-card" role="alertdialog" aria-modal="true" aria-labelledby="cfmT">
+        <div class="cfm-t" id="cfmT">${esc(titulo)}</div>${corpo?`<div class="cfm-x">${corpo}</div>`:""}
+        <div class="cfm-b"><button class="cfm-no" data-c="0">${esc(o.cancelar||"Cancelar")}</button>
+          <button class="cfm-ok ${o.perigo?"perigo":""}" data-c="1">${esc(o.ok||"Confirmar")}</button></div>
+      </div>`;
+    let feito = false;
+    const kd = e=>{ if(e.key==="Escape") fim(false); };
+    function fim(v){ if(feito) return; feito = true; document.removeEventListener("keydown", kd);
+      el.id = ""; el.classList.remove("on"); setTimeout(()=>el.remove(), 200); res(v); }
+    el._fim = fim;
+    el.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>fim(b.dataset.c==="1"));
+    document.addEventListener("keydown", kd);
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add("on")));
+    setTimeout(()=>{ const b = el.querySelector(".cfm-ok"); if(b) b.focus({preventScroll:true}); }, 60);
+  });
+}
+
 /* ===================== v36 · preferências (por pessoa, sincronizadas) ===================== */
 const PREF_PADRAO = { descanso:true, descansoSeg:90, descansoDoEx:true, vibrar:true, autoPreencher:true,
   resumo:true, semana:true, metaSemana:0, telaLigada:false };
@@ -2675,7 +2738,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v36 · preferências de treino (descanso, vibração, tela ligada, meta semanal)</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v37 · acabamento profissional (confirmações, navegação de data, textos)</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2858,9 +2921,9 @@ async function salvar(){
   if(!temValores(dr)){ toast("Preencha pelo menos uma série antes de salvar."); return; }
   // O treino é gravado na data mostrada no topo da tela (a que o usuário escolheu).
   const data = REF(), hoje = shift(0);
-  if(data > hoje && !confirm(`${dataLonga(data)} é uma data futura.\n\nRegistrar o treino nesse dia mesmo assim?`)) return;
+  if(data > hoje && !(await confirmar(`${dataLonga(data)} é uma data futura.\n\nRegistrar o treino nesse dia mesmo assim?`, {ok:"Registrar assim mesmo"}))) return;
   const outro = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===data && String(e.id)!==String(ui.editId));
-  if(outro && !confirm(`Já existe o treino ${outro.dia} registrado em ${brd(data)}.\n\nOK substitui pelo treino ${d}. Cancelar volta sem salvar.`)) return;
+  if(outro && !(await confirmar(`Já existe o treino ${outro.dia} registrado em ${brd(data)}.\n\nSe continuar, ele será substituído pelo treino ${d}.`, {ok:"Substituir", perigo:true}))) return;
   ui.saving = true;
   if(outro) S.events.splice(S.events.indexOf(outro), 1);
   const entries = clone(dr);
@@ -2939,14 +3002,14 @@ function abrirPickTreino(){
       ${ORDER.map(d=>`<button class="chip" data-pickabrir="${d}"><b>${d}</b> · ${_escSug(days[d].t)}</button>`).join("")}
     </div>
     <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.55">
-      Schedule sugerido não tem musc hoje. Você pode escolher qualquer treino — o registro conta normal.
+      O cronograma não tem musculação neste dia. Você pode escolher qualquer treino — o registro conta normal.
     </div>
   `;
   _renderSugestaoShell("Iniciar treino", "Escolha qual bloco vai treinar", body);
-  document.querySelectorAll("[data-pickabrir]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-pickabrir]").forEach(b=>b.onclick=async ()=>{
     const d = b.dataset.pickabrir;
     const aviso = verificarConflitoIniciar(ui.perfil, d);
-    if(aviso && !confirm(aviso)) return;
+    if(aviso && !(await confirmar(aviso, {ok:"Treinar assim mesmo"}))) return;
     fecharSugestao();
     ui.dia = d; ui.view = "treino"; ui.saved = false; ui.edit = false; ui.editId = null;
     render(); window.scrollTo(0,0);
@@ -3078,7 +3141,7 @@ async function abrirSugestao(refId){
       if(!s) return;
       const rNow = S.dieta[p].refs.find(x=>x.id===refId);
       if(!rNow) return;
-      if(!confirm(`Substituir os itens de "${rNow.nome}" pela sugestão "${s.nome}"?`)) return;
+      if(!(await confirmar(`Substituir os itens de "${rNow.nome}" pela sugestão "${s.nome}"?`, {ok:"Substituir"}))) return;
       rNow.itens = s.itens;
       if(s.nome && !rNow.nome) rNow.nome = s.nome;
       await store.set(S);
@@ -3124,7 +3187,7 @@ async function apagarRegistroRefeicao(logId){
   if(!D.log) return;
   const i = D.log.findIndex(l=>l.id==logId);
   if(i<0) return;
-  if(!confirm('Apagar esse registro do diário?')) return;
+  if(!(await confirmar('Apagar este registro do diário?', {ok:'Apagar', perigo:true}))) return;
   D.log.splice(i,1);
   await store.set(S);
   render();
@@ -3407,11 +3470,11 @@ function ligar(){
     if(ui.view!=="treino") ui.edit=false;
     if(ui.view!=="dieta") ui.edieta=false;
     render(); window.scrollTo(0,0);});
-  document.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=async ()=>{
     // Abre o registro na data que está na tela (hoje ou um dia passado escolhido nas setas/calendário).
     const dEscolhido = b.dataset.abrir;
     const aviso = verificarConflitoIniciar(ui.perfil, dEscolhido);
-    if(aviso && !confirm(aviso)) return;
+    if(aviso && !(await confirmar(aviso, {ok:"Treinar assim mesmo"}))) return;
     ui.dia=dEscolhido; ui.view="treino"; ui.saved=false; ui.edit=false; ui.editId=null; render(); window.scrollTo(0,0);});
   document.querySelectorAll("[data-edittoday]").forEach(b=>b.onclick=()=>{
     const p = ui.perfil, data = REF();
@@ -3424,7 +3487,7 @@ function ligar(){
   });
   document.querySelectorAll("[data-caldel]").forEach(b=>b.onclick=async ()=>{
     const ev = S.events.find(e=>String(e.id)===b.dataset.caldel); if(!ev) return;
-    if(!confirm(`Excluir o treino ${ev.dia} de ${brd(ev.data)}? Essa ação não pode ser desfeita.`)) return;
+    if(!(await confirmar(`Excluir o treino ${ev.dia} de ${brd(ev.data)}?\n\nEssa ação não pode ser desfeita.`, {ok:"Excluir", perigo:true}))) return;
     S.events.splice(S.events.indexOf(ev),1);
     await store.set(S); toast(`Treino ${ev.dia} de ${brd(ev.data)} excluído.`);
   });
@@ -3479,16 +3542,16 @@ function ligar(){
     const [id,n] = b.dataset.mv.split(":"); const arr = dayset(ui.perfil)[ui.dia].ex;
     const i = arr.findIndex(e=>e.id===id), j = i + Number(n);
     if(i>=0 && j>=0 && j<arr.length){ const t=arr[i]; arr[i]=arr[j]; arr[j]=t; store.set(S); render(); }});
-  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=async ()=>{
     const id = b.dataset.del; const arr = dayset(ui.perfil)[ui.dia].ex;
     const ex = arr.find(e=>e.id===id);
-    if(ex && confirm(`Remover "${ex.n}" do treino ${ui.dia}?`)){
+    if(ex && await confirmar(`Remover "${ex.n}" do treino ${ui.dia}?`, {ok:"Remover", perigo:true})){
       dayset(ui.perfil)[ui.dia].ex = arr.filter(e=>e.id!==id); store.set(S); render(); }});
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{
     dayset(ui.perfil)[ui.dia].ex.push({id:"x"+Date.now(),n:"Novo exercício",p:"8-12",s:3,ty:"load",ap:""});
     store.set(S); render(); window.scrollTo(0,document.body.scrollHeight);});
-  document.querySelectorAll("[data-reset]:not([data-sugclose])").forEach(b=>b.onclick=()=>{
-    if(confirm(`Restaurar o treino ${ui.dia} como estava no plano original?`)){
+  document.querySelectorAll("[data-reset]:not([data-sugclose])").forEach(b=>b.onclick=async ()=>{
+    if(await confirmar(`Restaurar o treino ${ui.dia} como estava no plano original?\n\nAs mudanças que você fez nos exercícios deste bloco serão perdidas.`, {ok:"Restaurar", perigo:true})){
       S.plan[ui.perfil][ui.dia] = clone(BASE[ui.perfil].days[ui.dia]); store.set(S); render(); }});
 
   document.querySelectorAll("[data-mes]").forEach(b=>b.onclick=()=>{ ui.mes += Number(b.dataset.mes); render(); });
@@ -3546,8 +3609,8 @@ function ligar(){
   document.querySelectorAll("[data-editdieta]").forEach(b=>b.onclick=()=>{
     ui.view="dieta"; ui.edieta=true; render(); window.scrollTo(0,0);
   });
-  document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=()=>{
-    if(confirm("Sair da conta?")) logout();
+  document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=async ()=>{
+    if(await confirmar("Sair da conta?", {ok:"Sair", perigo:true})) logout();
   });
   /* [data-meta] tratado pela delegação global (ligarDelegacaoUmaVez) */
 }
