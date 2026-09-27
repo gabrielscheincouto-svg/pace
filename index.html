@@ -1172,8 +1172,8 @@ const TIPO_DIA_LABEL = {musc_jiu:"Musc + Jiu",musc:"Só Musc",jiu:"Só Jiu",musc
 
 /* Atividades quick-action por perfil (chips no card do dia) — v27 inclui "jejum" p/ Gabriel */
 const ATIV_QUICK = {
-  gabriel: ["jiu","corrida","futebol","bike","jejum"],
-  eduarda: ["corrida","bike","jiu","futebol"]
+  gabriel: ["jiu","corrida","bike","jejum"],
+  eduarda: ["corrida","bike","jiu"]
 };
 const ATIV_LABEL = { jiu:"Jiu", corrida:"Corrida", futebol:"Futebol", bike:"Bike", natacao:"Natação", caminhada:"Caminhada", jejum:"Jejum" };
 
@@ -2109,7 +2109,7 @@ function viewHoje(p,m){
   // ============ Quick actions: planejar atividade do dia ============
   const dataRef = REF();
   const planHoje = getPlanejado(p, dataRef) || {};
-  const quicks = ATIV_QUICK[p] || ["jiu","corrida","futebol","bike"];
+  const quicks = ATIV_QUICK[p] || ["jiu","corrida","bike"];
   out += `<div class="qa-title" style="margin-top:18px">${ui.off===0?"Planejar hoje":(ui.off>0?"Planejar "+brd(dataRef):"Atividades de "+brd(dataRef))}</div>
     <div class="chips" style="margin-bottom:10px">
       ${quicks.map(a=>{
@@ -2602,7 +2602,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v35 · treino da Eduarda com foco em costas, ombro e TAF</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v35 · treino da Eduarda com foco em costas, ombro e TAF · sem futebol nos extras</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2875,7 +2875,7 @@ function abrirPickTreino(){
 }
 function abrirAtividadeExtra(){
   const p = ui.perfil, mainAt = meta(p).extra;
-  const presets = ["Bike","Futebol","Corrida","Natação","Caminhada","Jiu-jitsu","Outro"];
+  const presets = ["Bike","Corrida","Natação","Caminhada","Jiu-jitsu","Outro"];
   const body = `
     <div class="eyebrow" style="margin-bottom:8px">Atividade</div>
     <div class="chips" id="atvChips">
