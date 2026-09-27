@@ -829,6 +829,243 @@
   .rs-pr{display:flex;gap:8px;align-items:center;padding:9px 0;border-top:.5px dashed var(--hair);font-size:13px}
   .rs-pr span{flex:1;color:var(--muted)} .rs-pr b{font-family:var(--mono);color:var(--ink)}
   .rs-nopr{font-size:13px;color:var(--muted);line-height:1.5;padding:6px 2px}
+
+  /* =====================================================================
+     v38 · Design "pace" (protótipo rodada 3) — tokens + componentes.
+     Mesma estrutura nos temas claro/escuro; só os tokens mudam.
+     Cores sólidas, sem gradiente/brilho; um destaque (pc-hl) por tela.
+     ===================================================================== */
+  :root{
+    --paper:#0F1613; --surface:#16201C; --surface-2:#1C2823; --sunk:#131C18;
+    --ink:#ECF1EE; --muted:#A3AEA8; --faint:#77837D;
+    --hair:#223029; --hair-2:#2C3A33; --hair-3:#3A4A42;
+    --ac:#7ADBB5; --ac-ink:#0B1A13; --ac-soft:#1F3A2F; --ac-glow:transparent;
+    --ok:#7ADBB5; --danger:#F08A7E; --warn:#E7B45C; --info:#6FB3F2; --blue:#6FB3F2; --water:#6FB3F2;
+    --hl-bg:#EEEADC; --hl-ink:#121916; --hl-muted:#4D5A53; --hl-track:#D9D4C3;
+    --btn-hl:#121916; --on-btn-hl:#F4F2EA;
+    --serif:var(--sans); --display:var(--sans); --mono:var(--sans);
+    --sh-1:none; --sh-2:none; --sh-3:0 18px 50px rgba(0,0,0,.45); --shadow:none; --shadow-lg:none;
+    --tab-bg:#0F1613; --tap:48px;
+  }
+  html[data-theme="light"]{
+    --paper:#F5F4EF; --surface:#FFFFFF; --surface-2:#F0EFE9; --sunk:#EDECE5;
+    --ink:#14201A; --muted:#56615B; --faint:#7C8680;
+    --hair:#E2E1D9; --hair-2:#D2D1C7; --hair-3:#BDBCB1;
+    --ac:#1F6B4E; --ac-ink:#FFFFFF; --ac-soft:#DCEFE6;
+    --ok:#1F6B4E; --danger:#B8412F; --warn:#A96A12; --info:#2F7FC8; --blue:#2F7FC8; --water:#2F7FC8;
+    --hl-bg:#1E3A2F; --hl-ink:#F2F5F3; --hl-muted:#B7C8BF; --hl-track:#35584A;
+    --btn-hl:#9FE3C6; --on-btn-hl:#0E2219;
+    --sh-1:none; --sh-2:none; --sh-3:0 18px 50px rgba(20,22,30,.16); --shadow:none; --shadow-lg:none;
+    --tab-bg:#F5F4EF;
+  }
+  @media (prefers-color-scheme: light){
+    html[data-theme="auto"]{
+      --paper:#F5F4EF; --surface:#FFFFFF; --surface-2:#F0EFE9; --sunk:#EDECE5;
+      --ink:#14201A; --muted:#56615B; --faint:#7C8680;
+      --hair:#E2E1D9; --hair-2:#D2D1C7; --hair-3:#BDBCB1;
+      --ac:#1F6B4E; --ac-ink:#FFFFFF; --ac-soft:#DCEFE6;
+      --ok:#1F6B4E; --danger:#B8412F; --warn:#A96A12; --info:#2F7FC8; --blue:#2F7FC8; --water:#2F7FC8;
+      --hl-bg:#1E3A2F; --hl-ink:#F2F5F3; --hl-muted:#B7C8BF; --hl-track:#35584A;
+      --btn-hl:#9FE3C6; --on-btn-hl:#0E2219;
+      --sh-3:0 18px 50px rgba(20,22,30,.16); --tab-bg:#F5F4EF;
+    }
+  }
+  body{font-size:16px;letter-spacing:0;font-feature-settings:normal}
+  body *:not(svg):not(svg *){background-image:none!important;text-shadow:none!important}
+  .hero::after{display:none}
+  .hero .letter,.sg .l,.cell .l,.coach-treino .letter{font-style:normal}
+  .wrap{padding:calc(12px + env(safe-area-inset-top)) 20px calc(96px + env(safe-area-inset-bottom))}
+  .eyebrow{font-size:11px;letter-spacing:.12em}
+
+  /* ---------- ícones ---------- */
+  .pc-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .pc-ic.sm{width:18px;height:18px}
+
+  /* ---------- topo / títulos ---------- */
+  .pc-top{display:flex;align-items:center;gap:12px;min-height:var(--tap)}
+  .pc-brand{font-weight:800;font-size:28px;letter-spacing:-.04em;line-height:1;margin-right:auto;color:var(--ink)}
+  .pc-avatar{width:var(--tap);height:var(--tap);border-radius:50%;border:1.5px solid var(--hair-3);font-weight:650;font-size:17px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+  .pc-h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:18px 0 2px;color:var(--ink)}
+  .pc-dnav{display:flex;align-items:center;gap:4px;min-height:var(--tap)}
+  .pc-dnav .pc-sub{flex:1;margin:0}
+  .pc-sub{color:var(--muted);font-size:17px;margin:0}
+  .pc-ib{width:var(--tap);height:var(--tap);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
+  .pc-ib:disabled{opacity:.3}
+  .pc-link{display:inline-flex;align-items:center;gap:4px;min-height:var(--tap);color:var(--ink);font-size:15px;font-weight:500}
+  .pc-link.ac{color:var(--ac);font-weight:700}
+  .pc-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:30px 0 10px}
+  .pc-sec-h h2{font-size:22px;font-weight:750;letter-spacing:-.02em;margin:0;color:var(--ink)}
+  .pc-sec-h .aside{color:var(--muted);font-size:15px;white-space:nowrap}
+  .pc-why{color:var(--muted);font-size:14px;line-height:1.5;margin:10px 2px 0}
+  .pc-note{color:var(--faint);font-size:13px;line-height:1.5;margin:8px 2px 0}
+
+  /* ---------- destaque principal ---------- */
+  .pc-hl{background:var(--hl-bg);color:var(--hl-ink);border-radius:18px;padding:20px;margin-top:18px}
+  .pc-hl .ey{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--hl-muted)}
+  .pc-hl .ey .dot{width:8px;height:8px;border-radius:50%;background:#2FBF7F}
+  .pc-hl .ey .tag{letter-spacing:.04em;padding:2px 8px;border-radius:999px;border:1px solid var(--hl-muted);font-size:11px}
+  .pc-hl .ttl{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.08;margin:8px 0 4px}
+  .pc-hl .meta{color:var(--hl-muted);font-size:16px;margin-bottom:16px;font-variant-numeric:tabular-nums}
+  .pc-hl .big{font-size:48px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+  .pc-btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 20px;border-radius:14px;font-weight:700;font-size:17px;width:100%}
+  .pc-btn .pc-ic{width:20px;height:20px}
+  .pc-btn.hl{background:var(--btn-hl);color:var(--on-btn-hl)}
+  .pc-btn.pri{background:var(--ac);color:var(--ac-ink)}
+  .pc-btn.ghost{border:1.5px solid var(--hair-3);color:var(--ink)}
+  .pc-btn.sm{min-height:var(--tap);width:auto;padding:0 16px;font-size:15px;border-radius:12px}
+  .pc-btn.oac{border:1.5px solid var(--ac);color:var(--ac)}
+  .pc-btn:disabled{opacity:.45}
+  .pc-warn{border:1.5px solid var(--warn);border-radius:14px;padding:14px;margin-top:14px;color:var(--ink);font-size:14.5px;line-height:1.5}
+  .pc-warn .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+  /* ---------- linhas ---------- */
+  .pc-list{border-top:1px solid var(--hair)}
+  .pc-list.nb{border-top:0}
+  .pc-row{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 0;border-bottom:1px solid var(--hair);width:100%;text-align:left;color:var(--ink)}
+  .pc-row .main{flex:1;min-width:0;text-align:left}
+  .pc-row .t{font-weight:650;font-size:17px;line-height:1.3}
+  .pc-row .s{color:var(--muted);font-size:15px;margin-top:2px;line-height:1.35}
+  .pc-row .end{display:flex;align-items:center;gap:6px;font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .pc-row .chev{color:var(--faint);display:inline-flex}
+  .pc-st-ok{width:32px;height:32px;border-radius:50%;background:var(--ac);color:var(--ac-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .pc-st-ok .pc-ic{width:18px;height:18px;stroke-width:2.6}
+  .pc-st-pl{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--hair-3);color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800}
+  .pc-st-pl .pc-ic{width:18px;height:18px}
+  .pc-st-no{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--danger);color:var(--danger);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800}
+  .pc-pill{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;font-size:14px;font-weight:600;background:var(--surface-2);color:var(--ink)}
+
+  /* ---------- semana ---------- */
+  .pc-week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+  .pc-wd{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:var(--tap);padding:4px 0;color:var(--ink)}
+  .pc-wd .k{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .pc-wd .n{font-size:16px;font-variant-numeric:tabular-nums}
+  .pc-wd .c{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--hair-3);display:flex;align-items:center;justify-content:center;position:relative}
+  .pc-wd .c .pc-ic{width:18px;height:18px}
+  .pc-wd.done .c{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+  .pc-wd.done .c .pc-ic{stroke-width:2.6}
+  .pc-wd.prog .c{border:2.5px solid var(--ac);color:var(--ac)}
+  .pc-wd.x .c::after{content:"";position:absolute;bottom:-7px;width:5px;height:5px;border-radius:50%;background:var(--info)}
+  .pc-wd.hj .k,.pc-wd.hj .n{color:var(--ink);font-weight:800}
+  .pc-wd.sel .n{text-decoration:underline;text-underline-offset:4px}
+  .pc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--muted);font-size:13px;margin-top:10px}
+  .pc-legend span{display:inline-flex;align-items:center;gap:6px}
+  .pc-legend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .pc-legend i.d{background:var(--ac)} .pc-legend i.p{border:2px solid var(--ac)} .pc-legend i.x{background:var(--info);width:8px;height:8px}
+
+  /* ---------- barras / números ---------- */
+  .pc-bar{height:10px;border-radius:6px;background:var(--hair);overflow:hidden}
+  .pc-bar>i{display:block;height:100%;border-radius:6px;background:var(--ac)}
+  .pc-kc{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+  .pc-kc b{font-size:36px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+  .pc-kc span{color:var(--muted);font-size:17px}
+  .pc-macros{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px}
+  .pc-macros>div{text-align:center;padding:2px 6px}
+  .pc-macros>div+div{border-left:1px solid var(--hair)}
+  .pc-macros b{display:block;font-size:19px;font-weight:750;color:var(--ink);font-variant-numeric:tabular-nums}
+  .pc-macros span{color:var(--muted);font-size:13.5px}
+
+  /* ---------- abas (componente único) ---------- */
+  .pc-tabs{display:flex;border-bottom:1px solid var(--hair);margin-top:14px}
+  .pc-tab{flex:1;min-height:var(--tap);font-size:17px;font-weight:600;color:var(--muted);position:relative}
+  .pc-tab[aria-selected="true"]{color:var(--ac)}
+  .pc-tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2.5px;background:var(--ac);border-radius:2px}
+  .pc-period{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+  .pc-period .lbl{font-weight:650;font-size:17px}
+  .pc-sel{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:0 14px;border-radius:12px;border:1.5px solid var(--hair-3);font-weight:650;font-size:17px;color:var(--ink);text-align:left}
+  .pc-cmp{display:grid;grid-template-columns:1fr 1fr;margin-top:14px}
+  .pc-cmp>div{padding:0 12px}
+  .pc-cmp>div:first-child{padding-left:0}
+  .pc-cmp>div+div{border-left:1px solid var(--hair)}
+  .pc-cmp .d{color:var(--muted);font-size:14px}
+  .pc-cmp .v{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .pc-cmp .v small{font-size:15px;font-weight:600;color:var(--muted)}
+  .pc-delta{display:inline-block;margin-top:6px;font-weight:700;font-size:15px;color:var(--ac)}
+  .pc-delta.neg{color:var(--danger)}
+  .pc-crit{color:var(--muted);font-size:14px;margin-top:12px;line-height:1.5}
+
+  /* ---------- barra de navegação ---------- */
+  .tabbar{background:var(--tab-bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-top:1px solid var(--hair)}
+  .tabbar .in{padding:0;gap:0}
+  .tb{height:64px;font-size:13px;color:var(--muted);border-radius:0;gap:4px}
+  .tb::before{display:none}
+  .tb.on{color:var(--ac);font-weight:700}
+  .tb.on svg{color:var(--ac)}
+  .tb svg,.tb .pc-ic{width:24px;height:24px;stroke-width:1.8}
+  .tb.on .pc-ic{stroke-width:2.3}
+  body.pc-session .tabbar{display:none}
+  body.pc-session .wrap{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+
+  /* ---------- sessão de treino ---------- */
+  .pc-stop{display:grid;grid-template-columns:var(--tap) 1fr auto;align-items:center;gap:8px;min-height:56px}
+  .pc-stop .mid{text-align:center;font-weight:700;font-size:17px;color:var(--ink)}
+  .pc-stop .end{color:var(--ac);font-weight:700;font-size:17px;min-height:var(--tap);padding:0 4px}
+  .pc-stop .end:disabled{opacity:.5}
+  .pc-stitle{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:6px 0 2px;color:var(--ink)}
+  .pc-ex{margin-top:22px;padding-top:4px}
+  .pc-exh{display:flex;align-items:flex-start;gap:10px}
+  .pc-exn{flex:1;text-align:left;font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2;color:var(--ink);min-height:var(--tap)}
+  .pc-exn small{display:block;font-size:13px;font-weight:600;color:var(--ac);letter-spacing:0;margin-top:2px}
+  .pc-exm{color:var(--muted);font-size:14.5px;line-height:1.45;margin:2px 0 8px}
+  .pc-ex .ap{margin:0 0 8px}
+  .pc-sh,.pc-sr{display:grid;grid-template-columns:1.6rem minmax(3.2rem,1fr) minmax(4.3rem,1.15fr) minmax(4.3rem,1.15fr) var(--tap);gap:8px;align-items:center}
+  .pc-sh{color:var(--muted);font-size:13px;font-weight:600;padding:0 6px 8px;border-bottom:1px solid var(--hair)}
+  .pc-sh .c{text-align:center}
+  .pc-sr{padding:8px 6px;border-bottom:1px solid var(--hair);border-radius:12px;margin:0}
+  .pc-sr.cur{outline:2px solid var(--ac);outline-offset:-2px;border-bottom-color:transparent}
+  .pc-sr .ix{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .pc-sr .pv{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pc-sr .w2{grid-column:span 2}
+  .pc-sr input.cs{width:100%;min-height:var(--tap);height:var(--tap);border-radius:10px;border:1.5px solid var(--hair-3);background:var(--surface);text-align:center;font-size:17px;font-variant-numeric:tabular-nums;padding:0 4px;color:var(--ink);font-family:var(--sans)}
+  .pc-sr input.cs::placeholder{color:var(--faint)}
+  .pc-sr.done input.cs{background:transparent;border-color:var(--hair)}
+  .pc-sr .set-ok{width:var(--tap);height:var(--tap);border-radius:12px;border:2px solid var(--hair-3);display:flex;align-items:center;justify-content:center;background:transparent;color:transparent;font-size:0;padding:0}
+  .pc-sr .set-ok .pc-ic{width:22px;height:22px;stroke-width:2.8}
+  .pc-sr.done .set-ok,.pc-sr .set-ok.on{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+  .pc-obs{padding:4px 6px 8px 2.3rem;border-bottom:1px solid var(--hair)}
+  .pc-obs input{width:100%;min-height:44px;border-radius:10px;border:1.5px solid var(--hair-2);background:var(--surface);padding:0 12px;font-size:15px;color:var(--ink)}
+  .pc-exf{display:flex;justify-content:flex-end;gap:12px}
+  .pc-bottom{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--paper);border-top:1px solid var(--hair);padding:8px 20px calc(12px + env(safe-area-inset-bottom))}
+  .pc-bottom .in2{max-width:520px;margin:0 auto}
+  .pc-bottom .note{text-align:center;color:var(--faint);font-size:13px;margin-bottom:8px}
+  body.kb-open .pc-bottom{position:static;border-top:0;padding:8px 0 16px}
+  body.kb-open.pc-session .wrap{padding-bottom:24px}
+  .segs{margin-top:14px}
+  .sg .l{font-family:var(--sans);font-weight:800;font-size:20px}
+  .datebar{margin-top:12px}
+
+  /* cronômetro compacto (fica fora do render) */
+  .rest-bar{top:auto;bottom:calc(104px + env(safe-area-inset-bottom));left:16px;right:16px;max-width:488px;background:var(--hl-bg);color:var(--hl-ink);border:0;border-radius:18px;padding:10px 12px 12px;gap:10px;box-shadow:var(--sh-3)}
+  .rest-bar .rb-t{text-align:left;order:0}
+  .rest-bar .rb-t small{color:var(--hl-muted);font-size:12px;letter-spacing:.1em}
+  .rest-bar .rb-t b{color:var(--hl-ink);font-size:30px;font-weight:800;font-family:var(--sans);font-variant-numeric:tabular-nums}
+  .rest-bar button{min-height:var(--tap);height:var(--tap);min-width:52px;background:transparent;border:1.5px solid var(--hl-ink);color:var(--hl-ink);font-size:15px;font-weight:700;border-radius:12px}
+  .rest-bar .rb-x{border-color:transparent;color:var(--hl-ink)}
+  .rest-bar .rb-p{background:var(--hl-track)} .rest-bar .rb-p i{background:var(--hl-ink)}
+  .rest-bar [data-rb="-15"]{order:1} .rest-bar [data-rb="15"]{order:2} .rest-bar .rb-x{order:3} .rest-bar .rb-t{flex:1}
+
+  /* toast com desfazer */
+  .pc-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:95;background:var(--ink);color:var(--paper);border-radius:14px;padding:6px 6px 6px 16px;display:flex;align-items:center;gap:12px;width:max-content;max-width:min(92vw,480px);font-size:15px;box-shadow:var(--sh-3)}
+  .pc-toast button{min-height:40px;padding:0 12px;border-radius:10px;font-weight:750;color:var(--paper);text-decoration:underline}
+  body.pc-session .pc-toast{bottom:auto;top:calc(12px + env(safe-area-inset-top))}
+  body.kb-open .rest-bar{display:none}
+  body.pc-session .wrap{padding-bottom:calc(200px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom));background:var(--ink);color:var(--paper);border:0}
+
+  /* calendário dentro de Evolução */
+  .cal{background:transparent;border:0;padding:0;margin-top:8px}
+  .cell .l{font-family:var(--sans);font-weight:800}
+  .sum .v{font-family:var(--sans);font-weight:800}
+
+  /* dieta — plano */
+  .mealx{background:var(--surface);border:1px solid var(--hair);box-shadow:none}
+  .mx-name{font-family:var(--sans);font-weight:700}
+  .db-arw{width:44px;height:44px} .db-btn{min-height:44px;display:inline-flex;align-items:center}
+  .pc-obs input,.obs-in{min-height:44px}
+  .cfg-seg button{min-height:44px;height:44px}
+  .mx-dots{min-width:44px;min-height:44px}
+  .pc-bottom .note{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pc-jejum{border:1.5px solid var(--warn);border-radius:14px;padding:14px;margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--ink)}
+
 </style>
 </head>
 <body>
@@ -1434,7 +1671,7 @@ function logout(){
   location.reload();
 }
 
-let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editId:null, saving:false, obsOpen:{} };
+let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editId:null, saving:false, obsOpen:{}, dietTab:"diario", evoTab:"resumo", evoEx:null };
 
 const iso = d => {
   const y = d.getFullYear();
@@ -1971,35 +2208,21 @@ const ICON = {
 
 function render(){
   const p = ui.perfil, m = meta(p);
-  document.documentElement.style.setProperty("--ac", m.ac);
-  const dref = new Date(REF()+"T12:00");
-  const rel = ui.off===0?"hoje":ui.off===1?"amanhã":ui.off===-1?"ontem":(ui.off>0?"em "+ui.off+" dias":"há "+(-ui.off)+" dias");
-
-  let out = `<div class="head2">
-      <div class="who"><span class="logo">${ICON.logo}</span>Pace<small>${esc(m.label)} · ${WDL[dref.getDay()]}</small></div>
-      <button class="cfg" data-view="config" aria-label="Configurações">${ICON.config}</button>
-    </div>`;
-
-  if(ui.view!=="config" && ui.view!=="treino"){
-    out += `<div class="datenav">
-      <button class="arw" data-off="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="dt"><div class="d1">${dref.getDate()} de ${MES[dref.getMonth()]}</div>
-        <div class="d2">${ui.off===0?"hoje":`<b>${rel}</b> · toque para voltar a hoje`}</div></div>
-      <button class="arw" data-off="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
-    </div>`;
-  }
-
+  document.documentElement.style.removeProperty("--ac");
+  const sessao = ui.view==="treino";
+  document.body.classList.toggle("pc-session", sessao);
+  let out = "";
   if(ui.view==="hoje") out += viewHoje(p,m);
+  if(ui.view==="treinos") out += viewTreinos(p,m);
   if(ui.view==="treino") out += viewTreino(p,m);
   if(ui.view==="cal") out += viewCal(p,m);
   if(ui.view==="dieta") out += viewDieta(p,m);
-  if(ui.view==="config") out += viewConfig(p,m);
-  if(ui.toast) out += `<div class="toast">${ui.toast}</div>`;
+  if(ui.view==="config") out += pcTopo() + viewConfig(p,m);
+  if(ui.toast) out += `<div class="toast" role="status">${ui.toast}</div>`;
   document.getElementById("app").innerHTML = out;
-
-  document.getElementById("tabs").innerHTML =
-    [["hoje","Hoje"],["treino","Registrar"],["cal","Calendário"],["dieta","Dieta"],["config","Config"]].map(([k,l])=>
-      `<button class="tb ${ui.view===k?"on":""}" data-view="${k}">${ICON[k==="config"?"config":k]}<span>${l}</span></button>`).join("");
+  const NAV = [["hoje","Hoje","home"],["treinos","Treinos","dumbbell"],["dieta","Dieta","fork"],["cal","Evolução","chart"]];
+  document.getElementById("tabs").innerHTML = sessao ? "" : NAV.map(([k,l,i])=>
+    `<button class="tb ${ui.view===k?"on":""}" data-view="${k}" ${ui.view===k?'aria-current="page"':""}>${pic(i)}<span>${l}</span></button>`).join("");
   ligar();
   atualizaTelaLigada();
 }
@@ -2050,293 +2273,6 @@ function verificarConflitoIniciar(p, dEscolhido){
   return avisos.length ? "\u26A0\uFE0F " + avisos.join("\n\n") + "\n\nContinuar mesmo assim?" : null;
 }
 
-/* --------------------------------------------------------------------- HOJE */
-function viewHoje(p,m){
-  const days = dayset(p);
-  const treinoDoDia = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===REF());
-  // Preview de "amanhã · próximo treino" só faz sentido quando o usuário está
-  // vendo o dia de HOJE (ui.off===0) e o treino de hoje já foi concluído.
-  // Em datas passadas/futuras navegadas pelas setas, não mostrar preview.
-  const modoAmanha = !!(treinoDoDia && ui.off === 0);
-  let r, dRefAmanha = null;
-  if(modoAmanha){
-    const savedOff = ui.off; ui.off = savedOff + 1;
-    try{ r = avaliar(p); dRefAmanha = new Date(REF()+"T12:00"); }
-    finally{ ui.off = savedOff; }
-  } else {
-    r = avaliar(p);
-  }
-  // v30: Anti-repetição agora é UNIVERSAL, aplicada dentro de sugestaoTreino()/avaliar().
-  // Todos os cenários (hoje, amanhã via modoAmanha, futuro via ui.off>0, passado)
-  // recebem a mesma regra: olhar 3 dias anteriores → se letra base foi feita,
-  // trocar pra alternativa mais atrasada. Não há mais blocos ad-hoc aqui.
-  const d = days[r.win.d];
-  let out = pref("semana") ? semanaCard(p) : "";
-
-  // Se já treinou nesse dia -> mostra card "concluído" (Hevy-style hero verde)
-  if(treinoDoDia){
-    const diaFeito = days[treinoDoDia.dia];
-    if(diaFeito){
-      const lblDia = ui.off===0 ? "✓ Treino concluído"
-        : (ui.off<0 ? "✓ Treino registrado neste dia" : "✓ Treino registrado neste dia futuro");
-      out += `<div class="hero done">
-        <div class="top">
-          <div class="letter">${treinoDoDia.dia}</div>
-          <div class="info">
-            <div class="lbl" style="color:var(--ok)">${lblDia}</div>
-            <div class="ttl">${esc(diaFeito.t)}</div>
-            <div class="sub">${diaFeito.ex.length} exercícios · ${diaFeito.ex.reduce((a,e)=>a+e.s,0)} séries</div>
-          </div>
-        </div>
-      </div>`;
-      out += `<button class="go" data-edittoday="${treinoDoDia.dia}" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">Ver / editar treino registrado</button>`;
-    }
-  }
-
-  // Card do próximo treino (ou do dia)
-  // Em datas passadas/futuras com treino já registrado, não mostrar o card de próximo treino
-  // (o "concluído" já resume o dia; a próxima recomendação vive na tela de HOJE).
-  const escondeProxCard = !!treinoDoDia && ui.off !== 0;
-  const jiuChip = r.schedJiu ? `<span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:rgba(58,216,121,.14);color:var(--ac);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">Jiu à noite</span>` : "";
-  const descansoChip = r.schedRest ? `<span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">Sem musc</span>` : "";
-  if(!escondeProxCard){
-    // Se o schedule diz que o dia é sem musc (recuperação/descanso), renderiza card diferente
-    if(r.schedRest && ui.off===0 && !treinoDoDia){
-      const notaTxt = r.win.schedNota || "Descanso";
-      const isDescCompleto = /descanso completo/i.test(notaTxt);
-      const emo = isDescCompleto ? "😴" : (r.schedJiu ? "🥋" : "🧘");
-      const titulo = r.schedJiu ? `${notaTxt} · Jiu à noite` : notaTxt;
-      out += `<div class="hero">
-        <div class="top">
-          <div class="letter" style="font-size:26px">${emo}</div>
-          <div class="info">
-            <div class="lbl">Hoje</div>
-            <div class="ttl">${esc(titulo)}</div>
-            <div class="sub">Sem musculação · pelo seu cronograma</div>
-          </div>
-        </div>
-        <div class="why">${r.schedJiu ? "Dia de recuperar para o tatame à noite. Se quiser treinar mesmo assim, use o botão abaixo." : (isDescCompleto ? "Aproveite para recuperar. Se quiser treinar mesmo assim, use o botão abaixo." : "Dia leve: mobilidade, alongamento ou caminhada.")}</div>
-      </div>`;
-    } else {
-      const diaSemanaAmanha = dRefAmanha ? WDL[dRefAmanha.getDay()] : "amanhã";
-      const eyebrow = modoAmanha
-        ? `Amanhã · ${diaSemanaAmanha}`
-        : (ui.off===0?"Próximo treino":"Treino do dia");
-      const msg = modoAmanha
-        ? `${r.win.motivo}`
-        : `${r.descanso&&!r.schedRest?"<b>Neste dia o melhor é descansar.</b> ":""}${r.win.motivo}`;
-
-      out += `<div class="hero">
-        <div class="top">
-          <div class="letter">${r.win.d}</div>
-          <div class="info">
-            <div class="lbl">${eyebrow}${jiuChip}${descansoChip}</div>
-            <div class="ttl">${esc(d.t)}</div>
-            <div class="sub">${d.ex.length} exercícios · ${d.ex.reduce((a,e)=>a+e.s,0)} séries</div>
-          </div>
-        </div>
-        <div class="why">${msg}</div>
-      </div>`;
-    }
-  }
-
-  // v31: Card IA "Por que esse treino?" — populado por PaceIA.hydrate() após render.
-  if(ui.off === 0 && !treinoDoDia){
-    out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
-  }
-
-  // Botão Iniciar treino — SEMPRE visível (mesmo em dias de descanso).
-  // Schedule é sugestão, não bloqueio. Em dia de descanso abre seletor A/B/C/D.
-  if(!treinoDoDia){
-    if(r.schedRest){
-      out += `<button class="go" data-picktreino="1" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">${ICON.play} ${ui.off<0?"Registrar treino neste dia…":"Iniciar treino mesmo assim…"}</button>`;
-    } else {
-      out += `<button class="go" data-abrir="${r.win.d}">${ICON.play} ${ui.off<0?"Registrar treino "+r.win.d+" em "+brd(REF()):"Iniciar treino "+r.win.d}</button>`;
-    }
-  }
-
-  // ============ Quick actions: planejar atividade do dia ============
-  const dataRef = REF();
-  const planHoje = getPlanejado(p, dataRef) || {};
-  const quicks = ATIV_QUICK[p] || ["jiu","corrida","bike"];
-  out += `<div class="qa-title" style="margin-top:18px">${ui.off===0?"Planejar hoje":(ui.off>0?"Planejar "+brd(dataRef):"Atividades de "+brd(dataRef))}</div>
-    <div class="chips" style="margin-bottom:10px">
-      ${quicks.map(a=>{
-        const on = !!planHoje[a];
-        const emo = emojiAtiv(a==="jiu"?"jiu-jitsu":a);
-        const lbl = ATIV_LABEL[a] || a;
-        // v27: jejum usa laranja/âmbar em vez de verde
-        const isJejum = a==="jejum";
-        const activeStyle = isJejum
-          ? "background:#f59e0b;color:#000;border-color:#f59e0b"
-          : "background:var(--ac);color:#000;border-color:var(--ac)";
-        return `<button class="chip ${on?"on":""}" data-planq="${a}" style="${on?activeStyle:""}">${emo} ${on?"✓ ":"+ "}${esc(lbl)}</button>`;
-      }).join("")}
-    </div>`;
-
-  // Chips de atividades PLANEJADAS
-  const planKeys = Object.keys(planHoje).filter(k=>k!=="musc" && planHoje[k]);
-  if(planKeys.length){
-    out += `<div class="extras-list" style="margin-bottom:8px">`;
-    planKeys.forEach(k=>{
-      const emo = emojiAtiv(k==="jiu"?"jiu-jitsu":k);
-      // v27: chip de jejum planejado com destaque âmbar
-      const rowStyle = k==="jejum"
-        ? ' style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.35)"'
-        : '';
-      const lblExtra = k==="jejum" ? " planejado 🌙" : " planejado";
-      out += `<div class="row"${rowStyle}><span>${emo} ${esc(ATIV_LABEL[k]||k)}${lblExtra}</span><button class="rm" data-planq="${k}">remover</button></div>`;
-    });
-    out += `</div>`;
-  }
-
-  // Aviso de conflito (jiu/corrida planejado em dia de pernas)
-  // v29: passa r.win.d (letra EFETIVA após anti-repetição) — não schedule bruto.
-  const conflito = conflitoPlan(p, dataRef, r.win.d);
-  if(conflito && !treinoDoDia){
-    out += `<div class="hero" style="border:1px solid rgba(255,196,0,.35);background:linear-gradient(135deg,rgba(255,196,0,.08),rgba(255,120,0,.04))">
-      <div class="why" style="padding:2px 0 8px">⚠️ ${conflito.msg} Recomendamos trocar pro <b>${conflito.sugere}</b> (upper leve).</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="chip on" data-plansugmusc="${conflito.sugere}">Trocar pra ${conflito.sugere}</button>
-        <button class="chip" data-plansugmusc="${conflito.letraAtual}" data-planforce="1">Manter ${conflito.letraAtual}</button>
-      </div>
-    </div>`;
-  }
-
-  out += `<button class="coach-btn" data-coach="1">${ICON.spark} <span>Pergunte ao <span class="cbr">coach</span></span></button>`;
-
-  // Ações grandes
-  const skipAtivo = temSkip(p,0);
-  const extrasHoje = extrasDoDia(p, REF()).filter(e=>e.atividade && String(e.atividade).toLowerCase()!==mainSport(p));
-  const extraPrinc = temExtra(p,0);
-
-  out += `<div class="acts2">
-    <button class="act2 ${skipAtivo?"on":""}" data-skip="1">
-      ${ICON.moon}<span>${skipAtivo?"Descansei":"Não treinei"}</span>
-    </button>
-    <button class="act2 ${extraPrinc?"on":""}" data-atv="1">
-      ${ICON.run}<span>${extrasHoje.length?"Atividade (+"+extrasHoje.length+")":(extraPrinc?"✓ "+m.extra:"Atividade extra")}</span>
-    </button>
-  </div>`;
-
-  if(extrasHoje.length){
-    out += `<div class="extras-list">`;
-    extrasHoje.forEach(e=>{
-      const emo = emojiAtiv(e.atividade);
-      const dur = e.duracao?` · ${e.duracao} min`:"";
-      const nota = e.nota?` — ${esc(e.nota)}`:"";
-      out += `<div class="row"><span>${emo} ${esc(e.atividade)}${dur}${nota}</span><button class="rm" data-rmatv="${e.id}">remover</button></div>`;
-    });
-    out += `</div>`;
-  }
-
-  return out;
-}
-
-/* ------------------------------------------------------------------ REGISTRAR */
-function viewTreino(p,m){
-  const d = ui.dia, days = dayset(p), treino = days[d];
-  const ant = ultimaSessao(p,d);
-  const _dkey = p+":"+d;
-  const _draftVazio = !S.draft[_dkey] || !Object.values(S.draft[_dkey]).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)));
-  // v33: a última sessão aparece só como referência (texto cinza dentro do campo).
-  // Nada é copiado automaticamente: o que for salvo é só o que foi digitado.
-  if(false){
-    /* NÃO chamar salvaSoft() aqui — dispara push→pullAndMerge que
-       pode re-renderizar o DOM enquanto o usuário está no input. */
-  }
-  const dr = S.draft[_dkey] || {};
-  const dataTr = REF(), hojeIso = shift(0);
-  const passado = dataTr < hojeIso, futuro = dataTr > hojeIso;
-  const relTr = dataTr===hojeIso ? "hoje" : (ui.off===-1 ? "ontem" : (passado ? "há "+(-ui.off)+" dias" : "data futura"));
-  let out = `<div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
-      <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
-        <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
-      <div class="db-nav">
-        <button class="db-arw" data-off="-1" aria-label="Dia anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
-        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
-      </div>
-    </div>`;
-  if(ui.editId!=null){
-    out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
-  }
-  out += `<div class="segs">`;
-  ORDER.forEach(k=>{
-    const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
-    const t = u ? (dias(u.data)===0?"✓ feito":"há "+dias(u.data)+"d") : "nunca";
-    out += `<button class="sg ${k===d?"on":""}" data-dia="${k}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
-  });
-  out += `</div><div class="tbar">${ui.edit
-      ? `<input class="ed-f" style="margin:0" data-f="titulo" value="${esc(treino.t)}">`
-      : `<div class="t">${esc(treino.t)}</div>`}
-    ${ui.edit ? `<button class="edt on" data-edit="1">Concluir</button>` : ""}
-    </div>`;
-
-  if(!ui.edit && Object.keys(ant).length){
-    out += `<button class="reset" data-loadlast="1" style="margin-bottom:12px;color:var(--ac);border-color:rgba(58,216,121,.35);background:rgba(58,216,121,.06)">&#128260; usar valores da &uacute;ltima vez</button>`;
-  }
-
-  treino.ex.forEach((ex,idx)=>{
-    if(ui.edit){
-      out += `<div class="card ed">
-        <input class="ed-f" data-ex="${ex.id}" data-f="n" value="${esc(ex.n)}" placeholder="nome do exercício">
-        <input class="ed-f" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação">
-        <div class="ed-row">
-          <input class="ed-f" style="margin:0;flex:1" data-ex="${ex.id}" data-f="p" value="${esc(ex.p)}" placeholder="repetições">
-          <div class="step"><button data-step="${ex.id}:-1">−</button><span class="v">${ex.s}</span><button data-step="${ex.id}:1">+</button></div>
-        </div>
-        <div class="ed-row tys">
-          ${[["load","carga e reps"],["time","tempo"],["reps","só reps"]].map(([k,l])=>
-            `<button class="ty ${ex.ty===k?"on":""}" data-ty="${ex.id}:${k}">${l}</button>`).join("")}
-        </div>
-        <div class="ed-row" style="margin-bottom:0">
-          <button class="del" data-mv="${ex.id}:-1" style="width:44px">↑</button>
-          <button class="del" data-mv="${ex.id}:1" style="width:44px">↓</button>
-          <button class="del" data-del="${ex.id}">Remover exercício</button></div></div>`;
-    }else{
-      const sets = dr[ex.id]||[], a = ant[ex.id]||[], rs = resumo(ex,a);
-      const _dnMeta = [ex.descanso?"descanso "+esc(ex.descanso):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" · ");
-      out += `<div class="card"><div class="ex-h"><button class="ex-n ex-link" data-exhist="${ex.id}">${esc(ex.n)}<span class="ex-hi">histórico ›</span></button>
-        <div class="ex-p">${ex.s} x ${esc(ex.p)}</div></div>
-        ${_dnMeta?`<div style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:2px 0 6px;font-family:var(--sans)">${_dnMeta}</div>`:""}
-        <div class="ex-a ${rs?"has":""}">${rs?"última: "+rs:"primeira vez neste exercício"}</div>
-        <input class="ap" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação">`;
-      for(let i=0;i<ex.s;i++){
-        const s = sets[i]||{}, av = a[i]||{};
-        out += `<div class="set ${s.ok?"done":""}"><div class="i">${i+1}</div>`;
-        if(ex.ty==="load"){
-          out += campo(s.kg,av.kg||"kg","kg",ex.id,i,"kg");
-          out += campo(s.reps,av.reps||"reps","rep",ex.id,i,"reps");
-        }else if(ex.ty==="time"){
-          out += campo(s.sec,av.sec||"segundos","s",ex.id,i,"sec");
-        }else{
-          out += campo(s.reps,av.reps||"repetições","rep",ex.id,i,"reps");
-        }
-        const oKey = ex.id+":"+i, temObs = !!(s.obs && String(s.obs).trim());
-        out += `<button class="obs-tg ${temObs?"has":""}" data-obstg="${oKey}" aria-label="Observação da série ${i+1}">${temObs?"✎":"+"}</button><button class="set-ok ${s.ok?"on":""}" data-setok="${oKey}" aria-label="Concluir série ${i+1}">✓</button></div>`;
-        if(temObs || ui.obsOpen[oKey]) out += `<div class="obs-row">${campoObs(s.obs,ex.id,i)}</div>`;
-      }
-      out += `</div>`;
-    }
-  });
-
-  if(ui.edit){
-    out += `<button class="addx" data-add="1">+ Adicionar exercício</button>
-      <button class="reset" data-reset="1">Restaurar o treino ${d} original</button>
-      <div style="height:70px"></div>`;
-  }else{
-    out += `<div style="font-size:12px;color:var(--faint);line-height:1.55;padding:2px 4px 0">
-      Números em cinza são da última vez. Toque em ✓ para concluir a série: se o campo estiver vazio, repete a última carga, e o descanso começa a contar. Toque no nome do exercício para ver o histórico.</div>`;
-    const cheio = temValores(dr);
-    const totalSeries = treino.ex.reduce((a,e)=>a+e.s,0);
-    const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
-    out += `<div style="height:40px"></div><div class="save-wrap"><button class="save ${ui.saved?"done":cheio?"on":""}" id="salvar" ${ui.saving?"disabled":""}>
-      ${ui.saved?"✓ Treino salvo":`<span class="sv-1">${ui.editId!=null?"Atualizar":"Salvar"} treino ${d} · ${brd(dataTr)}</span><span class="sv-2">${feitas}/${totalSeries} séries preenchidas${passado?" · data passada":""}</span>`}</button></div>`;
-  }
-  return out;
-}
-
 function sessaoCard(s,days,acoes){
   const t = days[s.dia]; if(!t) return "";
   return `<div class="card"><div class="h-h"><span class="h-d">${s.dia} · ${esc(t.t)}</span>
@@ -2345,70 +2281,8 @@ function sessaoCard(s,days,acoes){
       return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") + (acoes||"") + `</div>`;
 }
 
-/* ------------------------------------------------------------------ CAL */
-function viewCal(p,m){
-  const days = dayset(p);
-  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
-  const ano = base.getFullYear(), mes = base.getMonth();
-  const prim = new Date(ano,mes,1), nd = new Date(ano,mes+1,0).getDate();
-  const inicio = (prim.getDay()+6)%7;
-  const sel = REF(), hj = shift(0);
-
-  let out = `<div class="cal"><div class="cal-h">
-      <button class="arw" data-mes="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="m">${MES[mes]} de ${ano}</div>
-      <button class="arw" data-mes="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
-    </div><div class="grid">
-    ${["seg","ter","qua","qui","sex","sáb","dom"].map(x=>`<div class="gh">${x}</div>`).join("")}`;
-
-  for(let i=0;i<inicio;i++) out += `<div class="cell out"></div>`;
-  let nT=0, nX=0, nS=0;
-  for(let d=1;d<=nd;d++){
-    const dt = `${ano}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const mmAll = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===dt), mm = mmAll[0];
-    const xx = S.events.find(e=>e.perfil===p&&e.tipo==="extra"&&e.data===dt);
-    const sk = skipDoDia(p,dt);
-    if(mm) nT++; if(xx) nX++; if(sk) nS++;
-    const skipCls = (!mm && !xx && sk) ? " skipd" : "";
-    out += `<button class="cell${skipCls} ${dt===sel?"sel":""} ${dt===hj?"hoje":""}" data-dt="${dt}">
-      <span class="n">${d}</span>
-      ${mm?`<span class="l">${mm.dia}${mmAll.length>1?`<sup class="mult">${mmAll.length}</sup>`:""}</span>`
-         :(sk&&!xx?`<span class="l skip" style="font-size:11px">—</span>`
-                  :`<span class="l" style="color:transparent">·</span>`)}
-      ${xx?`<span class="dot"></span>`:`<span class="dot" style="background:transparent"></span>`}</button>`;
-  }
-  out += `</div></div>`;
-
-  out += `<div class="sum">
-    <div><div class="v">${nT}</div><div class="k">musculação</div></div>
-    <div><div class="v">${nX}</div><div class="k">extras</div></div>
-    <div><div class="v">${nS}</div><div class="k">descansos</div></div></div>`;
-
-  const ss = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
-  const s = ss[0];
-  const xs = extrasDoDia(p,sel);
-  const sk = skipDoDia(p,sel);
-  const dref = new Date(sel+"T12:00");
-  out += `<div class="eyebrow" style="margin-bottom:9px">${WDL[dref.getDay()]}, ${dref.getDate()} de ${MES[dref.getMonth()]}</div>`;
-  if(sk) out += `<div class="card cal-row" style="padding:13px 15px;font-size:13px;color:var(--muted);background:var(--surface-2);border-color:var(--hair-2)"><span>😴 Marcado como descanso${sk.motivo?` — ${esc(sk.motivo)}`:""}</span><button class="mini" data-skip="1">desfazer</button></div>`;
-  xs.forEach(e=>{
-    const nome = e.atividade ? esc(e.atividade) : m.extra;
-    const emo = e.atividade ? emojiAtiv(e.atividade) : "·";
-    const dur = e.duracao?` · ${e.duracao} min`:"";
-    const nota = e.nota?`<div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5">${esc(e.nota)}</div>`:"";
-    out += `<div class="card cal-row" style="padding:13px 15px;font-size:13px;color:var(--blue);border-color:rgba(47,107,255,.25);background:rgba(47,107,255,.06)"><span>${emo} ${nome}${dur}${nota}</span><button class="mini" data-rmatv="${e.id}">remover</button></div>`;
-  });
-  if(ss.length>1) out += `<div class="warn-dup">Há ${ss.length} treinos registrados neste dia. Exclua os repetidos ou edite para mudar a data.</div>`;
-  ss.forEach(ev=>{
-    out += sessaoCard(ev,days,`<div class="cal-acts"><button data-caledit="${ev.id}">Editar ou mudar data</button><button class="del-x" data-caldel="${ev.id}">Excluir</button></div>`);
-  });
-  if(!ss.length && sel<=hj) out += `<button class="go cal-reg" data-calreg="1">${ICON.play} Registrar treino em ${brd(sel)}</button>`;
-  if(!s && !xs.length && !sk) out += `<div class="empty"><div class="icon">🏋️</div><div class="ttl">Ainda sem registro</div><div class="sub">A letra indica a divisão treinada, o ponto azul marca extras e o traço marca descanso.</div></div>`;
-  return out;
-}
-
 /* ------------------------------------------------------------------ DIETA */
-function viewDieta(p,m){
+function viewDietaEdicao(p,m){
   const D = S.dieta[p], sel = REF();
   const marc = S.check[p+":"+sel] || {};
   const st = id => marc[id] || null;
@@ -2416,7 +2290,7 @@ function viewDieta(p,m){
   const sim = id => st(id)==="ok" ? "✓" : st(id)==="no" ? "✕" : "";
 
   // Modo edição (via config)
-  if(ui.edieta){
+  if(true){
     let out = `<div class="tbar"><div class="t">Editar dieta</div>
       <button class="edt on" data-edieta="1">Concluir</button></div>`;
     out += `<div class="card ed">
@@ -2565,6 +2439,522 @@ function viewDieta(p,m){
   }
 
   out += `<div style="height:16px"></div>`;
+  return out;
+}
+
+
+/* ==========================================================================
+   v38 · design "pace" (protótipo rodada 3) aplicado ao app real.
+   Só muda a apresentação e os atalhos. Modelo de dados e sincronização iguais;
+   campos novos (draftMeta, agua) entram no mesmo documento e passam pelo merge.
+   ========================================================================== */
+const PI = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/>',
+  dumbbell:'<path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/>',
+  fork:'<path d="M6 3v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3M8 3v18M16 21V3c-2 1.5-3 4-3 7h3"/>',
+  chart:'<path d="M5 20V13M12 20V8M19 20V4"/>',
+  check:'<path d="M5 12.5 10 17l9-10"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  right:'<path d="m9 5 7 7-7 7"/>', left:'<path d="m15 5-7 7 7 7"/>', down:'<path d="m5 9 7 7 7-7"/>',
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  drop:'<path d="M12 3.5s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  pill:'<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="m9.5 8.4 5 7.2"/>',
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  run:'<circle cx="15" cy="4" r="2"/><path d="M4 22l4-5 2-3-3-3 4-4 3 4 3 1M10 14l2 3v5"/>',
+  note:'<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>'
+};
+const pic = (k, cls) => `<svg class="pc-ic ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${PI[k]||""}</svg>`;
+const cap = s => String(s||"").charAt(0).toUpperCase() + String(s||"").slice(1);
+const AGUA_META = { gabriel:3.5, eduarda:2.5 };
+const fmtL = n => Number(n||0).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+
+/* ---------- treino em andamento (rascunho datado) ---------- */
+function marcaDraft(p, d){
+  if(!S.draftMeta) S.draftMeta = {};
+  const k = p+":"+d, m = S.draftMeta[k];
+  if(!m || m.data !== REF()) S.draftMeta[k] = { data: REF(), inicio: Date.now() };
+}
+function limpaDraftMeta(p, d){ if(S.draftMeta) delete S.draftMeta[p+":"+d]; }
+function contaSeries(t, dr){
+  let total = 0, ok = 0, pre = 0;
+  t.ex.forEach(e=>{ total += e.s; (dr[e.id]||[]).slice(0,e.s).forEach(x=>{ if(!x) return; if(x.ok) ok++; if(x.kg||x.reps||x.sec) pre++; }); });
+  return { total, ok, pre };
+}
+/* Um treino só está "em andamento" se tem rascunho com valores iniciado HOJE e ainda não foi salvo. */
+function sessaoAberta(p){
+  const hoje = shift(0);
+  for(const L of ORDER){
+    const k = p+":"+L, m = S.draftMeta && S.draftMeta[k], dr = S.draft && S.draft[k], t = dayset(p)[L];
+    if(m && m.data===hoje && dr && t && temValores(dr)) return Object.assign({ L, t, inicio:m.inicio }, contaSeries(t, dr));
+  }
+  return null;
+}
+
+/* ---------- toast com desfazer (fora do render) ---------- */
+function toastUndo(msg, undo){
+  const old = document.getElementById("pcToast"); if(old) old.remove();
+  clearTimeout(toastUndo._t);
+  const el = document.createElement("div"); el.id = "pcToast"; el.className = "pc-toast"; el.setAttribute("role","status");
+  el.innerHTML = `<span>${esc(msg)}</span>${undo?`<button type="button">Desfazer</button>`:""}`;
+  document.body.appendChild(el);
+  if(undo) el.querySelector("button").onclick = ()=>{ el.remove(); undo(); };
+  toastUndo._t = setTimeout(()=>el.remove(), undo ? 5000 : 2400);
+}
+
+/* teclado aberto: a barra fixa do treino vira bloco normal para não cobrir os campos */
+(function(){
+  if(typeof window==="undefined" || !window.visualViewport) return;
+  let base = window.innerHeight;
+  const chk = ()=> document.body && document.body.classList.toggle("kb-open", window.visualViewport.height < base - 150);
+  window.visualViewport.addEventListener("resize", chk);
+  window.addEventListener("orientationchange", ()=>setTimeout(()=>{ base = window.innerHeight; chk(); }, 400));
+})();
+
+/* ---------- componentes ---------- */
+function pcTopo(){
+  const m = meta(ui.perfil), ini = (m.label||"?").charAt(0).toUpperCase();
+  return `<div class="pc-top"><span class="pc-brand" aria-label="pace">pace</span>
+    <button class="pc-avatar" data-view="config" aria-label="Perfil e configurações (${esc(m.label)})">${ini}</button></div>`;
+}
+function pcTabs(grupo, itens, atual){
+  return `<div class="pc-tabs" role="tablist">${itens.map(([k,l])=>`<button class="pc-tab" role="tab" aria-selected="${k===atual}" data-pctab="${grupo}:${k}">${l}</button>`).join("")}</div>`;
+}
+function pcSec(t, aside){ return `<div class="pc-sec-h"><h2>${t}</h2>${aside||""}</div>`; }
+function pcDataNav(){
+  const podeAvancar = true;
+  return `<div class="pc-dnav"><p class="pc-sub">${cap(dataLonga(REF()))}</p>
+    ${ui.off!==0?`<button class="pc-link ac" data-hoje="1">Hoje</button>`:""}
+    <button class="pc-ib" data-off="-1" aria-label="Dia anterior">${pic("left")}</button>
+    <button class="pc-ib" data-off="1" aria-label="Próximo dia" ${podeAvancar?"":"disabled"}>${pic("right")}</button></div>`;
+}
+function pcTituloDia(){
+  return ui.off===0 ? "Hoje" : ui.off===-1 ? "Ontem" : ui.off===1 ? "Amanhã" : (ui.off<0 ? `Há ${-ui.off} dias` : `Em ${ui.off} dias`);
+}
+function pcSemana(p){
+  const ref = REF(), ini = inicioSemana(ref), hj = shift(0), ab = sessaoAberta(p);
+  const K = ["SEG","TER","QUA","QUI","SEX","SÁB","DOM"];
+  return `<div class="pc-week" role="list">${K.map((k,i)=>{
+    const dt = somaDias(ini, i), d = new Date(dt+"T12:00");
+    const done = S.events.some(e=>e.perfil===p && e.tipo==="musc" && e.data===dt);
+    const prog = !done && ab && dt===hj;
+    const x = S.events.some(e=>e.perfil===p && e.tipo==="extra" && e.data===dt);
+    const lab = `${cap(dataLonga(dt))}: ${done?"treino concluído":prog?"treino em andamento":"sem treino"}${x?", atividade extra":""}`;
+    return `<button class="pc-wd ${done?"done":""} ${prog?"prog":""} ${x?"x":""} ${dt===hj?"hj":""} ${dt===ref&&dt!==hj?"sel":""}" data-dt="${dt}" role="listitem" aria-label="${lab}">
+      <span class="k">${k}</span><span class="n">${d.getDate()}</span><span class="c">${done?pic("check"):prog?pic("clock"):""}</span></button>`;
+  }).join("")}</div>
+  <div class="pc-legend"><span><i class="d"></i>Concluído</span><span><i class="p"></i>Em andamento (não conta)</span><span><i class="x"></i>Atividade extra</span></div>`;
+}
+function pcAgua(p){
+  const k = p+":"+REF(), v = (S.agua && S.agua[k]) || 0, meta = AGUA_META[p] || 3;
+  return `<div class="pc-row">${pic("drop")}<div class="main"><div class="t">Água</div>
+      <div class="pc-bar" style="margin-top:8px" aria-hidden="true"><i style="width:${Math.min(100, v/meta*100)}%;background:var(--water)"></i></div></div>
+    <span class="end" style="color:var(--muted);font-weight:500">${fmtL(v)} / ${fmtL(meta)} L</span>
+    ${v>0?`<button class="pc-ib" data-agua="-0.35" aria-label="Remover 350 ml">${pic("minus")}</button>`:""}
+    <button class="pc-btn sm oac" data-agua="0.35">${pic("plus","sm")} 350 ml</button></div>`;
+}
+function pcRefeicoesDia(p){
+  const D = S.dieta[p], marc = S.check[p+":"+REF()] || {};
+  const refs = D.refs || [], feitas = refs.filter(r=>marc[r.id]==="ok");
+  const temKcal = refs.some(r=>r.kcal!=null && r.kcal!=="");
+  const kcal = feitas.reduce((a,r)=>a + (Number(r.kcal)||0), 0);
+  const tipo = tipoDiaHoje(p), alvos = getAlvosDia(p), alvoHoje = (tipo && alvos && alvos[tipo]) ? alvos[tipo] : null;
+  const alvoK = alvoHoje ? Number(alvoHoje.kcal) : parseFloat(String(D.alvo && D.alvo.kcal || "").replace(/[^\d.]/g,"")) || null;
+  return { refs, feitas, temKcal, kcal, tipo, alvoHoje, alvoK, marc };
+}
+
+/* ------------------------------------------------------------------ HOJE */
+function viewHoje(p,m){
+  const days = dayset(p), hj = shift(0);
+  const treinoDoDia = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===REF());
+  const modoAmanha = !!(treinoDoDia && ui.off === 0);
+  let r;
+  if(modoAmanha){ const sv = ui.off; ui.off = sv + 1; try{ r = avaliar(p); } finally{ ui.off = sv; } }
+  else r = avaliar(p);
+  const d = days[r.win.d];
+  const ab = ui.off===0 ? sessaoAberta(p) : null;
+
+  let out = pcTopo() + `<h1 class="pc-h1">${pcTituloDia()}</h1>` + pcDataNav();
+
+  // ---- destaque único: estado real do treino do dia ----
+  const tagJiu = r.schedJiu ? `<span class="tag">Jiu à noite</span>` : "";
+  if(ab){
+    out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Treino em andamento</div>
+      <div class="ttl">${esc(ab.t.t)}</div>
+      <div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas${ab.pre>ab.ok?` · ${ab.pre-ab.ok} preenchidas`:""}</div>
+      <button class="pc-btn hl" data-continuar="${ab.L}"><span>Continuar treino</span>${pic("arrow")}</button></section>`;
+    if(treinoDoDia) out += `<p class="pc-why">Você já registrou o treino ${treinoDoDia.dia} neste dia. Ao salvar este, o app pergunta se deve substituir.</p>`;
+  } else if(treinoDoDia){
+    const tf = days[treinoDoDia.dia];
+    const nSer = Object.values(treinoDoDia.entries||{}).reduce((a,arr)=>a+(arr||[]).filter(x=>x&&(x.kg||x.reps||x.sec)).length,0);
+    out += `<section class="pc-hl" aria-label="Treino concluído"><div class="ey">${pic("check","sm")}${ui.off===0?"Treino concluído":"Treino registrado neste dia"}</div>
+      <div class="ttl">${esc(tf?tf.t:"Treino "+treinoDoDia.dia)}</div>
+      <div class="meta">Treino ${treinoDoDia.dia} · ${nSer} séries registradas</div>
+      <button class="pc-btn hl" data-edittoday="${treinoDoDia.dia}"><span>Ver ou editar treino</span>${pic("arrow")}</button></section>`;
+  } else if(r.schedRest && ui.off===0){
+    const nota = r.win.schedNota || "Descanso";
+    out += `<section class="pc-hl" aria-label="Dia sem musculação"><div class="ey">Pelo seu cronograma${tagJiu}</div>
+      <div class="ttl">${esc(nota)}</div>
+      <div class="meta">Sem musculação hoje</div>
+      <button class="pc-btn hl" data-picktreino="1"><span>Treinar mesmo assim</span>${pic("arrow")}</button></section>`;
+  } else {
+    const passado = REF() < hj;
+    out += `<section class="pc-hl" aria-label="Treino sugerido"><div class="ey">${ui.off===0?"Sugerido para hoje":passado?"Treino deste dia":"Sugerido para este dia"}${tagJiu}</div>
+      <div class="ttl">${esc(d.t)}</div>
+      <div class="meta">Treino ${r.win.d} · ${d.ex.length} exercícios · ${d.ex.reduce((a,e)=>a+e.s,0)} séries</div>
+      <button class="pc-btn hl" data-abrir="${r.win.d}"><span>${passado?"Registrar treino "+r.win.d:"Iniciar treino"}</span>${pic("arrow")}</button></section>`;
+    if(r.win.motivo) out += `<p class="pc-why">${r.descanso&&!r.schedRest?"<b>Neste dia o melhor é descansar.</b> ":""}${r.win.motivo}</p>`;
+    if(ui.off===0) out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
+  }
+
+  // conflito (atividade planejada × pernas)
+  const dataRef = REF();
+  const conflito = conflitoPlan(p, dataRef, r.win.d);
+  if(conflito && !treinoDoDia && !ab){
+    out += `<div class="pc-warn">${conflito.msg} Sugestão: trocar para o <b>${conflito.sugere}</b>.
+      <div class="acts"><button class="pc-btn sm oac" data-plansugmusc="${conflito.sugere}">Trocar para ${conflito.sugere}</button>
+      <button class="pc-btn sm ghost" data-plansugmusc="${conflito.letraAtual}" data-planforce="1">Manter ${conflito.letraAtual}</button></div></div>`;
+  }
+
+  // ---- semana ----
+  if(pref("semana")){
+    const feitos = treinosNaSemana(p, inicioSemana(REF())), metaS = metaSemanal(p);
+    out += pcSec("Sua semana", `<span class="aside">${feitos} de ${metaS} concluídos</span>`) + pcSemana(p);
+  }
+
+  // ---- alimentação (sem competir com a ação principal) ----
+  const R = pcRefeicoesDia(p);
+  out += pcSec("Alimentação", `<button class="pc-link" data-view="dieta">Abrir diário ${pic("right","sm")}</button>`);
+  if(R.temKcal && R.alvoK){
+    out += `<div class="pc-kc"><b>${R.kcal.toLocaleString("pt-BR")}</b><span>/ ${R.alvoK.toLocaleString("pt-BR")} kcal previstas</span></div>
+      <div class="pc-bar" style="margin-top:10px" aria-hidden="true"><i style="width:${Math.min(100,R.kcal/R.alvoK*100)}%"></i></div>`;
+  }
+  out += `<p class="pc-note" style="font-size:14px;color:var(--muted)">${R.feitas.length} de ${R.refs.length} refeições registradas${R.tipo?` · plano do dia: ${esc(TIPO_DIA_LABEL[R.tipo]||R.tipo)}`:""}${R.temKcal?" · kcal pelo plano de cada refeição":""}</p>`;
+  out += `<div class="pc-list" style="margin-top:14px">` + pcAgua(p);
+
+  // próxima atividade
+  if(ui.off===0){
+    const sch = getSchedule(p), am = somaDias(hj,1), dA = new Date(am+"T12:00"), sa = sch ? sch[WDK[dA.getDay()]] : null;
+    const planA = getPlanejado(p, am) || {};
+    const extrasA = Object.keys(planA).filter(k=>k!=="musc" && planA[k]).map(k=>ATIV_LABEL[k]||k);
+    const txt = [sa && sa.musc ? `treino ${sa.musc}` : "sem musculação", sa && sa.nota ? sa.nota : "", extrasA.length ? extrasA.join(", ")+" planejado" : ""].filter(Boolean).join(" · ");
+    out += `<button class="pc-row" data-dt="${am}">${pic("cal")}<div class="main"><div class="t">Amanhã</div><div class="s">${esc(txt)}</div></div><span class="chev">${pic("right")}</span></button>`;
+  }
+  out += `</div>`;
+
+  // ---- atividades do dia ----
+  const planHoje = getPlanejado(p, dataRef) || {};
+  const quicks = ATIV_QUICK[p] || ["jiu","corrida","bike"];
+  out += pcSec(ui.off===0 ? "Planejar hoje" : "Atividades do dia");
+  out += `<div class="chips" style="margin-bottom:10px">${quicks.map(a=>{
+    const on = !!planHoje[a];
+    return `<button class="chip ${on?"on":""}" data-planq="${a}" aria-pressed="${on}">${on?"✓ ":"+ "}${esc(ATIV_LABEL[a]||a)}</button>`;
+  }).join("")}</div>`;
+  const skipAtivo = temSkip(p,0);
+  const extrasHoje = extrasDoDia(p, REF()).filter(e=>e.atividade && String(e.atividade).toLowerCase()!==mainSport(p));
+  out += `<div class="pc-list">`;
+  extrasHoje.forEach(e=>{
+    out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${esc(e.atividade)}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div>
+      <button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
+  });
+  out += `<button class="pc-row" data-atv="1">${pic("run")}<div class="main"><div class="t">Registrar atividade extra</div><div class="s">${esc(m.extra)}, corrida, bike, caminhada…</div></div><span class="chev">${pic("right")}</span></button>
+    <button class="pc-row" data-skip="1">${pic("moon")}<div class="main"><div class="t">${skipAtivo?"Marcado como descanso":"Não treinei"}</div><div class="s">${skipAtivo?"Toque para desfazer":"Marca o dia como descanso"}</div></div><span class="chev">${pic("right")}</span></button>
+    <button class="pc-row" data-coach="1">${pic("spark")}<div class="main"><div class="t">Pergunte ao coach</div><div class="s">Dúvidas sobre treino e alimentação</div></div><span class="chev">${pic("right")}</span></button>
+  </div>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ TREINOS */
+function viewTreinos(p,m){
+  const days = dayset(p), ab = sessaoAberta(p), sug = avaliar(p).win.d;
+  let out = pcTopo() + `<h1 class="pc-h1">Treinos</h1><p class="pc-sub">Seu plano em blocos A · B · C · D</p>`;
+  if(ab){
+    out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Em andamento</div>
+      <div class="ttl">${esc(ab.t.t)}</div><div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas</div>
+      <button class="pc-btn hl" data-continuar="${ab.L}"><span>Continuar treino</span>${pic("arrow")}</button></section>`;
+  }
+  out += pcSec("Plano", `<span class="aside">sugestão de hoje: ${sug}</span>`) + `<div class="pc-list">`;
+  ORDER.forEach(L=>{
+    const t = days[L]; if(!t) return;
+    const u = evs(p,"musc").filter(e=>e.data<=shift(0)).find(e=>e.dia===L);
+    out += `<button class="pc-row" data-abrir="${L}"><span class="pc-st-pl">${L}</span>
+      <div class="main"><div class="t">${esc(t.t)}</div><div class="s">${t.ex.length} exercícios · ${t.ex.reduce((a,e)=>a+e.s,0)} séries · último: ${u?brd(u.data):"nunca"}</div></div>
+      <span class="chev">${pic("right")}</span></button>`;
+  });
+  out += `</div><div class="pc-list nb">
+    <button class="pc-row" data-editplan="1">${pic("edit")}<div class="main"><div class="t">Editar plano</div><div class="s">Exercícios, séries, repetições e ordem</div></div><span class="chev">${pic("right")}</span></button>
+    <button class="pc-row" data-view="cal">${pic("cal")}<div class="main"><div class="t">Registrar em outro dia</div><div class="s">Escolha o dia no calendário</div></div><span class="chev">${pic("right")}</span></button>
+  </div>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ SESSÃO (Registrar) */
+function pcCampo(v, exId, i, k, rot){
+  return `<input class="cs" type="text" data-cex="${exId}" data-ci="${i}" data-ck="${k}" value="${esc(String(v==null?"":v))}" placeholder="—" inputmode="decimal" pattern="[0-9.,]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" aria-label="${rot}">`;
+}
+function pcSerieAtual(treino, dr){
+  for(const ex of treino.ex){ const arr = dr[ex.id]||[]; for(let i=0;i<ex.s;i++){ const s = arr[i]; if(!s || !s.ok) return { ex, i }; } }
+  return null;
+}
+function pcFmtSet(ex, x){
+  if(!x) return "—";
+  if(ex.ty==="time") return x.sec ? `${x.sec} s` : "—";
+  if(ex.ty==="reps") return x.reps ? `${x.reps} rep` : "—";
+  if(!x.kg && !x.reps) return "—";
+  return `${x.kg||"—"} × ${x.reps||"—"}`;
+}
+function viewTreino(p,m){
+  const d = ui.dia, days = dayset(p), treino = days[d];
+  const antEv = evs(p,"musc").filter(e=>e.data<=REF() && String(e.id)!==String(ui.editId)).find(e=>e.dia===d);
+  const ant = antEv ? antEv.entries : {};
+  const dr = S.draft[p+":"+d] || {};
+  const dataTr = REF(), hojeIso = shift(0), passado = dataTr < hojeIso, futuro = dataTr > hojeIso;
+  const relTr = dataTr===hojeIso ? "hoje" : (ui.off===-1 ? "ontem" : (passado ? "há "+(-ui.off)+" dias" : "data futura"));
+  const c = contaSeries(treino, dr);
+  let out = `<div class="pc-stop">
+      <button class="pc-ib" data-minimizar="1" aria-label="Minimizar treino (o rascunho fica salvo)">${pic("down")}</button>
+      <div class="mid">Treino ${d}</div>
+      ${ui.edit ? `<button class="end" data-edit="1">Concluir edição</button>`
+        : `<button class="end" id="salvar" ${ui.saving?"disabled":""}>${ui.saved?"Salvo ✓":(ui.editId!=null?"Atualizar":"Encerrar")}</button>`}
+    </div>
+    ${ui.edit ? `<input class="ed-f" style="margin:6px 0 0" data-f="titulo" value="${esc(treino.t)}" aria-label="Nome do treino">`
+      : `<h1 class="pc-stitle">${esc(treino.t)}</h1><p class="pc-sub" id="pcProg">${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}</p>`}
+    <div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
+      <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
+        <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
+      <div class="db-nav">
+        <button class="db-arw" data-off="-1" aria-label="Dia anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
+        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>`;
+  if(ui.editId!=null) out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
+  out += `<div class="segs">`;
+  ORDER.forEach(k=>{
+    const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
+    const t = u ? (dias(u.data)===0?"✓ feito":"há "+dias(u.data)+"d") : "nunca";
+    out += `<button class="sg ${k===d?"on":""}" data-dia="${k}" aria-label="Treino ${k}, ${t}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
+  });
+  out += `</div>`;
+
+  if(ui.edit){
+    treino.ex.forEach(ex=>{
+      out += `<div class="card ed">
+        <input class="ed-f" data-ex="${ex.id}" data-f="n" value="${esc(ex.n)}" placeholder="nome do exercício">
+        <input class="ed-f" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação">
+        <div class="ed-row">
+          <input class="ed-f" style="margin:0;flex:1" data-ex="${ex.id}" data-f="p" value="${esc(ex.p)}" placeholder="repetições">
+          <div class="step"><button data-step="${ex.id}:-1" aria-label="Menos uma série">−</button><span class="v">${ex.s}</span><button data-step="${ex.id}:1" aria-label="Mais uma série">+</button></div>
+        </div>
+        <div class="ed-row tys">${[["load","carga e reps"],["time","tempo"],["reps","só reps"]].map(([k,l])=>`<button class="ty ${ex.ty===k?"on":""}" data-ty="${ex.id}:${k}">${l}</button>`).join("")}</div>
+        <div class="ed-row" style="margin-bottom:0">
+          <button class="del" data-mv="${ex.id}:-1" style="width:48px" aria-label="Subir">↑</button>
+          <button class="del" data-mv="${ex.id}:1" style="width:48px" aria-label="Descer">↓</button>
+          <button class="del" data-del="${ex.id}">Remover exercício</button></div></div>`;
+    });
+    out += `<button class="addx" data-add="1">+ Adicionar exercício</button><button class="reset" data-reset="1">Restaurar o treino ${d} original</button><div style="height:70px"></div>`;
+    return out;
+  }
+
+  if(Object.keys(ant).length) out += `<div style="display:flex;justify-content:flex-end"><button class="pc-link ac" data-loadlast="1">Preencher tudo com a última vez</button></div>`;
+  const atual = pcSerieAtual(treino, dr);
+  treino.ex.forEach(ex=>{
+    const sets = dr[ex.id]||[], a = ant[ex.id]||[];
+    const meta = [`${ex.s} séries · ${esc(ex.p)}${ex.ty==="time"?"":" rep"}`, `${segDescanso(ex)} s de descanso`, ex.no?esc(ex.no):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" · ");
+    const obsAberto = !!ui.obsOpen[ex.id+":*"];
+    out += `<section class="pc-ex" aria-label="${esc(ex.n)}">
+      <div class="pc-exh"><button class="pc-exn ex-link" data-exhist="${ex.id}">${esc(ex.n)}<small>Ver histórico</small></button></div>
+      <div class="pc-exm">${meta}</div>
+      <input class="ap" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação" aria-label="Observação do exercício">
+      <div class="pc-sh" aria-hidden="true"><span>Série</span><span>Anterior</span>${ex.ty==="load"?`<span class="c">kg</span><span class="c">Reps</span>`:`<span class="c" style="grid-column:span 2">${ex.ty==="time"?"Segundos":"Repetições"}</span>`}<span class="c">${pic("check","sm")}</span></div>`;
+    for(let i=0;i<ex.s;i++){
+      const s = sets[i]||{}, av = a[i]||null, cur = atual && atual.ex.id===ex.id && atual.i===i;
+      out += `<div class="pc-sr set ${s.ok?"done":""} ${cur?"cur":""}"><span class="ix">${i+1}</span><span class="pv">${av?pcFmtSet(ex,av):"—"}</span>`;
+      if(ex.ty==="load") out += pcCampo(s.kg,ex.id,i,"kg",`Série ${i+1}, carga em kg`) + pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`);
+      else if(ex.ty==="time") out += `<span class="w2">${pcCampo(s.sec,ex.id,i,"sec",`Série ${i+1}, segundos`)}</span>`;
+      else out += `<span class="w2">${pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`)}</span>`;
+      out += `<button class="set-ok ${s.ok?"on":""}" data-setok="${ex.id}:${i}" aria-pressed="${!!s.ok}" aria-label="${s.ok?`Reabrir série ${i+1} para corrigir`:`Concluir série ${i+1}`}">${pic("check")}</button></div>`;
+      const temObs = !!(s.obs && String(s.obs).trim());
+      if(temObs || obsAberto || ui.obsOpen[ex.id+":"+i]) out += `<div class="pc-obs">${campoObs(s.obs,ex.id,i)}</div>`;
+    }
+    out += `<div class="pc-exf"><button class="pc-link" data-exobs="${ex.id}">${obsAberto?"Ocultar observações":"+ Observação por série"}</button></div></section>`;
+  });
+  out += `<p class="pc-note">“Anterior” = ${antEv?`último treino ${d} (${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão, não execução. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.</p>`;
+  // barra inferior: opera sobre o MESMO estado do ✓ da linha
+  const btn = atual
+    ? `<button class="pc-btn pri" id="pcConcluir" data-concluir="${atual.ex.id}:${atual.i}" aria-label="Concluir série ${atual.i+1} de ${esc(atual.ex.n)}">Concluir série ${atual.i+1}</button>`
+    : `<button class="pc-btn pri" data-salvarbottom="1">${ui.editId!=null?"Atualizar treino":"Salvar treino"}</button>`;
+  out += `<div class="pc-bottom"><div class="in2"><div class="note">${atual?`${esc(atual.ex.n)} · rascunho salvo`:"Todas as séries concluídas · rascunho salvo"}</div>${btn}</div></div>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ EVOLUÇÃO */
+function pcMelhor(ex, arr){
+  const v = (arr||[]).filter(x=>x && (x.kg||x.reps||x.sec));
+  if(!v.length) return null;
+  if(ex.ty==="time") return v.reduce((b,x)=> num(x.sec)>num(b.sec)?x:b);
+  if(ex.ty==="reps") return v.reduce((b,x)=> num(x.reps)>num(b.reps)?x:b);
+  return v.reduce((b,x)=>{ const kx=num(x.kg), kb=num(b.kg); if(kx!==kb) return kx>kb?x:b; return num(x.reps)>num(b.reps)?x:b; });
+}
+function viewCal(p,m){
+  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
+  const ano = base.getFullYear(), mes = base.getMonth(), ym = `${ano}-${String(mes+1).padStart(2,"0")}`;
+  const tab = ui.evoTab || "resumo";
+  let out = pcTopo() + `<h1 class="pc-h1">Evolução</h1><p class="pc-sub">Seu histórico, com contexto.</p>`;
+  out += pcTabs("evo", [["resumo","Resumo"],["cal","Calendário"]], tab);
+  out += `<div class="pc-period"><button class="pc-ib" data-mes="-1" aria-label="Mês anterior">${pic("left")}</button>
+    <span class="lbl">${cap(MES[mes])} de ${ano}</span>
+    <button class="pc-ib" data-mes="1" aria-label="Próximo mês" ${ui.mes>=0?"disabled":""}>${pic("right")}</button></div>`;
+  if(tab==="cal") return out + pcCalendario(p, m, ano, mes);
+
+  const days = dayset(p), hj = shift(0);
+  const ses = S.events.filter(e=>e.perfil===p && e.tipo==="musc" && e.data.startsWith(ym)).sort((a,b)=>a.data<b.data?-1:1);
+  const ab = ym===hj.slice(0,7) ? sessaoAberta(p) : null;
+  const semana = ym===hj.slice(0,7) ? treinosNaSemana(p, inicioSemana(hj)) : null;
+  out += `<section class="pc-hl" aria-label="Treinos concluídos no mês"><div class="ey">Treinos concluídos</div>
+    <div style="display:flex;align-items:baseline;gap:14px;margin-top:6px"><span class="big">${ses.length}</span><span style="font-size:18px">em ${MES[mes]}</span></div>
+    <div class="meta" style="margin:8px 0 0">${semana!=null?`${semana} nesta semana · meta de ${metaSemanal(p)}`:"mês encerrado"}${ab?" · 1 em andamento (não conta)":""}</div></section>`;
+
+  // por exercício — só exercícios presentes nas sessões do período
+  const todos = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L}, ex)));
+  const presentes = todos.filter(ex=>ses.some(e=>pcMelhor(ex,(e.entries||{})[ex.id])));
+  if(!presentes.find(x=>x.id===ui.evoEx)) ui.evoEx = presentes.length ? presentes[0].id : null;
+  out += pcSec("Por exercício");
+  if(!ui.evoEx){ out += `<p class="pc-note" style="font-size:15px">Nenhum treino concluído neste período.</p>`; }
+  else{
+    const ex = presentes.find(x=>x.id===ui.evoEx);
+    const comE = ses.filter(e=>pcMelhor(ex,(e.entries||{})[ex.id]));
+    const un = ex.ty==="time" ? "segundos" : ex.ty==="reps" ? "repetições" : "kg (como anotado no treino)";
+    out += `<button class="pc-sel" data-evoex="1" aria-label="Escolher exercício"><span>${esc(ex.n)}</span>${pic("down")}</button>
+      <p class="pc-note" style="font-size:14px">Treino ${ex.L} · unidade: ${un} · ${comE.length} ${comE.length===1?"sessão":"sessões"} no período</p>`;
+    const a = comE[0], b = comE[comE.length-1], bA = pcMelhor(ex,a.entries[ex.id]), bB = pcMelhor(ex,b.entries[ex.id]);
+    const val = x => ex.ty==="time" ? `${x.sec}<small> s</small>` : ex.ty==="reps" ? `${x.reps}<small> rep</small>` : `${x.kg}<small> kg</small> × ${x.reps||"—"}`;
+    if(comE.length===1){
+      out += `<div class="pc-cmp" style="grid-template-columns:1fr"><div><div class="d">${brd(a.data)} · Treino ${a.dia}</div><div class="v">${val(bA)}</div></div></div>
+        <p class="pc-crit">Só uma sessão com este exercício no período — sem comparação.</p>`;
+    } else {
+      const dif = ex.ty==="time" ? num(bB.sec)-num(bA.sec) : ex.ty==="reps" ? num(bB.reps)-num(bA.reps) : num(bB.kg)-num(bA.kg);
+      const u = ex.ty==="time" ? "s" : ex.ty==="reps" ? "rep" : "kg";
+      out += `<div class="pc-cmp"><div><div class="d">${brd(a.data)} · primeira do mês</div><div class="v">${val(bA)}</div></div>
+        <div><div class="d">${brd(b.data)} · última do mês</div><div class="v">${val(bB)}</div>
+        <span class="pc-delta ${dif<0?"neg":""}">${dif>0?"+":""}${Math.round(dif*100)/100} ${u}</span></div></div>`;
+    }
+    out += `<p class="pc-crit">Série exibida: a de <b>maior ${ex.ty==="load"?"carga":ex.ty==="time"?"tempo":"número de repetições"}</b> em cada sessão${ex.ty==="load"?"; em empate, a com mais repetições":""}. Comparação entre a primeira e a última sessão do período que contêm este exercício.</p>`;
+    out += `<div class="pc-list" style="margin-top:10px">${comE.slice().reverse().map(e=>`<button class="pc-row" style="min-height:56px" data-evodt="${e.data}">
+      <div class="main"><div class="t" style="font-size:16px">${brd(e.data)} · Treino ${e.dia}</div><div class="s">${(e.entries[ex.id]||[]).filter(x=>x&&(x.kg||x.reps||x.sec)).map(x=>pcFmtSet(ex,x)).join(" · ")}</div></div>
+      <span class="end">${pcFmtSet(ex, pcMelhor(ex,e.entries[ex.id]))}</span></button>`).join("")}</div>`;
+  }
+
+  // últimas sessões
+  out += pcSec("Últimas sessões") + `<div class="pc-list">`;
+  if(ab) out += `<button class="pc-row" data-continuar="${ab.L}"><div class="main"><div class="t">Hoje, ${brd(hj)}</div><div class="s">Treino ${ab.L} · ${esc(ab.t.t)}</div></div><span class="pc-pill">Em andamento</span><span class="chev">${pic("right")}</span></button>`;
+  const lista = ses.slice().reverse().slice(0, 6);
+  lista.forEach(e=>{ const t = days[e.dia];
+    out += `<button class="pc-row" data-evodt="${e.data}"><div class="main"><div class="t">${e.data===hj?"Hoje, ":""}${brd(e.data)}</div><div class="s">Treino ${e.dia}${t?" · "+esc(t.t):""}</div></div>
+      <span class="pc-pill" style="background:transparent"><span class="pc-st-ok" style="width:22px;height:22px">${pic("check")}</span>Concluído</span><span class="chev">${pic("right")}</span></button>`; });
+  if(!ab && !lista.length) out += `<p class="pc-note" style="font-size:15px">Sem sessões neste período.</p>`;
+  out += `</div>`;
+  return out;
+}
+function pcCalendario(p, m, ano, mes){
+  const days = dayset(p);
+  const prim = new Date(ano,mes,1), nd = new Date(ano,mes+1,0).getDate(), inicio = (prim.getDay()+6)%7;
+  const sel = REF(), hj = shift(0), ab = sessaoAberta(p);
+  let out = `<div class="cal"><div class="grid">${["seg","ter","qua","qui","sex","sáb","dom"].map(x=>`<div class="gh">${x}</div>`).join("")}`;
+  for(let i=0;i<inicio;i++) out += `<div class="cell out"></div>`;
+  let nT=0, nX=0, nS=0;
+  for(let d=1; d<=nd; d++){
+    const dt = `${ano}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const mmAll = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===dt), mm = mmAll[0];
+    const xx = S.events.find(e=>e.perfil===p&&e.tipo==="extra"&&e.data===dt);
+    const sk = skipDoDia(p,dt), prog = !mm && ab && dt===hj;
+    if(mm) nT++; if(xx) nX++; if(sk) nS++;
+    const skipCls = (!mm && !xx && sk) ? " skipd" : "";
+    out += `<button class="cell${skipCls} ${dt===sel?"sel":""} ${dt===hj?"hoje":""}" data-dt="${dt}" aria-label="${d} de ${MES[mes]}${mm?", treino "+mm.dia+" concluído":prog?", treino em andamento":""}">
+      <span class="n">${d}</span>
+      ${mm?`<span class="l">${mm.dia}${mmAll.length>1?`<sup class="mult">${mmAll.length}</sup>`:""}</span>`
+        : prog ? `<span class="l" style="color:var(--ac)">${pic("clock","sm")}</span>`
+        : (sk&&!xx?`<span class="l skip" style="font-size:11px">—</span>`:`<span class="l" style="color:transparent">·</span>`)}
+      ${xx?`<span class="dot"></span>`:`<span class="dot" style="background:transparent"></span>`}</button>`;
+  }
+  out += `</div></div>`;
+  out += `<div class="pc-legend"><span><b style="color:var(--ac)">A–D</b> treino concluído</span><span>${pic("clock","sm")} em andamento</span><span><i class="x"></i>extra</span><span>— descanso</span></div>`;
+  out += `<div class="pc-macros" style="margin-top:14px"><div><b>${nT}</b><span>musculação</span></div><div><b>${nX}</b><span>extras</span></div><div><b>${nS}</b><span>descansos</span></div></div>`;
+
+  const ss = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
+  const xs = extrasDoDia(p,sel), sk = skipDoDia(p,sel);
+  out += pcSec(cap(dataLonga(sel)));
+  if(sk) out += `<div class="pc-row">${pic("moon")}<div class="main"><div class="t">Marcado como descanso</div>${sk.motivo?`<div class="s">${esc(sk.motivo)}</div>`:""}</div><button class="pc-btn sm ghost" data-skip="1">Desfazer</button></div>`;
+  xs.forEach(e=>{
+    out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${e.atividade?esc(e.atividade):esc(m.extra)}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div><button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
+  });
+  if(ss.length>1) out += `<div class="warn-dup">Há ${ss.length} treinos registrados neste dia. Exclua os repetidos ou edite para mudar a data.</div>`;
+  ss.forEach(ev=>{ out += sessaoCard(ev,days,`<div class="cal-acts"><button data-caledit="${ev.id}">Editar ou mudar data</button><button class="del-x" data-caldel="${ev.id}">Excluir</button></div>`); });
+  if(!ss.length && ab && sel===hj) out += `<button class="pc-row" data-continuar="${ab.L}"><div class="main"><div class="t">Treino ${ab.L} · ${esc(ab.t.t)}</div><div class="s">${ab.ok} de ${ab.total} séries concluídas</div></div><span class="pc-pill">Em andamento</span></button>`;
+  if(!ss.length && sel<=hj && !(ab && sel===hj)) out += `<button class="pc-btn ghost cal-reg" style="margin-top:14px" data-calreg="1">${pic("plus","sm")} Registrar treino em ${brd(sel)}</button>`;
+  if(!ss.length && !xs.length && !sk && !(ab && sel===hj)) out += `<p class="pc-note" style="font-size:14px">Sem registro neste dia.</p>`;
+  return out;
+}
+
+/* ------------------------------------------------------------------ DIETA */
+function viewDieta(p,m){
+  if(ui.edieta) return viewDietaEdicao(p,m);
+  const D = S.dieta[p], R = pcRefeicoesDia(p), tab = ui.dietTab || "diario";
+  let out = pcTopo() + `<h1 class="pc-h1">Alimentação</h1>` + pcDataNav();
+  out += pcTabs("diet", [["diario","Diário"],["plano","Plano"]], tab);
+  if(tab==="plano") return out + viewDietaPlano(p,m,R);
+
+  const al = R.alvoHoje || {};
+  const alv = k => al[k]!=null ? al[k] : (D.alvo && D.alvo[k==="prot"?"prot":k==="carb"?"carb":"gord"]) || "—";
+  out += `<section style="margin-top:18px" aria-label="Resumo do dia">
+    <div style="display:flex;align-items:center;justify-content:space-between"><span style="color:var(--muted)">Registrado ${ui.off===0?"hoje":"neste dia"}</span>
+      <button class="pc-link" data-metas="1">Metas ${pic("right","sm")}</button></div>
+    ${R.temKcal && R.alvoK ? `<div class="pc-kc"><b>${R.kcal.toLocaleString("pt-BR")}</b><span>/ ${R.alvoK.toLocaleString("pt-BR")} kcal</span></div>
+      <div class="pc-bar" style="margin-top:10px" aria-hidden="true"><i style="width:${Math.min(100,R.kcal/R.alvoK*100)}%"></i></div>`
+      : `<div class="pc-kc"><b>${R.feitas.length}</b><span>de ${R.refs.length} refeições</span></div>`}
+    <div class="pc-macros"><div><b>${esc(String(alv("prot")).replace(/\s*g$/,""))} g</b><span>Proteína</span></div><div><b>${esc(String(alv("carb")).replace(/\s*g$/,""))} g</b><span>Carbo</span></div><div><b>${esc(String(alv("gord")).replace(/\s*g$/,""))} g</b><span>Gordura</span></div></div>
+    <p class="pc-note">Metas do dia${R.tipo?` (${esc((TIPO_DIA_LABEL[R.tipo]||R.tipo).toLowerCase())})`:""}${R.temKcal?" · kcal somadas pelo plano das refeições registradas":""}.</p></section>`;
+  if(R.tipo==="jejum" || R.tipo==="jejum_jiu"){
+    out += `<div class="pc-jejum"><b>Jejum matinal hoje (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu"?" SuperCoffee às 05h45 liberado se houver treino.":""}</div>`;
+  }
+  const prox = R.refs.find(r=>!R.marc[r.id]);
+  out += `<div style="margin-top:18px"><button class="pc-btn pri" data-regprox="${prox?prox.id:(R.refs[0]||{}).id||""}">${pic("plus")} Registrar ${prox?esc(prox.nome.toLowerCase()):"refeição"}</button></div>`;
+  out += pcSec("Refeições", `<span class="aside">${R.feitas.length} de ${R.refs.length} registradas</span>`) + `<div class="pc-list">`;
+  R.refs.forEach(r=>{
+    const st = R.marc[r.id] || null;
+    const ico = st==="ok" ? `<span class="pc-st-ok" aria-hidden="true">${pic("check")}</span>` : st==="no" ? `<span class="pc-st-no" aria-hidden="true">${pic("x","sm")}</span>` : `<span class="pc-st-pl" aria-hidden="true">${pic("clock")}</span>`;
+    const lbl = st==="ok" ? "Registrada" : st==="no" ? "Não feita" : "Prevista";
+    const kc = (r.kcal!=null && r.kcal!=="") ? `${r.kcal} kcal` : "";
+    out += `<div class="pc-row">${ico}
+      <button class="main" data-mealmenu="${r.id}" style="min-height:var(--tap)"><div class="t">${esc(r.nome)}</div><div class="s">${r.hora?esc(r.hora)+" · ":""}${lbl}${kc&&st!=="ok"?" · "+kc+" no plano":""}</div></button>
+      <div class="end">${st==="ok"&&kc?`<span>${kc}</span>`:""}${!st?`<button class="pc-ib" data-chkok="${r.id}" aria-label="Marcar ${esc(r.nome)} como feita">${pic("plus")}</button>`:""}
+        <button class="pc-ib chev" data-mealmenu="${r.id}" aria-label="Opções de ${esc(r.nome)}">${pic("right")}</button></div></div>`;
+  });
+  out += `</div><div class="pc-list nb">` + pcAgua(p);
+  (D.extras||[]).forEach(x=>{
+    const st = R.marc[x.id] || null;
+    out += `<button class="pc-row" data-chk="${x.id}" aria-pressed="${st==="ok"}">${st==="ok"?`<span class="pc-st-ok">${pic("check")}</span>`:st==="no"?`<span class="pc-st-no">${pic("x","sm")}</span>`:`<span class="pc-st-pl">${pic("pill","sm")}</span>`}
+      <div class="main"><div class="t" style="font-weight:600;font-size:16px">${esc(x.nome)}</div><div class="s">${st==="ok"?"Feito hoje":st==="no"?"Não feito":"Item fixo do dia · toque para marcar"}</div></div></button>`;
+  });
+  out += `<button class="pc-row" data-diario="1">${pic("note")}<div class="main"><div class="t">Diário de refeições</div><div class="s">${(D.log||[]).length} registros escritos</div></div><span class="chev">${pic("right")}</span></button>
+    <button class="pc-row" data-openia="1">${pic("spark")}<div class="main"><div class="t">Sugestão do coach</div><div class="s">Ideias de troca e ajustes</div></div><span class="chev">${pic("right")}</span></button></div>`;
+  if(D.nota) out += `<p class="pc-note" style="font-size:14px;white-space:pre-line">${esc(D.nota)}</p>`;
+  return out;
+}
+function viewDietaPlano(p,m,R){
+  const D = S.dieta[p];
+  let out = pcSec("Plano alimentar", `<button class="pc-link ac" data-editdieta="1">Editar</button>`);
+  D.refs.forEach(r=>{
+    const st = R.marc[r.id] || null;
+    out += `<div class="mealx ${st==="ok"?"done":st==="no"?"faltou":""}">
+      <div class="mx-head"><span class="badge"></span><div class="mx-name">${esc(r.nome)}</div>
+        ${(r.hora||r.kcal)?`<div class="mx-hora">${esc(r.hora||"")}${(r.kcal!=null&&r.kcal!=="")?(r.hora?" · ":"")+r.kcal+" kcal":""}</div>`:""}
+        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações de ${esc(r.nome)}">⋯</button></div>
+      <div class="mx-items">${r.itens?esc(r.itens):`<span style="color:var(--faint)">vazio — toque em Editar para preencher</span>`}</div></div>`;
+  });
   return out;
 }
 
@@ -2738,7 +3128,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v37 · acabamento profissional (confirmações, navegação de data, textos)</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v38 · novo visual pace (Hoje, Treinos, Dieta, Evolução)</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2834,6 +3224,7 @@ function concluirSerie(exId, i){
     if(!(cur.kg || cur.reps || cur.sec)){ toast("Preencha a série antes de concluir."); return; }
   }
   cur.ok = true; S.draft[key][exId][i] = cur;
+  if(ui.editId==null) marcaDraft(p,d);
   vibrar(12);
   salvaSoft(); render();
   if(pref("descanso")) iniciarDescanso(segDescanso(ex));
@@ -2903,6 +3294,7 @@ function upd(p,d,exId,i,k,v){
   S.draft[key] = S.draft[key]||{};
   S.draft[key][exId] = S.draft[key][exId]||[];
   S.draft[key][exId][i] = Object.assign({}, S.draft[key][exId][i], {[k]:v});
+  if(ui.editId==null) marcaDraft(p,d);
   ui.saved = false; salvaSoft(); atualizaBarraSalvar();
 }
 function atualizaBarraSalvar(){
@@ -2911,9 +3303,8 @@ function atualizaBarraSalvar(){
   const dr = S.draft[ui.perfil+":"+ui.dia] || {};
   const total = treino.ex.reduce((a,e)=>a+e.s,0);
   const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
-  const s2 = bt.querySelector(".sv-2");
-  if(s2) s2.textContent = `${feitas}/${total} séries preenchidas${REF()<shift(0)?" · data passada":""}`;
-  bt.classList.toggle("on", temValores(dr));
+  const pg = document.getElementById("pcProg");
+  if(pg){ const c = contaSeries(treino, dr); pg.textContent = `${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}`; }
 }
 async function salvar(){
   if(ui.saving) return;
@@ -2933,6 +3324,7 @@ async function salvar(){
   else S.events.unshift({id:Date.now(),perfil:p,tipo:"musc",data,dia:d,entries});
   ui.editId = null;
   S.draft[key] = {};
+  limpaDraftMeta(p,d);
   ui.obsOpen = {};
   const evSalvo = ed || S.events[0];
   const rs = resumoTreino(p, d, entries, data, evSalvo && evSalvo.id);
@@ -3497,14 +3889,62 @@ function ligar(){
     render(); window.scrollTo(0,0);
   });
   document.querySelectorAll("[data-canceledit]").forEach(b=>b.onclick=()=>{
-    S.draft[ui.perfil+":"+ui.dia] = {}; ui.editId = null; ui.obsOpen = {}; ui.view = "hoje";
+    S.draft[ui.perfil+":"+ui.dia] = {}; limpaDraftMeta(ui.perfil, ui.dia); ui.editId = null; ui.obsOpen = {}; ui.view = "hoje";
     salvaSoft(); render(); window.scrollTo(0,0);
   });
   document.querySelectorAll("[data-trdate]").forEach(inp=>inp.onchange=()=>{
     if(!inp.value) return;
     ui.off = offDe(inp.value); ui.saved=false; render();
   });
-  document.querySelectorAll("[data-setok]").forEach(b=>b.onclick=()=>{ const [ex,i]=b.dataset.setok.split(":"); concluirSerie(ex, Number(i)); });
+  document.querySelectorAll("[data-setok],[data-concluir]").forEach(b=>b.onclick=()=>{
+    const [ex,i] = (b.dataset.setok||b.dataset.concluir).split(":"), n = Number(i);
+    const key = ui.perfil+":"+ui.dia, antes = clone(((S.draft[key]||{})[ex]||[])[n] || {});
+    concluirSerie(ex, n);
+    const agora = ((S.draft[key]||{})[ex]||[])[n] || {};
+    if(!antes.ok && agora.ok){
+      const usou = !(antes.kg||antes.reps||antes.sec);
+      toastUndo(`Série ${n+1} concluída${usou?" com o valor anterior":""}`, ()=>{
+        S.draft[key] = S.draft[key]||{}; S.draft[key][ex] = S.draft[key][ex]||[]; S.draft[key][ex][n] = antes;
+        pararDescanso(); salvaSoft(); render(); });
+      setTimeout(()=>{ const c = document.querySelector(".pc-sr.cur"); if(c) c.scrollIntoView({block:"center", behavior:"smooth"}); }, 60);
+    } else if(antes.ok && !agora.ok){
+      toastUndo(`Série ${n+1} reaberta para correção`, ()=>{ S.draft[key][ex][n] = antes; salvaSoft(); render(); });
+    }
+  });
+  document.querySelectorAll("[data-salvarbottom]").forEach(b=>b.onclick=salvar);
+  document.querySelectorAll("[data-continuar]").forEach(b=>b.onclick=()=>{
+    ui.dia = b.dataset.continuar; ui.off = 0; ui.view = "treino"; ui.edit = false; ui.editId = null; ui.saved = false; render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-minimizar]").forEach(b=>b.onclick=()=>{
+    if(ui.editId!=null){ S.draft[ui.perfil+":"+ui.dia] = {}; ui.editId = null; salvaSoft(); }
+    pararDescanso(); ui.edit = false; ui.view = "hoje"; ui.off = 0; render(); window.scrollTo(0,0);
+    if(sessaoAberta(ui.perfil)) toastUndo("Treino minimizado — continue pela tela Hoje"); });
+  document.querySelectorAll("[data-hoje]").forEach(b=>b.onclick=()=>{ ui.off = 0; ui.dia = avaliar(ui.perfil).win.d; render(); });
+  document.querySelectorAll("[data-exobs]").forEach(b=>b.onclick=()=>{ const k = b.dataset.exobs+":*"; ui.obsOpen[k] = !ui.obsOpen[k]; render(); });
+  document.querySelectorAll("[data-pctab]").forEach(b=>b.onclick=()=>{ const [g,k] = b.dataset.pctab.split(":"); if(g==="evo") ui.evoTab = k; else ui.dietTab = k; render(); });
+  document.querySelectorAll("[data-evodt]").forEach(b=>b.onclick=()=>{ ui.evoTab = "cal"; ui.off = offDe(b.dataset.evodt); render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-evoex]").forEach(b=>b.onclick=()=>{
+    const p = ui.perfil, days = dayset(p), base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
+    const ym = `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,"0")}`;
+    const ses = S.events.filter(e=>e.perfil===p && e.tipo==="musc" && e.data.startsWith(ym));
+    const lista = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L},ex))).filter(ex=>ses.some(e=>pcMelhor(ex,(e.entries||{})[ex.id])));
+    _renderSugestaoShell("Exercício", "Só aparecem exercícios com registro no período", `<div class="pc-list">${lista.map(ex=>{
+      const n = ses.filter(e=>pcMelhor(ex,(e.entries||{})[ex.id])).length;
+      return `<button class="pc-row" data-pickex="${ex.id}"><div class="main"><div class="t">${esc(ex.n)}</div><div class="s">Treino ${ex.L} · ${n} ${n===1?"sessão":"sessões"}</div></div>${ex.id===ui.evoEx?`<span style="color:var(--ac)">${pic("check")}</span>`:""}</button>`; }).join("")}</div>`);
+    document.querySelectorAll("#sugModal [data-pickex]").forEach(x=>x.onclick=()=>{ ui.evoEx = x.dataset.pickex; fecharSugestao(); render(); });
+  });
+  document.querySelectorAll("[data-agua]").forEach(b=>b.onclick=()=>{
+    if(!S.agua) S.agua = {};
+    const k = ui.perfil+":"+REF(), antes = S.agua[k]||0, dv = Number(b.dataset.agua);
+    S.agua[k] = Math.max(0, Math.round((antes+dv)*100)/100); store.set(S); render();
+    toastUndo(`${dv>0?"+":"−"}350 ml · ${fmtL(S.agua[k])} L`, ()=>{ S.agua[k] = antes; store.set(S); render(); });
+  });
+  document.querySelectorAll("[data-chkok]").forEach(b=>b.onclick=()=>{
+    const k = ui.perfil+":"+REF(), id = b.dataset.chkok, mk = S.check[k] || {}, antes = mk[id];
+    mk[id] = "ok"; S.check[k] = mk; store.set(S); render();
+    const r = (S.dieta[ui.perfil].refs||[]).find(x=>x.id===id);
+    toastUndo(`${r?r.nome:"Refeição"} registrada`, ()=>{ if(antes) mk[id]=antes; else delete mk[id]; store.set(S); render(); });
+  });
+  document.querySelectorAll("[data-regprox]").forEach(b=>b.onclick=()=>{ if(b.dataset.regprox) abrirRegistroRefeicao(b.dataset.regprox); });
   document.querySelectorAll("[data-exhist]").forEach(b=>b.onclick=()=>abrirHistoricoEx(b.dataset.exhist));
   document.querySelectorAll("[data-obstg]").forEach(b=>b.onclick=()=>{
     const k = b.dataset.obstg; ui.obsOpen[k] = !ui.obsOpen[k]; render();
