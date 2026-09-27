@@ -891,6 +891,9 @@
   .pc-h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:18px 0 2px;color:var(--ink)}
   .pc-dnav{display:flex;align-items:center;gap:4px;min-height:var(--tap)}
   .pc-dnav .pc-sub{flex:1;margin:0}
+  .pc-dnav.w{flex-wrap:wrap}
+  .pc-dnav.w .pc-sub{flex:1 1 100%}
+  .pc-dnav.w .pc-link{margin-right:auto;padding-left:0}
   .pc-sub{color:var(--muted);font-size:17px;margin:0}
   .pc-ib{width:var(--tap);height:var(--tap);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
   .pc-ib:disabled{opacity:.3}
@@ -1561,7 +1564,7 @@ function conflitoPlan(p, dataISO, letraEfetiva){
   if(isPernas && temAtividade){
     const ativ = plan.jiu?"jiu":(plan.corrida?"corrida":"futebol");
     return {
-      msg:`Você planejou ${ATIV_LABEL[ativ]||ativ} ${dataISO===REF()?"hoje":"neste dia"}. O treino sugerido (<b>${letraSchedule}</b>) é de pernas — pode sobrecarregar antes.`,
+      msg:`Você planejou ${ATIV_LABEL[ativ]||ativ} ${dataISO===shift(0)?"hoje":"neste dia"}. O treino sugerido (<b>${letraSchedule}</b>) é de pernas — pode sobrecarregar antes.`,
       sugere:"A", ativ, letraAtual: letraSchedule
     };
   }
@@ -2225,6 +2228,7 @@ function render(){
   const p = ui.perfil, m = meta(p);
   document.documentElement.style.removeProperty("--ac");
   const sessao = ui.view==="treino";
+  if(sessao && ui.editId==null && ui.off===0){ const _m = S.draftMeta && S.draftMeta[p+":"+ui.dia]; if(viraDia(_m) && temValores((S.draft||{})[p+":"+ui.dia]||{})) ui.off = -1; }
   document.body.classList.toggle("pc-session", sessao);
   let out = "";
   if(ui.view==="hoje") out += viewHoje(p,m);
@@ -2235,7 +2239,7 @@ function render(){
   if(ui.view==="config") out += pcTopo() + viewConfig(p,m);
   if(ui.toast) out += `<div class="toast" role="status">${ui.toast}</div>`;
   document.getElementById("app").innerHTML = out;
-  const NAV = [["hoje","Hoje","home"],["treinos","Treinos","dumbbell"],["dieta","Dieta","fork"],["cal","Evolução","chart"]];
+  const NAV = [["hoje","Início","home"],["treinos","Treinos","dumbbell"],["dieta","Dieta","fork"],["cal","Evolução","chart"]];
   document.getElementById("tabs").innerHTML = sessao ? "" : NAV.map(([k,l,i])=>
     `<button class="tb ${ui.view===k?"on":""}" data-view="${k}" ${ui.view===k?'aria-current="page"':""}>${pic(i)}<span>${l}</span></button>`).join("");
   ligar();
@@ -2509,6 +2513,8 @@ function marcaDraft(p, d){
   const k = p+":"+d, m = S.draftMeta[k];
   if(!m || m.data !== REF()) S.draftMeta[k] = { data: REF(), inicio: Date.now() };
 }
+/* treino começado antes da meia-noite e ainda em curso (até 8 h): continua valendo para o dia em que começou */
+function viraDia(m){ return !!(m && m.data===shift(-1) && m.inicio && (Date.now()-m.inicio) < 8*3600*1000); }
 function limpaDraftMeta(p, d){ if(S.draftMeta) delete S.draftMeta[p+":"+d]; }
 function contaSeries(t, dr){
   let total = 0, ok = 0, pre = 0;
@@ -2520,7 +2526,7 @@ function sessaoAberta(p){
   const hoje = shift(0);
   for(const L of ORDER){
     const k = p+":"+L, m = S.draftMeta && S.draftMeta[k], dr = S.draft && S.draft[k], t = dayset(p)[L];
-    if(m && m.data===hoje && dr && t && temValores(dr)) return Object.assign({ L, t, inicio:m.inicio }, contaSeries(t, dr));
+    if(m && (m.data===hoje || viraDia(m)) && dr && t && temValores(dr)) return Object.assign({ L, t, inicio:m.inicio, data:m.data }, contaSeries(t, dr));
   }
   return null;
 }
@@ -2557,8 +2563,8 @@ function pcTabs(grupo, itens, atual){
 function pcSec(t, aside){ return `<div class="pc-sec-h"><h2>${t}</h2>${aside||""}</div>`; }
 function pcDataNav(){
   const podeAvancar = true;
-  return `<div class="pc-dnav"><p class="pc-sub">${cap(dataLonga(REF()))}</p>
-    ${ui.off!==0?`<button class="pc-link ac" data-hoje="1">Hoje</button>`:""}
+  return `<div class="pc-dnav ${ui.off!==0?"w":""}"><p class="pc-sub">${cap(dataLonga(REF()))}</p>
+    ${ui.off!==0?`<button class="pc-link ac" data-hoje="1" aria-label="Voltar para hoje">Voltar para hoje</button>`:""}
     <button class="pc-ib" data-off="-1" aria-label="Dia anterior">${pic("left")}</button>
     <button class="pc-ib" data-off="1" aria-label="Próximo dia" ${podeAvancar?"":"disabled"}>${pic("right")}</button></div>`;
 }
@@ -2615,7 +2621,7 @@ function viewHoje(p,m){
   if(ab){
     out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Treino em andamento</div>
       <div class="ttl">${esc(ab.t.t)}</div>
-      <div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas${ab.pre>ab.ok?` · ${ab.pre-ab.ok} preenchidas`:""}</div>
+      <div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas${ab.pre>ab.ok?` · ${ab.pre-ab.ok} preenchidas`:""}${ab.data!==hj?` · começou ontem, fica em ${brd(ab.data)}`:""}</div>
       <button class="pc-btn hl" data-continuar="${ab.L}"><span>Continuar treino</span>${pic("arrow")}</button></section>`;
     if(treinoDoDia) out += `<p class="pc-why">Você já registrou o treino ${treinoDoDia.dia} neste dia. Ao salvar este, o app pergunta se deve substituir.</p>`;
   } else if(treinoDoDia){
@@ -2653,7 +2659,8 @@ function viewHoje(p,m){
   // ---- semana ----
   if(pref("semana")){
     const feitos = treinosNaSemana(p, inicioSemana(REF())), metaS = metaSemanal(p);
-    out += pcSec("Sua semana", `<span class="aside">${feitos} de ${metaS} concluídos</span>`) + pcSemana(p);
+    const _iniS = inicioSemana(REF()), _outraS = _iniS!==inicioSemana(shift(0));
+    out += pcSec(_outraS ? "Semana de "+brd(_iniS) : "Sua semana", `<span class="aside">${feitos} de ${metaS} concluídos</span>`) + pcSemana(p);
   }
 
   // ---- alimentação (sem competir com a ação principal) ----
@@ -2707,7 +2714,9 @@ function viewTreinos(p,m){
       <div class="ttl">${esc(ab.t.t)}</div><div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas</div>
       <button class="pc-btn hl" data-continuar="${ab.L}"><span>Continuar treino</span>${pic("arrow")}</button></section>`;
   }
-  out += pcSec("Plano", `<span class="aside">sugestão de hoje: ${sug}</span>`) + `<div class="pc-list">`;
+  if(ui.off!==0) out += `<div class="pc-warn">Você está em <b>${esc(dataLonga(REF()))}</b>. O treino que abrir aqui será registrado nesse dia.
+      <div class="acts"><button class="pc-btn sm oac" data-hoje="1">Voltar para hoje</button></div></div>`;
+  out += pcSec("Plano", `<span class="aside">${ui.off===0?"sugestão de hoje":"sugestão para "+esc(pcTituloDia().toLowerCase())}: ${sug}</span>`) + `<div class="pc-list">`;
   ORDER.forEach(L=>{
     const t = days[L]; if(!t) return;
     const u = evs(p,"musc").filter(e=>e.data<=shift(0)).find(e=>e.dia===L);
@@ -2950,7 +2959,7 @@ function viewDieta(p,m){
     <div class="pc-macros"><div><b>${esc(String(alv("prot")).replace(/\s*g$/,""))} g</b><span>Proteína</span></div><div><b>${esc(String(alv("carb")).replace(/\s*g$/,""))} g</b><span>Carbo</span></div><div><b>${esc(String(alv("gord")).replace(/\s*g$/,""))} g</b><span>Gordura</span></div></div>
     <p class="pc-note">Metas do dia${R.tipo?` (${esc((TIPO_DIA_LABEL[R.tipo]||R.tipo).toLowerCase())})`:""}${R.temKcal?" · kcal somadas pelo plano das refeições registradas":""}.</p></section>`;
   if(R.tipo==="jejum" || R.tipo==="jejum_jiu"){
-    out += `<div class="pc-jejum"><b>Jejum matinal hoje (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu"?" SuperCoffee às 05h45 liberado se houver treino.":""}</div>`;
+    out += `<div class="pc-jejum"><b>Jejum matinal ${ui.off===0?"hoje":"neste dia"} (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu"?" SuperCoffee às 05h45 liberado se houver treino.":""}</div>`;
   }
   const prox = R.refs.find(r=>!R.marc[r.id]);
   out += `<div style="margin-top:18px"><button class="pc-btn pri" data-regprox="${prox?prox.id:(R.refs[0]||{}).id||""}">${pic("plus")} Registrar ${prox?esc(prox.nome.toLowerCase()):"refeição"}</button></div>`;
@@ -2969,7 +2978,7 @@ function viewDieta(p,m){
   (D.extras||[]).forEach(x=>{
     const st = R.marc[x.id] || null;
     out += `<button class="pc-row" data-chk="${x.id}" aria-pressed="${st==="ok"}">${st==="ok"?`<span class="pc-st-ok">${pic("check")}</span>`:st==="no"?`<span class="pc-st-no">${pic("x","sm")}</span>`:`<span class="pc-st-pl">${pic("pill","sm")}</span>`}
-      <div class="main"><div class="t" style="font-weight:600;font-size:16px">${esc(x.nome)}</div><div class="s">${st==="ok"?"Feito hoje":st==="no"?"Não feito":"Item fixo do dia · toque para marcar"}</div></div></button>`;
+      <div class="main"><div class="t" style="font-weight:600;font-size:16px">${esc(x.nome)}</div><div class="s">${st==="ok"?(ui.off===0?"Feito hoje":"Feito neste dia"):st==="no"?"Não feito":"Item fixo do dia · toque para marcar"}</div></div></button>`;
   });
   out += `<button class="pc-row" data-diario="1">${pic("note")}<div class="main"><div class="t">Diário de refeições</div><div class="s">${(D.log||[]).length} registros escritos</div></div><span class="chev">${pic("right")}</span></button>
     <button class="pc-row" data-openia="1">${pic("spark")}<div class="main"><div class="t">Sugestão do coach</div><div class="s">Ideias de troca e ajustes</div></div><span class="chev">${pic("right")}</span></button></div>`;
@@ -3082,7 +3091,7 @@ function viewConfig(p,m){
 
   // Tela Hoje
   out += `<div class="cfg-sec">
-    <div class="lbl">Tela Hoje</div>
+    <div class="lbl">Tela Início</div>
     <div class="cfg-list">
       ${cfgSwitch("semana",pic("cal"),"Resumo da semana","treinos concluídos, em andamento e os 7 dias")}
       ${cfgSeg("metaSemana","Meta de treinos por semana", [[0,`Auto (${autoMeta})`],[2,"2"],[3,"3"],[4,"4"],[5,"5"],[6,"6"]])}
@@ -3160,7 +3169,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v39 · revisão do visual e ícones unificados</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v40 · varredura de datas e erros</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
@@ -3495,7 +3504,7 @@ function abrirMealMenu(refId){
   const nRegs = (D.log||[]).filter(l=>l.refId===r.id).length;
   const body = `
     <button class="cfg-row" style="border-radius:0" data-mealact="reg"><span class="em">${pic("note")}</span>
-      <span class="lb"><span class="tt">Registrar o que comi</span><span class="st">${nRegs?nRegs+" registros dessa refeição":"anotar hoje"}</span></span>
+      <span class="lb"><span class="tt">Registrar o que comi</span><span class="st">${nRegs?nRegs+" registros dessa refeição":(ui.off===0?"anotar hoje":"anotar neste dia")}</span></span>
       <span class="caret">${pic("right","sm")}</span></button>
     <button class="cfg-row" style="border-radius:0" data-mealact="sug"><span class="em">${pic("spark")}</span>
       <span class="lb"><span class="tt">Sugestões IA</span><span class="st">alternativas para essa refeição</span></span>
@@ -3954,11 +3963,11 @@ function ligar(){
     toastUndo("Rascunho descartado", ()=>{ S.draft[key] = bakD; if(bakM){ if(!S.draftMeta) S.draftMeta = {}; S.draftMeta[key] = bakM; } store.set(S); render(); });
   });
   document.querySelectorAll("[data-continuar]").forEach(b=>b.onclick=()=>{
-    ui.dia = b.dataset.continuar; ui.off = 0; ui.view = "treino"; ui.edit = false; ui.editId = null; ui.saved = false; render(); window.scrollTo(0,0); });
+    ui.dia = b.dataset.continuar; const _m = S.draftMeta && S.draftMeta[ui.perfil+":"+ui.dia]; ui.off = viraDia(_m) ? -1 : 0; ui.view = "treino"; ui.edit = false; ui.editId = null; ui.saved = false; render(); window.scrollTo(0,0); });
   document.querySelectorAll("[data-minimizar]").forEach(b=>b.onclick=()=>{
     if(ui.editId!=null){ S.draft[ui.perfil+":"+ui.dia] = {}; ui.editId = null; salvaSoft(); }
     pararDescanso(); ui.edit = false; ui.view = "hoje"; ui.off = 0; render(); window.scrollTo(0,0);
-    if(sessaoAberta(ui.perfil)) toastUndo("Treino minimizado — continue pela tela Hoje"); });
+    if(sessaoAberta(ui.perfil)) toastUndo("Treino minimizado — continue pela tela Início"); });
   document.querySelectorAll("[data-hoje]").forEach(b=>b.onclick=()=>{ ui.off = 0; ui.dia = avaliar(ui.perfil).win.d; render(); });
   document.querySelectorAll("[data-exobs]").forEach(b=>b.onclick=()=>{ const k = b.dataset.exobs+":*"; ui.obsOpen[k] = !ui.obsOpen[k]; render(); });
   document.querySelectorAll("[data-pctab]").forEach(b=>b.onclick=()=>{ const [g,k] = b.dataset.pctab.split(":"); if(g==="evo") ui.evoTab = k; else ui.dietTab = k; render(); });
