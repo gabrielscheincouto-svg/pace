@@ -2110,8 +2110,9 @@ function viewTreino(p,m){
   const ant = ultimaSessao(p,d);
   const _dkey = p+":"+d;
   const _draftVazio = !S.draft[_dkey] || !Object.values(S.draft[_dkey]).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)));
-  if(!ui.edit && _draftVazio && Object.keys(ant).length){
-    S.draft[_dkey] = clone(ant);
+  // v33: a última sessão aparece só como referência (texto cinza dentro do campo).
+  // Nada é copiado automaticamente: o que for salvo é só o que foi digitado.
+  if(false){
     /* NÃO chamar salvaSoft() aqui — dispara push→pullAndMerge que
        pode re-renderizar o DOM enquanto o usuário está no input. */
   }
@@ -2193,7 +2194,7 @@ function viewTreino(p,m){
       <div style="height:70px"></div>`;
   }else{
     out += `<div style="font-size:12px;color:var(--faint);line-height:1.55;padding:2px 4px 0">
-      Compostos param a 2 repetições da falha. Isoladores, última série a 1.</div>`;
+      Números em cinza dentro dos campos são da última vez, só como referência. Compostos param a 2 repetições da falha. Isoladores, última série a 1.</div>`;
     const cheio = temValores(dr);
     const totalSeries = treino.ex.reduce((a,e)=>a+e.s,0);
     const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
@@ -2521,7 +2522,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v32 · datas retroativas e sincronização segura</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v33 · última carga como referência</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2539,7 +2540,17 @@ function upd(p,d,exId,i,k,v){
   S.draft[key] = S.draft[key]||{};
   S.draft[key][exId] = S.draft[key][exId]||[];
   S.draft[key][exId][i] = Object.assign({}, S.draft[key][exId][i], {[k]:v});
-  ui.saved = false; salvaSoft();
+  ui.saved = false; salvaSoft(); atualizaBarraSalvar();
+}
+function atualizaBarraSalvar(){
+  const bt = document.getElementById("salvar"); if(!bt) return;
+  const treino = dayset(ui.perfil)[ui.dia]; if(!treino) return;
+  const dr = S.draft[ui.perfil+":"+ui.dia] || {};
+  const total = treino.ex.reduce((a,e)=>a+e.s,0);
+  const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
+  const s2 = bt.querySelector(".sv-2");
+  if(s2) s2.textContent = `${feitas}/${total} séries preenchidas${REF()<shift(0)?" · data passada":""}`;
+  bt.classList.toggle("on", temValores(dr));
 }
 async function salvar(){
   if(ui.saving) return;
@@ -3333,6 +3344,12 @@ function ligarDelegacaoUmaVez(){
   if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
   if(!S.planejado.gabriel) S.planejado.gabriel = {};
   if(!S.planejado.eduarda) S.planejado.eduarda = {};
+  try{
+    Object.keys(S.draft||{}).forEach(k=>{
+      const [pp,dd] = k.split(":"); const ant = ultimaSessao(pp,dd);
+      if(Object.keys(ant).length && JSON.stringify(S.draft[k])===JSON.stringify(ant)) S.draft[k] = {};
+    });
+  }catch(e){}
   ui.perfil = AUTH.perfil;
   ui.dia = avaliar(ui.perfil).win.d;
   render();
