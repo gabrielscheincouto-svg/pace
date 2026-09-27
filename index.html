@@ -1130,14 +1130,37 @@ const DIETA_ALVOS_DIA_GABRIEL = {
   jejum_jiu:{kcal:2500,prot:175,carb:280,gord:70}
 };
 const SCHED_EDUARDA = {
-  seg:{musc:"A",corrida:false,nota:"Superior — foco em push"},
-  ter:{musc:"B",corrida:true,nota:"Corrida à noite — treino leve"},
-  qua:{musc:"C",corrida:false,nota:"Superior — foco em pull"},
-  qui:{musc:"D",corrida:true,nota:"Corrida à noite — treino leve"},
-  sex:{musc:"A",corrida:false,nota:"Superior — reforço"},
-  sab:{musc:"B",corrida:false,nota:"Pernas — dia forte"},
+  seg:{musc:"A",corrida:false,nota:"Glúteo + posterior"},
+  ter:{musc:"B",corrida:true,nota:"Costas + barra (TAF) · corrida leve à noite"},
+  qua:{musc:"C",corrida:false,nota:"Quadríceps + glúteo"},
+  qui:{musc:"D",corrida:true,nota:"Ombros + abdominal (TAF) · corrida à noite"},
+  sex:{musc:"A",corrida:false,nota:"Glúteo + posterior"},
+  sab:{musc:"B",corrida:false,nota:"Costas + barra (TAF)"},
   dom:{musc:null,corrida:false,nota:"Descanso completo"}
 };
+/* v35: programa de superiores da Eduarda — foco em costas e ombro, com os
+   testes do TAF da Brigada Militar (isometria na barra e abdominal remador).
+   Pernas (A e C) ficam como estão. */
+const EDU_V35 = {
+  B:{t:"Costas + barra (TAF)",cat:"sup",ex:[
+    {id:"eb_iso",n:"Isometria na barra fixa (TAF)",p:"máx · meta 20 s+",s:4,ty:"time",d:120,ap:"",no:"Queixo acima da barra, pegada pronada. Se não segurar 10 s: sobe pelo banco e desce o mais devagar possível"},
+    {id:"ec1",n:"Puxador frente aberto",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Puxa até o peito, escápulas pra baixo e pra trás"},
+    {id:"eb_rcurv",n:"Remada curvada com barra ou halter",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Tronco a ~45°, coluna neutra, puxa até o umbigo"},
+    {id:"ea2",n:"Remada baixa pegada neutra",p:"10-12",s:3,ty:"load",d:60,ap:"",no:"Segura 1 s com as costas contraídas"},
+    {id:"eb_pulld",n:"Pulldown braço estendido no cabo",p:"12-15",s:3,ty:"load",d:60,ap:"",no:"Braços quase retos, leva a barra até a coxa"},
+    {id:"ea5",n:"Rosca martelo",p:"10-12",s:3,ty:"load",d:60,ap:"",no:"Bíceps e antebraço ajudam a segurar o queixo na barra"},
+    {id:"eb_hang",n:"Pendurada na barra (pegada)",p:"máx",s:2,ty:"time",d:60,ap:"",no:"Braços estendidos, só segurando — treina a pegada"}]},
+  D:{t:"Ombros + abdominal (TAF)",cat:"sup",ex:[
+    {id:"ec2",n:"Desenvolvimento sentado com halter",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Não trava o cotovelo em cima"},
+    {id:"ed_elev",n:"Elevação lateral (bi-set)",p:"12-15",s:4,ty:"load",d:60,ap:"",no:"Bi-set com face pull"},
+    {id:"ed_face",n:"Face pull (bi-set)",p:"15",s:4,ty:"load",d:45,ap:"",no:"Puxa até a altura da testa, abrindo os cotovelos"},
+    {id:"ed_crinv",n:"Crucifixo inverso com halter",p:"12-15",s:3,ty:"load",d:60,ap:"",no:"Posterior do ombro e postura"},
+    {id:"ed_flex",n:"Flexão de braço",p:"máx (joelhos se precisar)",s:3,ty:"reps",d:60,ap:"",no:"Corpo reto da cabeça ao pé"},
+    {id:"ed_rem",n:"Abdominal remador (TAF)",p:"1 min · meta 32+",s:3,ty:"reps",d:90,ap:"",no:"Como no teste: deitada, braços estendidos atrás da cabeça, senta abraçando os joelhos. Anota quantas fez em 1 min"},
+    {id:"ec6",n:"Prancha isométrica",p:"45 s",s:3,ty:"time",d:45,ap:"",no:""}]}
+};
+// v35: padrão da Eduarda = programa atual (A e C sem mudança) + B/D novos — usado no 'restaurar padrão'
+BASE.eduarda.days = { A:{"t": "Glúteo + posterior", "cat": "inf", "ex": [{"id": "ed1", "n": "Hip thrust com barra", "p": "10-12", "s": 4, "ty": "load", "d": 120, "no": "Explode subida, controla descida", "ap": ""}, {"id": "ea_stiff", "n": "Stiff com halter", "p": "10-12", "s": 4, "ty": "load", "d": 90, "no": "Mantém coluna neutra, quadril pra trás", "ap": ""}, {"id": "ed2", "n": "Mesa flexora (bi-set)", "p": "12-15", "s": 3, "ty": "load", "d": 60, "no": "Bi-set com abdução no cabo", "ap": ""}, {"id": "ea_abd", "n": "Abdução no cabo (bi-set)", "p": "15 cada perna", "s": 3, "ty": "load", "d": 60, "no": "", "ap": ""}, {"id": "ea_hipuni", "n": "Elevação pélvica unilateral", "p": "12 cada perna", "s": 3, "ty": "load", "d": 60, "no": "Foca no glúteo médio", "ap": ""}, {"id": "ea_prlat", "n": "Prancha lateral", "p": "30 s cada lado", "s": 3, "ty": "time", "d": 45, "no": "", "ap": ""}]}, B:clone(EDU_V35.B), C:{"t": "Quadríceps + glúteo", "cat": "inf", "ex": [{"id": "eb1", "n": "Agachamento smith ou livre", "p": "10-12", "s": 4, "ty": "load", "d": 120, "no": "Descida controlada até paralela", "ap": ""}, {"id": "eb2", "n": "Leg press 45°", "p": "12-15", "s": 4, "ty": "load", "d": 90, "no": "Pés altos pra ativar mais glúteo", "ap": ""}, {"id": "ec_ext", "n": "Cadeira extensora (bi-set)", "p": "12-15", "s": 3, "ty": "load", "d": 60, "no": "Bi-set com búlgaro", "ap": ""}, {"id": "ed3", "n": "Búlgaro com halter (bi-set)", "p": "10 cada perna", "s": 3, "ty": "load", "d": 60, "no": "Joelho não passa da linha do pé", "ap": ""}, {"id": "ec_adu", "n": "Adução na máquina", "p": "15-20", "s": 3, "ty": "load", "d": 45, "no": "", "ap": ""}, {"id": "ec_absinf", "n": "Abdominal infra", "p": "15", "s": 3, "ty": "reps", "d": 45, "no": "", "ap": ""}]}, D:clone(EDU_V35.D) };
 const DIETA_DIAS_EDUARDA = {seg:"musc",ter:"musc_corrida",qua:"musc",qui:"musc_corrida",sex:"musc",sab:"musc",dom:"descanso"};
 const DIETA_ALVOS_DIA_EDUARDA = {
   musc_corrida:{kcal:2100,prot:130,carb:260,gord:55},
@@ -1612,16 +1635,17 @@ const PACE_GRUPOS_LETRA = {
     C: ['costas','ombro','triceps','biceps'],
     D: ['perna_post','core','antebraco']
   },
+  // v35: A glúteo/posterior · B costas + barra (TAF) · C quadríceps · D ombros + abdominal (TAF)
   eduarda: {
-    A: ['peito','costas','biceps','core'],
-    B: ['perna_ant','core','panturrilha'],
-    C: ['costas','ombro','biceps','core'],
-    D: ['perna_post','core']
+    A: ['perna_post','core'],
+    B: ['costas','biceps','antebraco'],
+    C: ['perna_ant','core'],
+    D: ['ombro','peito','triceps','core']
   }
 };
 const PACE_META_SEMANAL = {
   gabriel: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:2, triceps:2, core:2, cardio:2, antebraco:1, panturrilha:0 },
-  eduarda: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:2, triceps:1, core:3, cardio:2, panturrilha:1, antebraco:0 }
+  eduarda: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:2, biceps:1, triceps:1, core:3, cardio:2, panturrilha:0, antebraco:1 }
 };
 function _paceContribMusc(perfil, letra){
   const grupos = (PACE_GRUPOS_LETRA[perfil]||{})[letra] || [];
@@ -2578,7 +2602,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v34 · séries com ✓, descanso, recordes e semana</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v35 · treino da Eduarda com foco em costas, ombro e TAF</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -3556,10 +3580,23 @@ function ligarDelegacaoUmaVez(){
       if(Object.keys(ant).length && JSON.stringify(S.draft[k])===JSON.stringify(ant)) S.draft[k] = {};
     });
   }catch(e){}
+  // v35: aplica uma única vez o novo B/D da Eduarda (costas/ombro + TAF) e corrige as notas da semana
+  let migrouPlano = false;
+  try{
+    if(!S.planVer) S.planVer = {};
+    if((S.planVer.eduarda||0) < 35 && S.plan.eduarda){
+      S.plan.eduarda.B = clone(EDU_V35.B);
+      S.plan.eduarda.D = clone(EDU_V35.D);
+      const sc = S.plan.eduarda.schedule;
+      if(sc) Object.keys(SCHED_EDUARDA).forEach(k=>{ if(sc[k] && sc[k].musc===SCHED_EDUARDA[k].musc) sc[k].nota = SCHED_EDUARDA[k].nota; });
+      S.planVer.eduarda = 35; migrouPlano = true;
+    }
+  }catch(e){ console.warn('[migração plano v35]', e); }
   ui.perfil = AUTH.perfil;
   ui.dia = avaliar(ui.perfil).win.d;
   render();
   syncEngine.start();
+  if(migrouPlano) store.set(S);
 })();
 </script>
 </body>
