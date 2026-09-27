@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="pace">
 <meta name="theme-color" content="#0A0B0F" id="themeColor">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230A0B0F'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='96' font-style='italic' fill='%23E85D3F' text-anchor='middle'%3Ep%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23121916'/%3E%3Cpath d='M32 13a19 19 0 1 1-19 19' fill='none' stroke='%23F5F4EF' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='18.6' cy='18.6' r='4.2' fill='%237ADBB5'/%3E%3C/svg%3E">
 <title>pace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -886,7 +887,25 @@
 
   /* ---------- topo / títulos ---------- */
   .pc-top{display:flex;align-items:center;gap:12px;min-height:var(--tap)}
-  .pc-brand{font-weight:800;font-size:28px;letter-spacing:-.04em;line-height:1;margin-right:auto;color:var(--ink)}
+  .pc-brand{font-weight:800;font-size:28px;letter-spacing:-.04em;line-height:1;margin-right:auto;color:var(--ink);display:inline-flex;align-items:center;gap:10px}
+  .pc-mark{width:32px;height:32px;flex:none}
+  .mk-bg{fill:var(--ink)} .mk-ring{stroke:var(--paper)} .mk-dot{fill:var(--ac)}
+  .login-mark{width:72px;height:72px;margin-bottom:4px}
+  .pc-more{margin:12px 0 0;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .pc-more summary,.pc-dica summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;color:var(--muted);font-size:14px;font-weight:600}
+  .pc-more summary::-webkit-details-marker,.pc-dica summary::-webkit-details-marker{display:none}
+  .pc-more summary::after,.pc-dica summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:6px;transition:transform .15s}
+  .pc-more[open] summary::after,.pc-dica[open] summary::after{transform:rotate(-135deg)}
+  .pc-more p,.pc-dica p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.5}
+  .pc-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;border:1px solid var(--hair);font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pc-chip .pc-ic{width:14px;height:14px;color:var(--muted)}
+  .pc-exm{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .pc-dica{flex:1 1 100%}
+  .pc-dica summary{min-height:40px;font-size:13px}
+  .pc-dica .apv{color:var(--ink);font-weight:500}
+  .pc-dica .ap{margin:0 0 10px}
+  .pc-stats{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:10px;color:var(--muted);font-size:14px}
+  .pc-stats b{color:var(--ink);font-size:16px}
   .pc-avatar{width:var(--tap);height:var(--tap);border-radius:50%;border:1.5px solid var(--hair-3);font-weight:650;font-size:17px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
   .pc-h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:18px 0 2px;color:var(--ink)}
   .pc-dnav{display:flex;align-items:center;gap:4px;min-height:var(--tap)}
@@ -1659,6 +1678,7 @@ function mostraLogin(msg){
     '<div class="login-wrap" id="app">'+
     '  <div class="login-card">'+
     '    <div class="login-brand">'+
+    '      <svg class="login-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" class="mk-bg"/><path d="M32 13a19 19 0 1 1-19 19" class="mk-ring" fill="none" stroke-width="7" stroke-linecap="round"/><circle cx="18.6" cy="18.6" r="4.2" class="mk-dot"/></svg>'+
     '      <div class="nm">pace</div>'+
     '    </div>'+
     '    <div class="login-sub">Registre o ritmo dos seus treinos.</div>'+
@@ -2552,9 +2572,10 @@ function toastUndo(msg, undo){
 })();
 
 /* ---------- componentes ---------- */
+const PACE_MARK = (cls) => `<svg class="${cls||"pc-mark"}" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" class="mk-bg"/><path d="M32 13a19 19 0 1 1-19 19" class="mk-ring" fill="none" stroke-width="7" stroke-linecap="round"/><circle cx="18.6" cy="18.6" r="4.2" class="mk-dot"/></svg>`;
 function pcTopo(){
   const m = meta(ui.perfil), ini = (m.label||"?").charAt(0).toUpperCase();
-  return `<div class="pc-top"><span class="pc-brand" aria-label="pace">pace</span>
+  return `<div class="pc-top"><span class="pc-brand" aria-label="pace">${PACE_MARK()}<span>pace</span></span>
     <button class="pc-avatar" data-view="config" aria-label="Perfil e configurações (${esc(m.label)})">${ini}</button></div>`;
 }
 function pcTabs(grupo, itens, atual){
@@ -2583,7 +2604,7 @@ function pcSemana(p){
     return `<button class="pc-wd ${done?"done":""} ${prog?"prog":""} ${x?"x":""} ${dt===hj?"hj":""} ${dt===ref&&dt!==hj?"sel":""}" data-dt="${dt}" role="listitem" aria-label="${lab}">
       <span class="k">${k}</span><span class="n">${d.getDate()}</span><span class="c">${done?pic("check"):prog?pic("clock"):""}</span></button>`;
   }).join("")}</div>
-  <div class="pc-legend"><span><i class="d"></i>Concluído</span><span><i class="p"></i>Em andamento (não conta)</span><span><i class="x"></i>Atividade extra</span></div>`;
+  <div class="pc-legend"><span><i class="d"></i>Feito</span><span><i class="p"></i>Em andamento</span><span><i class="x"></i>Extra</span></div>`;
 }
 function pcAgua(p){
   const k = p+":"+REF(), v = (S.agua && S.agua[k]) || 0, meta = AGUA_META[p] || 3;
@@ -2643,7 +2664,7 @@ function viewHoje(p,m){
       <div class="ttl">${esc(d.t)}</div>
       <div class="meta">Treino ${r.win.d} · ${d.ex.length} exercícios · ${d.ex.reduce((a,e)=>a+e.s,0)} séries</div>
       <button class="pc-btn hl" data-abrir="${r.win.d}"><span>${passado?"Registrar treino "+r.win.d:"Iniciar treino"}</span>${pic("arrow")}</button></section>`;
-    if(r.win.motivo) out += `<p class="pc-why">${r.descanso&&!r.schedRest?"<b>Neste dia o melhor é descansar.</b> ":""}${r.win.motivo}</p>`;
+    if(r.win.motivo) out += `<details class="pc-more"><summary>${pic("info","sm")}<span>${r.descanso&&!r.schedRest?"Neste dia o melhor é descansar":"Por que este treino"}</span></summary><p>${r.win.motivo}</p></details>`;
     if(ui.off===0) out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
   }
 
@@ -2670,7 +2691,7 @@ function viewHoje(p,m){
     out += `<div class="pc-kc"><b>${R.kcal.toLocaleString("pt-BR")}</b><span>/ ${R.alvoK.toLocaleString("pt-BR")} kcal previstas</span></div>
       <div class="pc-bar" style="margin-top:10px" aria-hidden="true"><i style="width:${Math.min(100,R.kcal/R.alvoK*100)}%"></i></div>`;
   }
-  out += `<p class="pc-note" style="font-size:14px;color:var(--muted)">${R.feitas.length} de ${R.refs.length} refeições registradas${R.tipo?` · plano do dia: ${esc(TIPO_DIA_LABEL[R.tipo]||R.tipo)}`:""}${R.temKcal?" · kcal pelo plano de cada refeição":""}</p>`;
+  out += `<div class="pc-stats"><span><b>${R.feitas.length}</b> de ${R.refs.length} refeições</span>${R.tipo?`<span class="pc-chip">${esc(TIPO_DIA_LABEL[R.tipo]||R.tipo)}</span>`:""}</div>`;
   out += `<div class="pc-list" style="margin-top:14px">` + pcAgua(p);
 
   // próxima atividade
@@ -2803,12 +2824,13 @@ function viewTreino(p,m){
   const atual = pcSerieAtual(treino, dr);
   treino.ex.forEach(ex=>{
     const sets = dr[ex.id]||[], a = ant[ex.id]||[];
-    const meta = [`${ex.s} séries · ${esc(ex.p)}${ex.ty==="time"?"":" rep"}`, `${segDescanso(ex)} s de descanso`, ex.no?esc(ex.no):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" · ");
+    const dica = [ex.no?esc(ex.no):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" ");
+    const meta = `<span class="pc-chip">${ex.s} × ${esc(ex.p)}${ex.ty==="time"?"":" rep"}</span><span class="pc-chip">${pic("clock","sm")}${segDescanso(ex)} s</span>`
+      + `<details class="pc-dica"${ui.apOpen&&ui.apOpen[ex.id]?" open":""} data-apdet="${ex.id}"><summary>${pic(ex.ap?"note":"info","sm")}<span class="${ex.ap?"apv":""}">${ex.ap?esc(ex.ap):(dica?"Dica e anotação":"Anotação")}</span></summary>${dica?`<p>${dica}</p>`:""}<input class="ap" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação" aria-label="Observação do exercício"></details>`;
     const obsAberto = !!ui.obsOpen[ex.id+":*"];
     out += `<section class="pc-ex" aria-label="${esc(ex.n)}">
       <div class="pc-exh"><button class="pc-exn ex-link" data-exhist="${ex.id}">${esc(ex.n)}<small>Ver histórico</small></button></div>
       <div class="pc-exm">${meta}</div>
-      <input class="ap" data-ex="${ex.id}" data-f="ap" value="${esc(ex.ap)}" placeholder="aparelho, pegada ou observação" aria-label="Observação do exercício">
       <div class="pc-sh" aria-hidden="true"><span>Série</span><span>Anterior</span>${ex.ty==="load"?`<span class="c">kg</span><span class="c">Reps</span>`:`<span class="c" style="grid-column:span 2">${ex.ty==="time"?"Segundos":"Repetições"}</span>`}<span class="c">${pic("check","sm")}</span></div>`;
     for(let i=0;i<ex.s;i++){
       const s = sets[i]||{}, av = a[i]||null, cur = atual && atual.ex.id===ex.id && atual.i===i;
@@ -2823,7 +2845,7 @@ function viewTreino(p,m){
     out += `<div class="pc-exf"><button class="pc-link" data-exobs="${ex.id}">${obsAberto?"Ocultar observações":pic("plus","sm")+"<span>Observação por série</span>"}</button></div></section>`;
   });
   if(temValores(dr) && ui.editId==null) out += `<div class="pc-exf" style="justify-content:flex-start;margin-top:8px"><button class="pc-link" style="color:var(--danger)" data-descartar="1">Descartar rascunho deste treino</button></div>`;
-  out += `<p class="pc-note">“Anterior” = ${antEv?`último treino ${d} (${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão, não execução. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.</p>`;
+  out += `<details class="pc-more"><summary>${pic("info","sm")}<span>Como funciona</span></summary><p>“Anterior” = ${antEv?`último treino ${d} (${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.</p></details>`;
   // barra inferior: opera sobre o MESMO estado do ✓ da linha
   const btn = atual
     ? `<button class="pc-btn pri" id="pcConcluir" data-concluir="${atual.ex.id}:${atual.i}" aria-label="Concluir série ${atual.i+1} de ${esc(atual.ex.n)}">Concluir série ${atual.i+1}</button>`
@@ -2957,7 +2979,7 @@ function viewDieta(p,m){
       <div class="pc-bar" style="margin-top:10px" aria-hidden="true"><i style="width:${Math.min(100,R.kcal/R.alvoK*100)}%"></i></div>`
       : `<div class="pc-kc"><b>${R.feitas.length}</b><span>de ${R.refs.length} refeições</span></div>`}
     <div class="pc-macros"><div><b>${esc(String(alv("prot")).replace(/\s*g$/,""))} g</b><span>Proteína</span></div><div><b>${esc(String(alv("carb")).replace(/\s*g$/,""))} g</b><span>Carbo</span></div><div><b>${esc(String(alv("gord")).replace(/\s*g$/,""))} g</b><span>Gordura</span></div></div>
-    <p class="pc-note">Metas do dia${R.tipo?` (${esc((TIPO_DIA_LABEL[R.tipo]||R.tipo).toLowerCase())})`:""}${R.temKcal?" · kcal somadas pelo plano das refeições registradas":""}.</p></section>`;
+    </section>`;
   if(R.tipo==="jejum" || R.tipo==="jejum_jiu"){
     out += `<div class="pc-jejum"><b>Jejum matinal ${ui.off===0?"hoje":"neste dia"} (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu"?" SuperCoffee às 05h45 liberado se houver treino.":""}</div>`;
   }
@@ -3169,7 +3191,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v40 · varredura de datas e erros</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v41 · nova marca e interface mais enxuta</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
@@ -3962,6 +3984,7 @@ function ligar(){
     S.draft[key] = {}; limpaDraftMeta(ui.perfil, ui.dia); pararDescanso(); store.set(S); render();
     toastUndo("Rascunho descartado", ()=>{ S.draft[key] = bakD; if(bakM){ if(!S.draftMeta) S.draftMeta = {}; S.draftMeta[key] = bakM; } store.set(S); render(); });
   });
+  document.querySelectorAll("[data-apdet]").forEach(d=>d.ontoggle=()=>{ ui.apOpen = ui.apOpen||{}; ui.apOpen[d.dataset.apdet] = d.open; });
   document.querySelectorAll("[data-continuar]").forEach(b=>b.onclick=()=>{
     ui.dia = b.dataset.continuar; const _m = S.draftMeta && S.draftMeta[ui.perfil+":"+ui.dia]; ui.off = viraDia(_m) ? -1 : 0; ui.view = "treino"; ui.edit = false; ui.editId = null; ui.saved = false; render(); window.scrollTo(0,0); });
   document.querySelectorAll("[data-minimizar]").forEach(b=>b.onclick=()=>{
