@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -682,6 +682,49 @@
   .pace-ia-prox-t{font-family:var(--display);font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin-bottom:6px;font-weight:600}
   .pace-ia-prox-l{font-family:var(--sans);font-size:12.5px;color:var(--ink);opacity:.88;line-height:1.6;font-weight:400}
   .pace-ia-muted{color:var(--faint);font-size:12px;font-family:var(--sans);font-weight:400}
+
+  /* ===== v32 · registro com data, edição segura, calendário ===== */
+  .cfg-row .lb .tt,.cfg-row .lb .st{display:block}
+  .datebar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);
+    border:.5px solid var(--hair-2);border-radius:14px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--sh-1)}
+  .datebar.past{border-color:rgba(245,158,11,.45);background:linear-gradient(135deg,rgba(245,158,11,.10),rgba(245,158,11,.03))}
+  .datebar.fut{border-color:rgba(248,113,113,.5)}
+  .db-l{display:flex;flex-direction:column;min-width:0}
+  .db-k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  .db-v{font-size:16px;font-weight:600;color:var(--ink);margin-top:2px;letter-spacing:-.01em}
+  .db-v::first-letter{text-transform:uppercase}
+  .db-r{font-size:12px;color:var(--muted);margin-top:1px}
+  .datebar.past .db-r{color:#f59e0b;font-weight:600}
+  .datebar.fut .db-r{color:var(--danger);font-weight:600}
+  .db-btn{position:relative;flex-shrink:0;height:40px;padding:0 16px;border-radius:11px;display:flex;align-items:center;
+    background:var(--sunk);border:.5px solid var(--hair-2);color:var(--ac);font-size:13.5px;font-weight:600;overflow:hidden}
+  .db-btn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;border:0;padding:0;margin:0}
+  .edit-note{font-size:12.5px;color:var(--muted);line-height:1.5;background:var(--ac-soft);border:.5px solid var(--ac);
+    border-radius:12px;padding:10px 12px;margin-bottom:12px}
+  .edit-note button{display:inline-block;margin-left:4px;color:var(--danger);font-weight:600;font-size:12.5px;background:none;border:0;padding:6px 0}
+  .obs-tg{width:34px;height:46px;flex-shrink:0;border-radius:12px;border:.5px dashed var(--hair-2);background:transparent;
+    color:var(--faint);font-size:17px;line-height:1}
+  .obs-tg.has{border-style:solid;border-color:var(--ac);color:var(--ac);font-size:15px}
+  .obs-tg:active{transform:scale(.94)}
+  .obs-row{margin:-2px 42px 10px 28px}
+  .obs-in{width:100%;height:38px;font-size:16px}
+  .save{height:auto;min-height:56px;padding:8px 14px;display:flex !important;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .save .sv-1{font-size:15px;font-weight:600}
+  .save .sv-2{font-size:11.5px;font-weight:500;opacity:.8}
+  .save:disabled{opacity:.7}
+  .cell .l{position:relative}
+  .cell .mult{position:absolute;top:-4px;right:-9px;font-family:var(--sans);font-style:normal;font-size:9px;font-weight:700;
+    color:#0A0B0F;background:#f59e0b;border-radius:6px;padding:0 3px;line-height:13px}
+  .warn-dup{font-size:12.5px;line-height:1.5;color:#f59e0b;background:rgba(245,158,11,.08);border:.5px solid rgba(245,158,11,.4);
+    border-radius:12px;padding:10px 12px;margin-bottom:10px}
+  .cal-acts{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:.5px dashed var(--hair)}
+  .cal-acts button{flex:1;height:40px;border-radius:11px;background:var(--sunk);border:.5px solid var(--hair-2);color:var(--ink);font-size:13px;font-weight:600}
+  .cal-acts .del-x{flex:0 0 96px;color:var(--danger)}
+  .cal-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .mini{flex-shrink:0;font-size:12px;font-weight:600;color:var(--danger);background:transparent;border:.5px solid var(--hair-2);border-radius:9px;padding:7px 10px}
+  .cal-reg{margin-top:4px}
+  .extras-list .rm{padding:8px 6px;font-size:12px}
+  .toast{bottom:calc(150px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
@@ -724,11 +767,56 @@ const store = {
   }
 };
 
+/* ============================================================ merge (3 vias)
+   Combina o que mudou neste aparelho (local) com o que outro aparelho enviou
+   (remoto), usando a última versão sincronizada (base) como referência.
+   - só um lado mudou: fica a mudança
+   - os dois mudaram: combina campo a campo; listas com "id" (eventos, diário,
+     exercícios) combinam item a item; exclusões são respeitadas
+   - conflito no mesmo valor simples: prevalece o local                         */
+const _eqJ = (a,b) => JSON.stringify(a)===JSON.stringify(b);
+const _isObj = x => x!==null && typeof x==='object' && !Array.isArray(x);
+const _isIdArr = x => Array.isArray(x) && x.every(e=>e && typeof e==='object' && e.id!=null);
+function merge3(b,l,r){
+  if(_eqJ(l,r)) return l;
+  if(b!==undefined && _eqJ(l,b)) return r;
+  if(b!==undefined && _eqJ(r,b)) return l;
+  if(_isObj(l) && _isObj(r)){
+    const bo = _isObj(b) ? b : {};
+    const out = {};
+    new Set([...Object.keys(l),...Object.keys(r),...Object.keys(bo)]).forEach(k=>{
+      const inL = k in l, inR = k in r, inB = k in bo;
+      if(inL && inR){ out[k] = merge3(inB?bo[k]:undefined, l[k], r[k]); return; }
+      if(inL){ if(inB && _eqJ(l[k], bo[k])) return; out[k] = l[k]; return; }
+      if(inR){ if(inB && _eqJ(r[k], bo[k])) return; out[k] = r[k]; return; }
+    });
+    return out;
+  }
+  if(_isIdArr(l) && _isIdArr(r) && (b==null || _isIdArr(b))){
+    const idx = a => { const m = new Map(); (a||[]).forEach(e=>m.set(String(e.id), e)); return m; };
+    const B = idx(b), L = idx(l), R = idx(r);
+    const out = [];
+    const ordem = [...L.keys(), ...[...R.keys()].filter(k=>!L.has(k))];
+    ordem.forEach(id=>{
+      const inL = L.has(id), inR = R.has(id), inB = B.has(id);
+      if(inL && inR){ out.push(merge3(inB?B.get(id):undefined, L.get(id), R.get(id))); return; }
+      if(inL){ if(inB && _eqJ(L.get(id), B.get(id))) return; out.push(L.get(id)); return; }
+      if(inR){ if(inB && _eqJ(R.get(id), B.get(id))) return; out.push(R.get(id)); return; }
+    });
+    // eventos e diário (ids numéricos = data de criação): mais recente primeiro
+    if(out.length && out.every(e=>/^\d+$/.test(String(e.id)))) out.sort((x,y)=>Number(y.id)-Number(x.id));
+    return out;
+  }
+  return l;
+}
+if(typeof window!=='undefined') window.PaceMerge = { merge3 };
+
 /* ============================================================ syncEngine (Supabase) */
 const syncEngine = (function(){
   const SUPA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co';
   const SUPA_KEY = 'sb_publishable_s0FBWPYPcIXO5ln95i5f6g_oPj7Bsar';
   const ROW_ID   = 'gabi_eduarda';
+  const BASE_KEY = 'gt-base-v1';
   const DEVICE_ID = (function(){
     let d = localStorage.getItem('gt-device-id');
     if(!d){ d = 'dev-'+Math.random().toString(36).slice(2,10); try{localStorage.setItem('gt-device-id',d);}catch(e){} }
@@ -737,11 +825,14 @@ const syncEngine = (function(){
   let client = null;
   try { client = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null; } catch(e) { console.warn('supabase init falhou',e); }
   let localVersion = Number(localStorage.getItem(VERSION_KEY) || 0);
+  let base = (function(){ try{ const b = localStorage.getItem(BASE_KEY); return b ? JSON.parse(b) : null; }catch(e){ return null; } })();
   let pushTimer = null;
   let pushInflight = false;
   let pendingWhile = false;
   let statusEl = null;
   let applyingRemote = false;
+  const cl = o => JSON.parse(JSON.stringify(o));
+  const setBase = o => { base = cl(o); try{ localStorage.setItem(BASE_KEY, JSON.stringify(base)); }catch(e){} };
   const setStatus = (kind, txt) => {
     if(!statusEl) statusEl = document.getElementById('syncBadge');
     if(!statusEl) return;
@@ -752,6 +843,21 @@ const syncEngine = (function(){
   };
   const getVersion = () => localVersion;
   const setLocalVersion = v => { localVersion = v; try{localStorage.setItem(VERSION_KEY, String(v));}catch(e){} };
+  const temAlteracaoLocal = () => base ? !_eqJ(S, base) : false;
+
+  // aplica um estado no S sem trocar a referência (o resto do app usa S direto)
+  function aplicar(obj){
+    applyingRemote = true;
+    try{
+      Object.keys(S).forEach(k=>{ if(!(k in obj)) delete S[k]; });
+      Object.assign(S, obj);
+      if(!S.events) S.events = [];
+      if(!S.draft) S.draft = {};
+      if(!S.check) S.check = {};
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+      if(typeof safeRender === 'function') safeRender();
+    } finally { applyingRemote = false; }
+  }
 
   async function pullOnce(){
     if(!client) throw new Error('no client');
@@ -767,12 +873,38 @@ const syncEngine = (function(){
     pushInflight = true;
     setStatus('saving','⏳ salvando');
     try {
-      const nextVersion = localVersion + 1;
-      const payload = { id: ROW_ID, data: S, version: nextVersion, updated_at: new Date().toISOString(), updated_by: DEVICE_ID };
-      const { error } = await client.from('treino_state').upsert(payload);
-      if(error) throw error;
-      setLocalVersion(nextVersion);
-      setStatus('ok','☁ sincronizado');
+      for(let tentativa=0; tentativa<4; tentativa++){
+        const remote = await pullOnce();
+        const rv = remote ? Number(remote.version||0) : 0;
+        const remoteHas = remote && remote.data && typeof remote.data==='object' && Object.keys(remote.data).length;
+        // outro aparelho enviou antes: combina antes de enviar, para não apagar nada
+        if(remoteHas && rv !== localVersion){
+          aplicar(merge3(base || undefined, cl(S), remote.data));
+          setBase(remote.data);
+          setLocalVersion(rv);
+        }
+        const snap = cl(S);
+        const nextVersion = rv + 1;
+        const payload = { data: snap, version: nextVersion, updated_at: new Date().toISOString(), updated_by: DEVICE_ID };
+        let gravou = false;
+        if(remote){
+          const { data, error } = await client.from('treino_state').update(payload).eq('id', ROW_ID).eq('version', rv).select('version');
+          if(error) throw error;
+          gravou = Array.isArray(data) && data.length > 0;
+        } else {
+          const { error } = await client.from('treino_state').insert(Object.assign({ id: ROW_ID }, payload));
+          gravou = !error;
+        }
+        if(gravou){
+          setLocalVersion(nextVersion);
+          setBase(snap);
+          setStatus('ok','☁ sincronizado');
+          return;
+        }
+        // versão mudou no meio do caminho: busca de novo e combina
+      }
+      setStatus('offline','⚠ tentando sincronizar');
+      pendingWhile = true;
     } catch(e){
       console.warn('push falhou', e);
       setStatus('offline','⚠ offline');
@@ -789,23 +921,24 @@ const syncEngine = (function(){
   }
 
   async function pullAndMerge(){
-    if(!client || !navigator.onLine){ return; }
+    if(!client || !navigator.onLine || pushInflight){ return; }
     try {
       const remote = await pullOnce();
-      if(!remote) return;
+      if(!remote || pushInflight) return;
       const rv = Number(remote.version || 0);
-      if(rv > localVersion && remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length){
-        applyingRemote = true;
-        Object.assign(S, remote.data);
-        if(!S.events) S.events = [];
-        if(!S.draft) S.draft = {};
-        if(!S.check) S.check = {};
-        setLocalVersion(rv);
-        try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
-        if(typeof safeRender === 'function') safeRender();
-        else if(typeof render === 'function') render();
-        applyingRemote = false;
+      const remoteHas = remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length;
+      if(rv > localVersion && remoteHas){
+        if(temAlteracaoLocal()){
+          aplicar(merge3(base, cl(S), remote.data));
+          setBase(remote.data); setLocalVersion(rv);
+          schedulePush();
+        } else {
+          aplicar(cl(remote.data));
+          setBase(remote.data); setLocalVersion(rv);
+        }
         setStatus('ok','☁ sincronizado');
+      } else if(temAlteracaoLocal()){
+        schedulePush();
       } else {
         setStatus('ok','☁ sincronizado');
       }
@@ -821,16 +954,25 @@ const syncEngine = (function(){
     const local = await store.get();
     const remoteHas = remote && remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length;
     const rv = remote ? Number(remote.version||0) : 0;
-    if(remoteHas && rv >= localVersion){
-      Object.assign(S, remote.data);
+    let enviar = false;
+    if(remoteHas){
+      if(local && base && !_eqJ(local, base)){
+        // alterações feitas sem conexão (ou não enviadas): combina com o remoto
+        Object.assign(S, merge3(base, local, remote.data)); enviar = true;
+      } else if(local && !base && rv < localVersion){
+        Object.assign(S, local); enviar = true;
+      } else {
+        Object.assign(S, remote.data);
+      }
+      setBase(remote.data);
       setLocalVersion(rv);
       try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
       setStatus('ok','☁ sincronizado');
     } else if(local){
       Object.assign(S, local);
-      if(remote && rv < localVersion) schedulePush();
-      else if(!remoteHas && (local.events && local.events.length)) schedulePush();
+      if(local.events && local.events.length) enviar = true;
     }
+    if(enviar) schedulePush();
     if(!navigator.onLine) setStatus('offline','⚠ offline');
   }
 
@@ -1165,7 +1307,7 @@ function logout(){
   location.reload();
 }
 
-let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editDate:null };
+let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editId:null, saving:false, obsOpen:{} };
 
 const iso = d => {
   const y = d.getFullYear();
@@ -1177,6 +1319,10 @@ const shift = n => { const d=new Date(); d.setDate(d.getDate()+Number(n)); retur
 const REF = () => shift(ui.off);
 const dias = a => Math.round((new Date(REF()) - new Date(a))/86400000);
 const brd = s => s ? s.slice(8,10)+"/"+s.slice(5,7) : "";
+const dataLonga = s => { const d = new Date(s+"T12:00"); return `${WDL[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]}`; };
+const offDe = s => Math.round((new Date(s+"T12:00") - new Date(shift(0)+"T12:00"))/86400000);
+const temValores = dr => Object.values(dr||{}).some(a=>(a||[]).some(x=>x&&(x.kg||x.reps||x.sec)));
+function toast(msg, ms){ ui.toast = msg; render(); clearTimeout(toast._t); toast._t = setTimeout(()=>{ ui.toast=null; render(); }, ms||2200); }
 const WD = ["dom","seg","ter","qua","qui","sex","sáb"];
 const MES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const WDL = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
@@ -1677,7 +1823,7 @@ function resumo(ex,sets){
   return a.length?a.join("  "):null;
 }
 const ultimaSessao = (p,d) => { const e = evs(p,"musc").filter(x=>x.data<=REF()).find(x=>x.dia===d); return e?e.entries:{}; };
-const esc = s => (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
 /* icons ------- */
 const ICON = {
@@ -1786,9 +1932,8 @@ function viewHoje(p,m){
   let r, dRefAmanha = null;
   if(modoAmanha){
     const savedOff = ui.off; ui.off = savedOff + 1;
-    r = avaliar(p);
-    dRefAmanha = new Date(REF()+"T12:00");
-    ui.off = savedOff;
+    try{ r = avaliar(p); dRefAmanha = new Date(REF()+"T12:00"); }
+    finally{ ui.off = savedOff; }
   } else {
     r = avaliar(p);
   }
@@ -1875,9 +2020,9 @@ function viewHoje(p,m){
   // Schedule é sugestão, não bloqueio. Em dia de descanso abre seletor A/B/C/D.
   if(!treinoDoDia){
     if(r.schedRest){
-      out += `<button class="go" data-picktreino="1" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">${ICON.play} Iniciar treino mesmo assim…</button>`;
+      out += `<button class="go" data-picktreino="1" style="background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--hair)">${ICON.play} ${ui.off<0?"Registrar treino neste dia…":"Iniciar treino mesmo assim…"}</button>`;
     } else {
-      out += `<button class="go" data-abrir="${r.win.d}">${ICON.play} Iniciar treino ${r.win.d}</button>`;
+      out += `<button class="go" data-abrir="${r.win.d}">${ICON.play} ${ui.off<0?"Registrar treino "+r.win.d+" em "+brd(REF()):"Iniciar treino "+r.win.d}</button>`;
     }
   }
 
@@ -1885,7 +2030,7 @@ function viewHoje(p,m){
   const dataRef = REF();
   const planHoje = getPlanejado(p, dataRef) || {};
   const quicks = ATIV_QUICK[p] || ["jiu","corrida","futebol","bike"];
-  out += `<div class="qa-title" style="margin-top:18px">Planejar hoje</div>
+  out += `<div class="qa-title" style="margin-top:18px">${ui.off===0?"Planejar hoje":(ui.off>0?"Planejar "+brd(dataRef):"Atividades de "+brd(dataRef))}</div>
     <div class="chips" style="margin-bottom:10px">
       ${quicks.map(a=>{
         const on = !!planHoje[a];
@@ -1971,9 +2116,20 @@ function viewTreino(p,m){
        pode re-renderizar o DOM enquanto o usuário está no input. */
   }
   const dr = S.draft[_dkey] || {};
-  let out = `<div class="segs">`;
+  const dataTr = REF(), hojeIso = shift(0);
+  const passado = dataTr < hojeIso, futuro = dataTr > hojeIso;
+  const relTr = dataTr===hojeIso ? "hoje" : (ui.off===-1 ? "ontem" : (passado ? "há "+(-ui.off)+" dias" : "data futura"));
+  let out = `<div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
+      <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
+        <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
+      <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
+    </div>`;
+  if(ui.editId!=null){
+    out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
+  }
+  out += `<div class="segs">`;
   ORDER.forEach(k=>{
-    const u = evs(p,"musc").find(e=>e.dia===k);
+    const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
     const t = u ? (dias(u.data)===0?"neste dia":"há "+dias(u.data)+"d") : "nunca";
     out += `<button class="sg ${k===d?"on":""}" data-dia="${k}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
   });
@@ -2023,7 +2179,9 @@ function viewTreino(p,m){
         }else{
           out += campo(s.reps,av.reps||"repetições","rep",ex.id,i,"reps");
         }
-        out += `</div><div class="obs-row">${campoObs(s.obs,ex.id,i)}</div>`;
+        const oKey = ex.id+":"+i, temObs = !!(s.obs && String(s.obs).trim());
+        out += `<button class="obs-tg ${temObs?"has":""}" data-obstg="${oKey}" aria-label="Observação da série ${i+1}">${temObs?"✎":"+"}</button></div>`;
+        if(temObs || ui.obsOpen[oKey]) out += `<div class="obs-row">${campoObs(s.obs,ex.id,i)}</div>`;
       }
       out += `</div>`;
     }
@@ -2036,19 +2194,21 @@ function viewTreino(p,m){
   }else{
     out += `<div style="font-size:12px;color:var(--faint);line-height:1.55;padding:2px 4px 0">
       Compostos param a 2 repetições da falha. Isoladores, última série a 1.</div>`;
-    const cheio = Object.values(dr).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)));
-    out += `<div class="save-wrap"><button class="save ${ui.saved?"done":cheio?"on":""}" id="salvar">
-      ${ui.saved?"Treino salvo":"Salvar treino "+d+(ui.off?" em "+brd(REF()):"")}</button></div>`;
+    const cheio = temValores(dr);
+    const totalSeries = treino.ex.reduce((a,e)=>a+e.s,0);
+    const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
+    out += `<div style="height:40px"></div><div class="save-wrap"><button class="save ${ui.saved?"done":cheio?"on":""}" id="salvar" ${ui.saving?"disabled":""}>
+      ${ui.saved?"✓ Treino salvo":`<span class="sv-1">${ui.editId!=null?"Atualizar":"Salvar"} treino ${d} · ${brd(dataTr)}</span><span class="sv-2">${feitas}/${totalSeries} séries preenchidas${passado?" · data passada":""}</span>`}</button></div>`;
   }
   return out;
 }
 
-function sessaoCard(s,days){
+function sessaoCard(s,days,acoes){
   const t = days[s.dia]; if(!t) return "";
   return `<div class="card"><div class="h-h"><span class="h-d">${s.dia} · ${esc(t.t)}</span>
     <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">${brd(s.data)}</span></div>` +
-    t.ex.map(ex=>{ const r = resumo(ex,s.entries[ex.id]);
-      return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") + `</div>`;
+    t.ex.map(ex=>{ const r = resumo(ex,(s.entries||{})[ex.id]);
+      return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") + (acoes||"") + `</div>`;
 }
 
 /* ------------------------------------------------------------------ CAL */
@@ -2071,14 +2231,14 @@ function viewCal(p,m){
   let nT=0, nX=0, nS=0;
   for(let d=1;d<=nd;d++){
     const dt = `${ano}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const mm = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===dt);
+    const mmAll = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===dt), mm = mmAll[0];
     const xx = S.events.find(e=>e.perfil===p&&e.tipo==="extra"&&e.data===dt);
     const sk = skipDoDia(p,dt);
     if(mm) nT++; if(xx) nX++; if(sk) nS++;
     const skipCls = (!mm && !xx && sk) ? " skipd" : "";
     out += `<button class="cell${skipCls} ${dt===sel?"sel":""} ${dt===hj?"hoje":""}" data-dt="${dt}">
       <span class="n">${d}</span>
-      ${mm?`<span class="l">${mm.dia}</span>`
+      ${mm?`<span class="l">${mm.dia}${mmAll.length>1?`<sup class="mult">${mmAll.length}</sup>`:""}</span>`
          :(sk&&!xx?`<span class="l skip" style="font-size:11px">—</span>`
                   :`<span class="l" style="color:transparent">·</span>`)}
       ${xx?`<span class="dot"></span>`:`<span class="dot" style="background:transparent"></span>`}</button>`;
@@ -2090,20 +2250,25 @@ function viewCal(p,m){
     <div><div class="v">${nX}</div><div class="k">extras</div></div>
     <div><div class="v">${nS}</div><div class="k">descansos</div></div></div>`;
 
-  const s = S.events.find(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
+  const ss = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
+  const s = ss[0];
   const xs = extrasDoDia(p,sel);
   const sk = skipDoDia(p,sel);
   const dref = new Date(sel+"T12:00");
   out += `<div class="eyebrow" style="margin-bottom:9px">${WDL[dref.getDay()]}, ${dref.getDate()} de ${MES[dref.getMonth()]}</div>`;
-  if(sk) out += `<div class="card" style="padding:13px 15px;font-size:13px;color:var(--muted);background:var(--surface-2);border-color:var(--hair-2)">😴 Marcado como descanso${sk.motivo?` — ${esc(sk.motivo)}`:""}</div>`;
+  if(sk) out += `<div class="card cal-row" style="padding:13px 15px;font-size:13px;color:var(--muted);background:var(--surface-2);border-color:var(--hair-2)"><span>😴 Marcado como descanso${sk.motivo?` — ${esc(sk.motivo)}`:""}</span><button class="mini" data-skip="1">desfazer</button></div>`;
   xs.forEach(e=>{
     const nome = e.atividade ? esc(e.atividade) : m.extra;
     const emo = e.atividade ? emojiAtiv(e.atividade) : "·";
     const dur = e.duracao?` · ${e.duracao} min`:"";
     const nota = e.nota?`<div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5">${esc(e.nota)}</div>`:"";
-    out += `<div class="card" style="padding:13px 15px;font-size:13px;color:var(--blue);border-color:rgba(47,107,255,.25);background:rgba(47,107,255,.06)">${emo} ${nome}${dur}${nota}</div>`;
+    out += `<div class="card cal-row" style="padding:13px 15px;font-size:13px;color:var(--blue);border-color:rgba(47,107,255,.25);background:rgba(47,107,255,.06)"><span>${emo} ${nome}${dur}${nota}</span><button class="mini" data-rmatv="${e.id}">remover</button></div>`;
   });
-  if(s) out += sessaoCard(s,days);
+  if(ss.length>1) out += `<div class="warn-dup">Há ${ss.length} treinos registrados neste dia. Exclua os repetidos ou edite para mudar a data.</div>`;
+  ss.forEach(ev=>{
+    out += sessaoCard(ev,days,`<div class="cal-acts"><button data-caledit="${ev.id}">Editar ou mudar data</button><button class="del-x" data-caldel="${ev.id}">Excluir</button></div>`);
+  });
+  if(!ss.length && sel<=hj) out += `<button class="go cal-reg" data-calreg="1">${ICON.play} Registrar treino em ${brd(sel)}</button>`;
   if(!s && !xs.length && !sk) out += `<div class="empty"><div class="icon">🏋️</div><div class="ttl">Ainda sem registro</div><div class="sub">A letra indica a divisão treinada, o ponto azul marca extras e o traço marca descanso.</div></div>`;
   return out;
 }
@@ -2356,7 +2521,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">📦</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v30 · anti-repetição universal</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">Pace · v32 · datas retroativas e sincronização segura</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">☁️</span>
@@ -2377,19 +2542,31 @@ function upd(p,d,exId,i,k,v){
   ui.saved = false; salvaSoft();
 }
 async function salvar(){
+  if(ui.saving) return;
   const p = ui.perfil, d = ui.dia, key = p+":"+d, dr = S.draft[key]||{};
-  if(!Object.values(dr).some(a=>(a||[]).some(s=>s&&(s.kg||s.reps||s.sec)))) return;
-  // Sempre grava com a data REAL de hoje, exceto ao editar um treino já registrado
-  // (nesse caso ui.editDate preserva a data original do evento). Isso evita gravar
-  // treino de hoje como se fosse de amanhã quando ui.off≠0.
-  const dataEv = ui.editDate || iso(new Date());
-  ui.editDate = null;
-  S.events.unshift({id:Date.now(),perfil:p,tipo:"musc",data:dataEv,dia:d,entries:dr});
+  if(!temValores(dr)){ toast("Preencha pelo menos uma série antes de salvar."); return; }
+  // O treino é gravado na data mostrada no topo da tela (a que o usuário escolheu).
+  const data = REF(), hoje = shift(0);
+  if(data > hoje && !confirm(`${dataLonga(data)} é uma data futura.\n\nRegistrar o treino nesse dia mesmo assim?`)) return;
+  const outro = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===data && String(e.id)!==String(ui.editId));
+  if(outro && !confirm(`Já existe o treino ${outro.dia} registrado em ${brd(data)}.\n\nOK substitui pelo treino ${d}. Cancelar volta sem salvar.`)) return;
+  ui.saving = true;
+  if(outro) S.events.splice(S.events.indexOf(outro), 1);
+  const entries = clone(dr);
+  const ed = ui.editId!=null ? S.events.find(e=>String(e.id)===String(ui.editId)) : null;
+  if(ed){ ed.data = data; ed.dia = d; ed.entries = entries; }
+  else S.events.unshift({id:Date.now(),perfil:p,tipo:"musc",data,dia:d,entries});
+  ui.editId = null;
   S.draft[key] = {};
+  ui.obsOpen = {};
   const ok = await store.set(S);
   ui.saved = true; ui.toast = ok?null:"Não deu para salvar. Anote as cargas e tente de novo.";
   render();
-  setTimeout(()=>{ ui.saved=false; ui.view="hoje"; render(); window.scrollTo(0,0); },1300);
+  setTimeout(()=>{
+    ui.saved=false; ui.saving=false; ui.view="hoje"; ui.dia = avaliar(ui.perfil).win.d;
+    window.scrollTo(0,0);
+    if(ok) toast(`Treino ${d} salvo em ${brd(data)}.`); else render();
+  },900);
 }
 async function marcarExtra(off){
   const p = ui.perfil, data = shift(ui.off+Number(off));
@@ -2430,6 +2607,13 @@ async function salvarAtividadeExtra(ativ, dur, nota){
   fecharSugestao();
   render();
 }
+function editarEvento(ev){
+  const p = ui.perfil;
+  S.draft[p+":"+ev.dia] = clone(ev.entries||{});
+  ui.editId = ev.id; ui.off = offDe(ev.data); ui.dia = ev.dia;
+  ui.view = "treino"; ui.saved = false; ui.edit = false; ui.obsOpen = {};
+  render(); window.scrollTo(0,0);
+}
 function abrirPickTreino(){
   const p = ui.perfil, days = dayset(p);
   const body = `
@@ -2447,7 +2631,7 @@ function abrirPickTreino(){
     const aviso = verificarConflitoIniciar(ui.perfil, d);
     if(aviso && !confirm(aviso)) return;
     fecharSugestao();
-    ui.dia = d; ui.view = "treino"; ui.saved = false; ui.edit = false; ui.editDate = null; ui.off = 0;
+    ui.dia = d; ui.view = "treino"; ui.saved = false; ui.edit = false; ui.editId = null;
     render(); window.scrollTo(0,0);
   });
 }
@@ -2607,7 +2791,7 @@ async function salvarRegistroRefeicao(refId, texto){
   if(!D.log) D.log = [];
   D.log.unshift({
     id: Date.now(),
-    data: shift(0),
+    data: REF(),
     hora: _agoraHM(),
     refId: r.id,
     refNome: r.nome,
@@ -2632,7 +2816,7 @@ function abrirRegistroRefeicao(refId){
   const p = ui.perfil, D = S.dieta[p], r = D.refs.find(x=>x.id===refId);
   if(!r) return;
   const historico = (D.log||[]).filter(l=>l.refId===refId).slice(0,5);
-  const hoje = shift(0);
+  const hoje = REF();
   const jaHoje = (D.log||[]).find(l=>l.refId===refId && l.data===hoje);
   const histHTML = historico.length
     ? historico.map(l=>`<div class="log-item" data-logfill="${_escSug(l.texto)}">
@@ -2646,7 +2830,7 @@ function abrirRegistroRefeicao(refId){
     <div id="regHist">${histHTML}</div>
     <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5">Toque num registro para copiar o texto no campo acima.</div>
   `;
-  _renderSugestaoShell(`📝 ${r.nome} · hoje`, `${brd(hoje)} · ${_agoraHM()}`, body);
+  _renderSugestaoShell(`📝 ${r.nome} · ${hoje===shift(0)?"hoje":brd(hoje)}`, `${brd(hoje)} · ${_agoraHM()}`, body);
   const ta = document.getElementById('regTexto');
   const bt = document.getElementById('regSalvar');
   bt.onclick = () => salvarRegistroRefeicao(refId, ta.value);
@@ -2882,7 +3066,7 @@ function _renderCoach(j){
       const letraSel = b.dataset.coachapply;
       ui.dia = letraSel;
       ui.view = 'treino';
-      ui.saved = false;
+      ui.saved = false; ui.editId = null;
       b.textContent = '✓ Aplicado';
       b.classList.add('done');
       setTimeout(()=>{ fecharSugestao(); render(); window.scrollTo(0,0); }, 400);
@@ -2897,31 +3081,51 @@ function ligar(){
     if(ui.view==="hoje") ui.dia = avaliar(ui.perfil).win.d; render();});
   const dt = document.querySelector(".dt"); if(dt) dt.onclick=()=>{ ui.off=0; ui.dia=avaliar(ui.perfil).win.d; render(); };
   document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{
+    if(ui.view==="treino" && b.dataset.view!=="treino" && ui.editId!=null){
+      S.draft[ui.perfil+":"+ui.dia] = {}; ui.editId = null; salvaSoft();
+    }
     if(b.dataset.view==="treino" && ui.view!=="treino") ui.dia = avaliar(ui.perfil).win.d;
     ui.view=b.dataset.view; ui.saved=false;
     if(ui.view!=="treino") ui.edit=false;
     if(ui.view!=="dieta") ui.edieta=false;
     render(); window.scrollTo(0,0);});
   document.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>{
-    // Registrar novo treino sempre volta pra HOJE — treino registrado é evento real,
-    // não pode ser agendado pra data futura.
+    // Abre o registro na data que está na tela (hoje ou um dia passado escolhido nas setas/calendário).
     const dEscolhido = b.dataset.abrir;
     const aviso = verificarConflitoIniciar(ui.perfil, dEscolhido);
     if(aviso && !confirm(aviso)) return;
-    ui.dia=dEscolhido; ui.view="treino"; ui.saved=false; ui.edit=false; ui.editDate=null; ui.off=0; render(); window.scrollTo(0,0);});
-  document.querySelectorAll("[data-edittoday]").forEach(b=>b.onclick=async ()=>{
-    const dia = b.dataset.edittoday, p = ui.perfil, data = REF();
-    const i = S.events.findIndex(e=>e.perfil===p && e.tipo==="musc" && e.data===data);
-    if(i<0){ ui.dia=dia; ui.view="treino"; ui.saved=false; ui.editDate=null; render(); return; }
-    const ev = S.events[i];
-    if(!confirm("Editar o treino registrado neste dia? Os valores atuais viram rascunho e você salva de novo.")) return;
-    S.draft[p+":"+dia] = clone(ev.entries||{});
-    S.events.splice(i,1);
-    await store.set(S);
-    // Preserva a data original do evento editado (pode ser passado/futuro).
-    ui.editDate = ev.data;
-    ui.dia=dia; ui.view="treino"; ui.saved=false;
+    ui.dia=dEscolhido; ui.view="treino"; ui.saved=false; ui.edit=false; ui.editId=null; render(); window.scrollTo(0,0);});
+  document.querySelectorAll("[data-edittoday]").forEach(b=>b.onclick=()=>{
+    const p = ui.perfil, data = REF();
+    const ev = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===data);
+    if(!ev){ ui.dia=b.dataset.edittoday; ui.view="treino"; ui.saved=false; ui.editId=null; render(); return; }
+    editarEvento(ev);
+  });
+  document.querySelectorAll("[data-caledit]").forEach(b=>b.onclick=()=>{
+    const ev = S.events.find(e=>String(e.id)===b.dataset.caledit); if(ev) editarEvento(ev);
+  });
+  document.querySelectorAll("[data-caldel]").forEach(b=>b.onclick=async ()=>{
+    const ev = S.events.find(e=>String(e.id)===b.dataset.caldel); if(!ev) return;
+    if(!confirm(`Excluir o treino ${ev.dia} de ${brd(ev.data)}? Essa ação não pode ser desfeita.`)) return;
+    S.events.splice(S.events.indexOf(ev),1);
+    await store.set(S); toast(`Treino ${ev.dia} de ${brd(ev.data)} excluído.`);
+  });
+  document.querySelectorAll("[data-calreg]").forEach(b=>b.onclick=()=>{
+    const sug = sugestaoTreino(ui.perfil, REF());
+    ui.dia = sug.musc || avaliar(ui.perfil).win.d; ui.view="treino"; ui.saved=false; ui.edit=false; ui.editId=null;
     render(); window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-canceledit]").forEach(b=>b.onclick=()=>{
+    S.draft[ui.perfil+":"+ui.dia] = {}; ui.editId = null; ui.obsOpen = {}; ui.view = "hoje";
+    salvaSoft(); render(); window.scrollTo(0,0);
+  });
+  document.querySelectorAll("[data-trdate]").forEach(inp=>inp.onchange=()=>{
+    if(!inp.value) return;
+    ui.off = offDe(inp.value); ui.saved=false; render();
+  });
+  document.querySelectorAll("[data-obstg]").forEach(b=>b.onclick=()=>{
+    const k = b.dataset.obstg; ui.obsOpen[k] = !ui.obsOpen[k]; render();
+    if(ui.obsOpen[k]){ const [ex,i] = k.split(":"); const el = document.querySelector(`input[data-cex="${ex}"][data-ci="${i}"][data-ck="obs"]`); if(el) el.focus(); }
   });
   document.querySelectorAll("[data-loadlast]").forEach(b=>b.onclick=async ()=>{
     const p = ui.perfil, d = ui.dia, ant = ultimaSessao(p,d);
