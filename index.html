@@ -1140,6 +1140,24 @@
   .mo-obs{font-size:14px;line-height:1.45;color:var(--muted)}
   .mo-sep{color:var(--ac);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;margin:18px 2px 8px}
   .mo-feita{display:flex;align-items:center;gap:8px;color:var(--ac);font-weight:600;margin:14px 2px 4px}
+
+  /* v43 · encerrar antes do fim e marcar treino como feito */
+  .pc-bb{display:grid;grid-template-columns:auto 1fr;gap:10px}
+  .pc-bb .pc-btn.ghost{width:auto;padding:0 18px}
+  .cfm-card{max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);overflow-y:auto}
+  .cfm-ops{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+  .cfm-op{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;min-height:56px;padding:12px 16px;border-radius:14px;background:var(--sunk);border:1.5px solid var(--hair-2);color:var(--ink);text-align:left}
+  .cfm-op .ot{font-size:16px;font-weight:700;line-height:1.3}
+  .cfm-op .ot em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-left:8px;padding:1px 7px;border-radius:999px;border:1px solid currentColor;vertical-align:2px;white-space:nowrap}
+  .cfm-op .os{font-size:13.5px;color:var(--muted);line-height:1.4}
+  .cfm-op.pri{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+  .cfm-op.pri .os{color:var(--ac-ink);opacity:.8}
+  .cfm-cx{display:block;width:100%;height:50px;border-radius:14px;font-size:15px;font-weight:600;margin-top:10px}
+  .cal-feito{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .cal-feito .pc-ic{width:18px;height:18px}
+  .h-rapido{margin:8px 0 0;font-size:12.5px;color:var(--faint);line-height:1.4}
+  .pc-hl-2{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin-top:10px;border-radius:14px;border:1.5px solid var(--hl-muted);color:var(--hl-ink);font-weight:700;font-size:16px;background:transparent}
+  .pc-hl-2 .pc-ic{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -2261,7 +2279,18 @@ function resumo(ex,sets){
   }).filter(Boolean);
   return a.length?a.join("  "):null;
 }
-const ultimaSessao = (p,d) => { const e = evs(p,"musc").filter(x=>x.data<=REF()).find(x=>x.dia===d); return e?e.entries:{}; };
+/* "Anterior" de cada exercício: o registro mais recente deste treino em que ele tem valor.
+   Se o último treino foi encerrado antes do fim, o exercício que ficou de fora usa a sessão anterior. */
+function ultimaSessao(p, d){
+  const t = (dayset(p)||{})[d]; if(!t) return {};
+  const lista = evs(p,"musc").filter(x=>x.data<=REF() && x.dia===d && (ui.editId==null || String(x.id)!==String(ui.editId)));
+  const out = {};
+  t.ex.forEach(ex=>{
+    const e = lista.find(x=>((x.entries||{})[ex.id]||[]).some(s=>s && (s.kg||s.reps||s.sec)));
+    if(e) out[ex.id] = e.entries[ex.id];
+  });
+  return out;
+}
 const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
 /* icons ------- */
@@ -2354,7 +2383,9 @@ function sessaoCard(s,days,acoes){
   return `<div class="card"><div class="h-h"><span class="h-d">${s.dia} · ${esc(t.t)}</span>
     <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">${brd(s.data)}</span></div>` +
     t.ex.map(ex=>{ const r = resumo(ex,(s.entries||{})[ex.id]);
-      return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") + (acoes||"") + `</div>`;
+      return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") +
+    (Number(s.rapido)>0 ? `<p class="h-rapido">Marcado como feito · ${Number(s.rapido)} ${Number(s.rapido)===1?"série":"séries"} com o valor da última vez</p>` : "") +
+    (acoes||"") + `</div>`;
 }
 
 /* ------------------------------------------------------------------ DIETA */
@@ -2572,6 +2603,8 @@ function marcaDraft(p, d){
 }
 /* treino começado antes da meia-noite e ainda em curso (até 8 h): continua valendo para o dia em que começou */
 function viraDia(m){ return !!(m && m.data===shift(-1) && m.inicio && (Date.now()-m.inicio) < 8*3600*1000); }
+/* sessão ao vivo que passou da meia-noite: começou no próprio dia do treino (não é registro feito depois) */
+function passouMeiaNoite(m, data){ return !!(m && m.data===data && viraDia(m) && iso(new Date(m.inicio))===m.data); }
 function limpaDraftMeta(p, d){ if(S.draftMeta) delete S.draftMeta[p+":"+d]; }
 function contaSeries(t, dr){
   let total = 0, ok = 0, pre = 0;
@@ -2700,7 +2733,8 @@ function viewHoje(p,m){
     out += `<section class="pc-hl" aria-label="Treino sugerido"><div class="ey">${ui.off===0?"Sugerido para hoje":passado?"Treino deste dia":"Sugerido para este dia"}${tagJiu}</div>
       <div class="ttl">${esc(d.t)}</div>
       <div class="meta">Treino ${r.win.d} · ${d.ex.length} exercícios · ${d.ex.reduce((a,e)=>a+e.s,0)} séries</div>
-      <button class="pc-btn hl" data-abrir="${r.win.d}"><span>${passado?"Registrar treino "+r.win.d:"Iniciar treino"}</span>${pic("arrow")}</button></section>`;
+      <button class="pc-btn hl" data-abrir="${r.win.d}"><span>${passado?"Registrar treino "+r.win.d:"Iniciar treino"}</span>${pic("arrow")}</button>
+      ${passado?`<button class="pc-hl-2" data-feitorapido="1">${pic("check","sm")}<span>Já fiz: marcar como feito</span></button>`:""}</section>`;
     if(r.win.motivo) out += `<details class="pc-more"><summary>${pic("info","sm")}<span>${r.descanso&&!r.schedRest?"Neste dia o melhor é descansar":"Por que este treino"}</span></summary><p>${r.win.motivo}</p></details>`;
     if(ui.off===0) out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
   }
@@ -2807,11 +2841,13 @@ function pcFmtSet(ex, x){
 function viewTreino(p,m){
   const d = ui.dia, days = dayset(p), treino = days[d];
   const antEv = evs(p,"musc").filter(e=>e.data<=REF() && String(e.id)!==String(ui.editId)).find(e=>e.dia===d);
-  const ant = antEv ? antEv.entries : {};
+  const ant = ultimaSessao(p, d);
   const dr = S.draft[p+":"+d] || {};
   const dataTr = REF(), hojeIso = shift(0), passado = dataTr < hojeIso, futuro = dataTr > hojeIso;
   const relTr = dataTr===hojeIso ? "hoje" : (ui.off===-1 ? "ontem" : (passado ? "há "+(-ui.off)+" dias" : "data futura"));
   const c = contaSeries(treino, dr);
+  // dia anterior = registro de algo já feito; treino que passou da meia-noite continua como sessão ao vivo
+  const modoPassado = passado && !passouMeiaNoite(S.draftMeta && S.draftMeta[p+":"+d], dataTr);
   let out = `<div class="pc-stop">
       <button class="pc-ib" data-minimizar="1" aria-label="Minimizar treino (o rascunho fica salvo)">${pic("down")}</button>
       <div class="mid">Treino ${d}</div>
@@ -2882,12 +2918,24 @@ function viewTreino(p,m){
     out += `<div class="pc-exf"><button class="pc-link" data-exobs="${ex.id}">${obsAberto?"Ocultar observações":pic("plus","sm")+"<span>Observação por série</span>"}</button></div></section>`;
   });
   if(temValores(dr) && ui.editId==null) out += `<div class="pc-exf" style="justify-content:flex-start;margin-top:8px"><button class="pc-link" style="color:var(--danger)" data-descartar="1">Descartar rascunho deste treino</button></div>`;
-  out += `<details class="pc-more"><summary>${pic("info","sm")}<span>Como funciona</span></summary><p>“Anterior” = ${antEv?`último treino ${d} (${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.</p></details>`;
+  out += `<details class="pc-more"><summary>${pic("info","sm")}<span>Como funciona</span></summary><p>“Anterior” = ${antEv?`o último registro de cada exercício no treino ${d} (último treino ${d} em ${brd(antEv.data)})`:"sem registro anterior"}; é só sugestão. Toque em ${pic("check","sm")} para concluir a série${pref("autoPreencher")?" (campos vazios usam o valor anterior)":""}; toque de novo para corrigir.${ui.editId!=null?"":modoPassado?" Para registrar sem marcar série por série, toque em Marcar treino como feito.":" Para sair antes do fim, toque em Encerrar: você escolhe se salva só as séries feitas ou o treino inteiro."}</p></details>`;
   // barra inferior: opera sobre o MESMO estado do ✓ da linha
-  const btn = atual
-    ? `<button class="pc-btn pri" id="pcConcluir" data-concluir="${atual.ex.id}:${atual.i}" aria-label="Concluir série ${atual.i+1} de ${esc(atual.ex.n)}">Concluir série ${atual.i+1}</button>`
-    : `<button class="pc-btn pri" data-salvarbottom="1">${ui.editId!=null?"Atualizar treino":"Salvar treino"}</button>`;
-  out += `<div class="pc-bottom"><div class="in2"><div class="note">${atual?`${esc(atual.ex.n)} · rascunho salvo`:"Todas as séries concluídas · rascunho salvo"}</div>${btn}</div></div>`;
+  let btn, nota;
+  if(ui.editId!=null){
+    btn = `<button class="pc-btn pri" data-salvarbottom="1">Atualizar treino</button>`;
+    nota = "Editando um treino já registrado";
+  } else if(!atual){
+    btn = `<button class="pc-btn pri" data-salvarbottom="1">Salvar treino</button>`;
+    nota = "Todas as séries concluídas · rascunho salvo";
+  } else if(modoPassado){
+    btn = `<button class="pc-btn pri" data-finalizar="1">Marcar treino como feito</button>`;
+    nota = c.ok ? `${c.ok} de ${c.total} séries concluídas · rascunho salvo` : "Registra o treino inteiro de uma vez";
+  } else {
+    btn = `<div class="pc-bb"><button class="pc-btn ghost" data-finalizar="1">Encerrar</button>`
+      + `<button class="pc-btn pri" id="pcConcluir" data-concluir="${atual.ex.id}:${atual.i}" aria-label="Concluir série ${atual.i+1} de ${esc(atual.ex.n)}">Concluir série ${atual.i+1}</button></div>`;
+    nota = `${esc(atual.ex.n)} · rascunho salvo`;
+  }
+  out += `<div class="pc-bottom"><div class="in2"><div class="note">${nota}</div>${btn}</div></div>`;
   return out;
 }
 
@@ -3057,7 +3105,9 @@ function pcCalendario(p, m, ano, mes){
   if(ss.length>1) out += `<div class="warn-dup">Há ${ss.length} treinos registrados neste dia. Exclua os repetidos ou edite para mudar a data.</div>`;
   ss.forEach(ev=>{ out += sessaoCard(ev,days,`<div class="cal-acts"><button data-caledit="${ev.id}">Editar ou mudar data</button><button class="del-x" data-caldel="${ev.id}">Excluir</button></div>`); });
   if(!ss.length && ab && sel===hj) out += `<button class="pc-row" data-continuar="${ab.L}"><div class="main"><div class="t">Treino ${ab.L} · ${esc(ab.t.t)}</div><div class="s">${ab.ok} de ${ab.total} séries concluídas</div></div><span class="pc-pill">Em andamento</span></button>`;
-  if(!ss.length && sel<=hj && !(ab && sel===hj)) out += `<button class="pc-btn ghost cal-reg" style="margin-top:14px" data-calreg="1">${pic("plus","sm")} Registrar treino em ${brd(sel)}</button>`;
+  if(!ss.length && sel<=hj && !(ab && sel===hj)) out += `<div class="cal-feito">
+      <button class="pc-btn pri" data-feitorapido="1">${pic("check","sm")} Marcar treino como feito</button>
+      <button class="pc-btn ghost" data-calreg="1">${pic("edit","sm")} Preencher série por série</button></div>`;
   if(!ss.length && !xs.length && !sk && !(ab && sel===hj)) out += `<p class="pc-note" style="font-size:14px">Sem registro neste dia.</p>`;
   return out;
 }
@@ -3291,7 +3341,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v42 · calendário no menu, gráficos e opções das refeições</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v43 · encerrar o treino antes do fim e marcar dias anteriores como feitos</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
@@ -3469,12 +3519,17 @@ function atualizaBarraSalvar(){
   const pg = document.getElementById("pcProg");
   if(pg){ const c = contaSeries(treino, dr); pg.textContent = `${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}`; }
 }
-async function salvar(){
+/* o: { entries, rapido } quando o conteúdo já foi montado por finalizarTreino (encerrar antes do fim);
+   chamado direto pelo botão, recebe o evento do clique e grava o rascunho como está */
+async function salvar(o){
+  o = (o && o.entries) ? o : null;
   if(ui.saving) return;
   const p = ui.perfil, d = ui.dia, key = p+":"+d, dr = S.draft[key]||{};
-  if(!temValores(dr)){ toast("Preencha pelo menos uma série antes de salvar."); return; }
-  const _c = contaSeries(dayset(p)[d], dr);
-  if(_c.ok>0 && _c.pre>_c.ok && !(await confirmar(`Salvar o treino ${d}?\n\n${_c.ok} ${_c.ok===1?"série concluída":"séries concluídas"} e ${_c.pre-_c.ok} só ${_c.pre-_c.ok===1?"preenchida":"preenchidas"}. As preenchidas também entram no histórico — apague as que não fez.`, {ok:"Salvar"}))) return;
+  if(!o){
+    if(!temValores(dr)){ toast("Preencha pelo menos uma série antes de salvar."); return; }
+    const _c = contaSeries(dayset(p)[d], dr);
+    if(_c.ok>0 && _c.pre>_c.ok && !(await confirmar(`Salvar o treino ${d}?\n\n${_c.ok} ${_c.ok===1?"série concluída":"séries concluídas"} e ${_c.pre-_c.ok} só ${_c.pre-_c.ok===1?"preenchida":"preenchidas"}. As preenchidas também entram no histórico — apague as que não fez.`, {ok:"Salvar"}))) return;
+  }
   // O treino é gravado na data mostrada no topo da tela (a que o usuário escolheu).
   const data = REF(), hoje = shift(0);
   if(data > hoje && !(await confirmar(`${dataLonga(data)} é uma data futura.\n\nRegistrar o treino nesse dia mesmo assim?`, {ok:"Registrar assim mesmo"}))) return;
@@ -3482,11 +3537,15 @@ async function salvar(){
   if(outro && !(await confirmar(`Já existe o treino ${outro.dia} registrado em ${brd(data)}.\n\nSe continuar, ele será substituído pelo treino ${d}.`, {ok:"Substituir", perigo:true}))) return;
   ui.saving = true;
   if(outro) S.events.splice(S.events.indexOf(outro), 1);
-  const entries = clone(dr);
+  const entries = o ? clone(o.entries) : clone(dr);
   Object.values(entries).forEach(arr=>(arr||[]).forEach(x=>{ if(x) delete x.ok; }));
   const ed = ui.editId!=null ? S.events.find(e=>String(e.id)===String(ui.editId)) : null;
-  if(ed){ ed.data = data; ed.dia = d; ed.entries = entries; }
-  else S.events.unshift({id:Date.now(),perfil:p,tipo:"musc",data,dia:d,entries});
+  if(ed){ ed.data = data; ed.dia = d; ed.entries = entries; delete ed.rapido; }
+  else {
+    const novo = {id:Date.now(),perfil:p,tipo:"musc",data,dia:d,entries};
+    if(o && o.rapido) novo.rapido = o.rapido;   // nº de séries que entraram com o valor da última vez
+    S.events.unshift(novo);
+  }
   ui.editId = null;
   S.draft[key] = {};
   limpaDraftMeta(p,d);
@@ -3501,10 +3560,130 @@ async function salvar(){
   setTimeout(()=>{
     ui.saved=false; ui.saving=false; ui.view="hoje"; ui.dia = avaliar(ui.perfil).win.d;
     window.scrollTo(0,0); render();
-    if(ok && pref("resumo")) mostrarResumo(d, data, rs);
+    if(ok && pref("resumo") && rs.series>0) mostrarResumo(d, data, rs);
     else if(ok) toast(`Treino ${d} salvo.`);
   },700);
 }
+
+/* ===================== v43 · encerrar antes do fim e marcar treino como feito ===================== */
+/* Monta o que entra no histórico sem exigir o ✓ em cada série.
+   modo "feitas": só as séries concluídas; "preenchidas": as séries com valor;
+   "todas": todas as séries do plano, e as vazias recebem o valor do último registro do exercício.
+   Uma observação escrita numa série que fica de fora é mantida (sem valores). */
+function entradasParaSalvar(p, d, dr, modo){
+  const t = dayset(p)[d], ant = modo==="todas" ? ultimaSessao(p, d) : {}, out = {};
+  let usouAnterior = 0, series = 0;
+  const temV = s => !!(s && (s.kg || s.reps || s.sec));
+  const soObs = s => (s && s.obs && String(s.obs).trim()) ? { obs: s.obs } : null;
+  if(!t) return { entries: out, usouAnterior, series };
+  t.ex.forEach(ex=>{
+    const arr = (dr||{})[ex.id] || [], a = ant[ex.id] || [], lin = [];
+    for(let i=0; i<ex.s; i++){
+      const s = arr[i] ? Object.assign({}, arr[i]) : null;
+      let r = null;
+      if(modo==="feitas") r = (s && s.ok && temV(s)) ? s : soObs(s);
+      else if(modo==="preenchidas") r = temV(s) ? s : soObs(s);
+      else if(temV(s)) r = s;
+      else {
+        const v = a[i] || {}, novo = {};
+        ["kg","reps","sec"].forEach(k=>{ if(v[k]) novo[k] = v[k]; });
+        if(temV(novo)){ r = Object.assign(s || {}, novo); usouAnterior++; }
+        else r = soObs(s);
+      }
+      if(r){ delete r.ok; if(temV(r)) series++; }
+      lin.push(r);
+    }
+    while(lin.length && lin[lin.length-1]==null) lin.pop();
+    if(lin.length) out[ex.id] = lin;
+  });
+  return { entries: out, usouAnterior, series };
+}
+
+/* Folha com várias opções (mesmo visual da confirmação). Devolve a chave escolhida ou null. */
+function escolher(titulo, corpo, opcoes, o){
+  o = o || {};
+  return new Promise(res=>{
+    const velho = document.getElementById("cfmSheet");
+    if(velho){ try{ velho._fim && velho._fim(false); }catch(e){} }
+    const el = document.createElement("div"); el.id = "cfmSheet"; el.className = "cfm";
+    el.innerHTML = `<div class="cfm-bg" data-k=""></div>
+      <div class="cfm-card" role="dialog" aria-modal="true" aria-labelledby="cfmT">
+        <div class="cfm-t" id="cfmT">${esc(titulo)}</div>${corpo?`<div class="cfm-x">${esc(corpo)}</div>`:""}
+        <div class="cfm-ops">${opcoes.map(x=>`<button class="cfm-op${x.pri?" pri":""}" data-k="${esc(x.k)}"><span class="ot">${esc(x.t)}${x.tag?`<em>${esc(x.tag)}</em>`:""}</span>${x.s?`<span class="os">${esc(x.s)}</span>`:""}</button>`).join("")}</div>
+        <button class="cfm-no cfm-cx" data-k="">${esc(o.cancelar||"Cancelar")}</button>
+      </div>`;
+    let feito = false;
+    const kd = e=>{ if(e.key==="Escape") fim(null); };
+    function fim(v){ if(feito) return; feito = true; document.removeEventListener("keydown", kd);
+      el.id = ""; el.classList.remove("on"); setTimeout(()=>el.remove(), 200); res(v || null); }
+    el._fim = ()=>fim(null);
+    el.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>fim(b.dataset.k || null));
+    document.addEventListener("keydown", kd);
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add("on")));
+    setTimeout(()=>{ const b = el.querySelector(".cfm-op.pri") || el.querySelector(".cfm-op"); if(b) b.focus({preventScroll:true}); }, 60);
+  });
+}
+
+/* Encerrar (barra de cima, barra de baixo ou "Marcar treino como feito" em dia anterior) */
+async function finalizarTreino(){
+  if(ui.saving) return;
+  if(ui.editId!=null) return salvar();                       // editando um registro: grava o que está na tela
+  const p = ui.perfil, d = ui.dia, t = dayset(p)[d]; if(!t) return;
+  const dr = S.draft[p+":"+d] || {}, c = contaSeries(t, dr);
+  if(c.total && c.ok >= c.total) return salvar();            // tudo concluído: fluxo de sempre
+  const data = REF(), passado = data < shift(0) && !passouMeiaNoite(S.draftMeta && S.draftMeta[p+":"+d], data);
+  const pl = (n, um, varios) => n===1 ? um : varios;
+  const parcial = entradasParaSalvar(p, d, dr, c.ok>0 ? "feitas" : "preenchidas");
+  const todas = entradasParaSalvar(p, d, dr, "todas");
+  const ops = [];
+  if(parcial.series > 0 && parcial.series < c.total){
+    const n = parcial.series, fora = c.total - n, semMarcar = c.ok>0 ? Math.max(0, c.pre - c.ok) : 0;
+    ops.push({ k:"parcial", pri: !passado,
+      t: c.ok>0 ? `Salvar só ${pl(n, "a série feita", `as ${n} séries feitas`)}` : `Salvar ${pl(n, "a série preenchida", `as ${n} séries preenchidas`)}`,
+      s: `${pl(fora, "A outra fica", `As outras ${fora} ficam`)} fora do histórico${semMarcar>0 ? `, inclusive ${pl(semMarcar, "1 preenchida sem marcar", `${semMarcar} preenchidas sem marcar`)}` : ""}.` });
+  }
+  ops.push({ k:"todas", pri: passado || !ops.length,
+    t: "Marcar o treino inteiro como feito",
+    s: todas.usouAnterior ? `${pl(todas.usouAnterior, "1 série vazia recebe", `${todas.usouAnterior} séries vazias recebem`)} o valor da última vez.`
+      : todas.series ? "Entram os valores que estão na tela."
+      : "Ainda não há registro anterior deste treino: fica registrado sem cargas." });
+  const corpo = c.ok>0 ? `${c.ok} de ${c.total} séries concluídas.`
+    : c.pre>0 ? `${c.pre} de ${c.total} séries preenchidas, nenhuma concluída.`
+    : "Nenhuma série marcada.";
+  const k = await escolher(passado ? `Registrar o treino ${d} em ${brd(data)}` : `Encerrar o treino ${d}?`, corpo, ops,
+    { cancelar: passado ? "Voltar" : "Continuar treinando" });
+  if(k==="parcial") return salvar({ entries: parcial.entries });
+  if(k==="todas") return salvar({ entries: todas.entries, rapido: todas.usouAnterior });
+}
+
+/* Dia anterior (Calendário ou Início): escolhe o treino e registra inteiro, sem abrir a sessão */
+async function marcarFeitoRapido(){
+  const p = ui.perfil, data = REF(), days = dayset(p);
+  if(data > shift(0)) return;
+  const ja = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===data);
+  if(ja){ toast(`Já existe o treino ${ja.dia} em ${brd(data)}.`); return; }
+  const sug = (sugestaoTreino(p, data)||{}).musc || avaliar(p).win.d;
+  const ops = ORDER.filter(L=>days[L]).map(L=>{
+    const u = evs(p,"musc").find(e=>e.data<data && e.dia===L);
+    return { k:L, pri: L===sug, tag: L===sug ? "sugerido" : "",
+      t: `Treino ${L} · ${days[L].t}`, s: u ? `Última vez em ${brd(u.data)}` : "Sem registro anterior" };
+  });
+  const L = await escolher("Qual treino você fez?", `${cap(dataLonga(data))}. Entra no histórico com o valor da última vez de cada exercício; dá para editar depois.`, ops);
+  if(!L || !days[L]) return;
+  if(S.events.some(e=>e.perfil===p && e.tipo==="musc" && e.data===data)) return;   // registrado em outro aparelho enquanto escolhia
+  const r = entradasParaSalvar(p, L, {}, "todas");
+  const ev = { id: Date.now(), perfil:p, tipo:"musc", data, dia:L, entries:r.entries };
+  if(r.usouAnterior) ev.rapido = r.usouAnterior;
+  S.events.unshift(ev);
+  vibrar([30,60,30]);
+  await store.set(S); render();
+  toastUndo(`Treino ${L} registrado em ${brd(data)}`, async ()=>{
+    const i = S.events.findIndex(e=>String(e.id)===String(ev.id)); if(i>=0) S.events.splice(i,1);
+    await store.set(S); render();
+  });
+}
+
 async function marcarExtra(off){
   const p = ui.perfil, data = shift(ui.off+Number(off));
   const i = S.events.findIndex(e=>e.perfil===p && e.tipo==="extra" && e.data===data && isMainExtra(p,e));
@@ -4168,7 +4347,9 @@ function ligar(){
   /* v26: NÃO registrar onclick direto pros chips [data-planq]/[data-plansugmusc].
      A delegação global em ligarDelegacaoUmaVez() já cobre esses cliques.
      Registrar aqui causava DUPLA execução do togglePlanejado (chip vira e desvira). */
-  const sv = document.getElementById("salvar"); if(sv) sv.onclick=salvar;
+  const sv = document.getElementById("salvar"); if(sv) sv.onclick=()=>finalizarTreino();
+  document.querySelectorAll("[data-finalizar]").forEach(b=>b.onclick=()=>finalizarTreino());
+  document.querySelectorAll("[data-feitorapido]").forEach(b=>b.onclick=()=>marcarFeitoRapido());
 
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ui.edit=!ui.edit;render();});
   /* input[data-f] tratado pela delegação global (ligarDelegacaoUmaVez) */
