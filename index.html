@@ -23,8 +23,7 @@
      Type:    Instrument Serif (display, italic) + Inter (body)
               + JetBrains Mono (numerics/weights)
      Palette: Graphite paper + hierarchical neutrals; warm ember
-              per-user accent (Gabriel #E85D3F, Eduarda #F06B95).
-              No fitness-green cliche.
+              accent. No fitness-green cliche.
      Motion:  220ms cubic-bezier(.22,1,.36,1); tap = 0.98 scale.
      Grid:    4/8pt spacing; three radii, three shadows.
      Icons:   Lucide-family stroke SVGs (1.7 default).
@@ -626,8 +625,6 @@
     font-size:14px;font-weight:500;transition:all var(--dur-fast) var(--ease)}
   .cfg-perfil button:active{transform:scale(.97)}
   .cfg-perfil button.on{background:var(--sunk);color:var(--ink);font-weight:600;box-shadow:var(--sh-1)}
-  .cfg-perfil button.on[data-cfp="gabriel"]{color:#E85D3F}
-  .cfg-perfil button.on[data-cfp="eduarda"]{color:#F06B95}
   .cfg-theme{display:flex;gap:6px;padding:8px}
   .cfg-theme button{flex:1;height:60px;border-radius:11px;background:transparent;color:var(--muted);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
@@ -1158,6 +1155,39 @@
   .h-rapido{margin:8px 0 0;font-size:12.5px;color:var(--faint);line-height:1.4}
   .pc-hl-2{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin-top:10px;border-radius:14px;border:1.5px solid var(--hl-muted);color:var(--hl-ink);font-weight:700;font-size:16px;background:transparent}
   .pc-hl-2 .pc-ic{width:18px;height:18px}
+
+  /* ---------- contas: ativação, envio por IA, administrador ---------- */
+  .login-user{font-size:16px;font-weight:650;color:var(--ink);background:var(--sunk);border:.5px solid var(--hair-2);border-radius:12px;padding:13px 14px;word-break:break-all}
+  .imp-escolher{position:relative;overflow:hidden;cursor:pointer}
+  .imp-escolher input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+  .imp-lista{display:grid;gap:8px;margin-top:10px}
+  .imp-arq{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 14px;border:1px solid var(--hair-2);border-radius:12px}
+  .imp-arq .main{flex:1;min-width:0}
+  .imp-arq .t{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .imp-arq .s{color:var(--muted);font-size:13px;margin-top:2px}
+  .imp-av{margin:6px 0 0 18px;padding:0;font-size:14px;line-height:1.5}
+  .imp-t{display:flex;align-items:baseline;gap:8px;margin:18px 0 8px;flex-wrap:wrap}
+  .imp-t b{font-weight:800;color:var(--ac);font-size:17px}
+  .imp-t span{font-weight:650;font-size:16px;color:var(--ink)}
+  .imp-t small{color:var(--muted);font-size:13px}
+  .imp-tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+  .imp-tab th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.04em;padding:6px 6px 6px 0;border-bottom:1px solid var(--hair-2)}
+  .imp-tab td{padding:8px 6px 8px 0;border-bottom:1px solid var(--hair);vertical-align:top;color:var(--ink)}
+  .imp-tab td:nth-child(2),.imp-tab th:nth-child(2){width:52px;text-align:center}
+  .imp-tab td:nth-child(3),.imp-tab th:nth-child(3){width:96px}
+  .imp-tab td small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  .imp-sem{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+  .imp-sem div{border:1px solid var(--hair-2);border-radius:10px;padding:6px 0}
+  .imp-sem small{display:block;color:var(--muted);font-size:12px}
+  .imp-sem b{font-size:15px}
+  .imp-itens{color:var(--muted);font-size:14px;line-height:1.55;white-space:pre-line}
+  .adm-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .adm-row{align-items:flex-start;padding:14px 0}
+  .adm-row.lido{opacity:.62}
+  .adm-perigo{color:var(--danger);border-color:var(--danger)}
+  .adm-link{font-family:var(--mono);font-size:13px;line-height:1.5;word-break:break-all;margin:10px 0 6px;user-select:all;-webkit-user-select:all}
+  .adm-txt{white-space:pre-wrap;margin-top:6px;font-size:15.5px;line-height:1.5;color:var(--ink)}
+  .adm-data{font-weight:400;color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -1185,18 +1215,32 @@ if(window.matchMedia){
   try{ window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", ()=>{ if(getTheme()==="auto") applyTheme("auto"); }); }catch(e){}
 }
 
-/* ============================================================ armazenagem */
-const STORE_KEY = "gt-state-v2";
-const VERSION_KEY = "gt-version-v2";
+/* ============================================================ armazenagem
+   Cópia local do documento do grupo da conta (funciona sem internet).
+   As chaves levam o grupo no nome: duas contas no mesmo aparelho não se misturam. */
+const SUPA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co';
+const SUPA_KEY = 'sb_publishable_s0FBWPYPcIXO5ln95i5f6g_oPj7Bsar';
+const IA_URL = SUPA_URL + '/functions/v1/pace-ia';
+const GRUPO_LEGADO = 'gabi_eduarda';   // documento do app antes das contas: a cópia local antiga passa para as chaves novas
+const CHAVES = { estado:"", versao:"", base:"" };
+function definirChaves(grupo){
+  CHAVES.estado = "pace-estado:"+grupo; CHAVES.versao = "pace-versao:"+grupo; CHAVES.base = "pace-base:"+grupo;
+  try{
+    if(grupo===GRUPO_LEGADO && localStorage.getItem(CHAVES.estado)===null && localStorage.getItem("gt-state-v2")!==null){
+      [["gt-state-v2",CHAVES.estado],["gt-version-v2",CHAVES.versao],["gt-base-v1",CHAVES.base]].forEach(([de,para])=>{
+        const v = localStorage.getItem(de); if(v!==null) localStorage.setItem(para, v);
+      });
+      ["gt-state-v2","gt-version-v2","gt-base-v1"].forEach(k=>localStorage.removeItem(k));
+    }
+  }catch(e){ console.warn("[chaves]", e); }
+}
 const store = {
   async get(){
-    try{ if(window.storage){ const r = await window.storage.get(STORE_KEY); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
-    try{ const s = localStorage.getItem(STORE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; }
+    try{ const s = localStorage.getItem(CHAVES.estado); return s?JSON.parse(s):null; }catch(e){ return null; }
   },
   async set(v){
     const s = JSON.stringify(v);
-    try{ if(window.storage){ await window.storage.set(STORE_KEY, s, false); syncEngine.schedulePush(); return true; } }catch(e){}
-    try{ localStorage.setItem(STORE_KEY, s); syncEngine.schedulePush(); return true; }catch(e){ return false; }
+    try{ localStorage.setItem(CHAVES.estado, s); syncEngine.schedulePush(); return true; }catch(e){ syncEngine.schedulePush(); return false; }
   }
 };
 
@@ -1244,28 +1288,53 @@ function merge3(b,l,r){
 }
 if(typeof window!=='undefined') window.PaceMerge = { merge3 };
 
-/* ============================================================ syncEngine (Supabase) */
+/* ============================================================ servidor
+   Tudo passa por funções do banco que conferem a sessão (pace_*): o app não lê
+   nem grava tabelas diretamente. */
+let SB = null;
+try { SB = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY, { auth:{ persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } }) : null; } catch(e) { console.warn('supabase init falhou', e); }
+async function rpc(nome, args){
+  if(!SB) throw new Error('Sem conexão com o servidor.');
+  const { data, error } = await SB.rpc(nome, args || {});
+  if(error){
+    const msg = String((error && (error.message || error.details)) || error);
+    const e = new Error(msg);
+    e.sessao = /sessao_invalida/.test(msg);
+    throw e;
+  }
+  return data;
+}
+
+/* ============================================================ syncEngine */
 const syncEngine = (function(){
-  const SUPA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co';
-  const SUPA_KEY = 'sb_publishable_s0FBWPYPcIXO5ln95i5f6g_oPj7Bsar';
-  const ROW_ID   = 'gabi_eduarda';
-  const BASE_KEY = 'gt-base-v1';
   const DEVICE_ID = (function(){
-    let d = localStorage.getItem('gt-device-id');
+    let d = null;
+    try{ d = localStorage.getItem('gt-device-id'); }catch(e){}
     if(!d){ d = 'dev-'+Math.random().toString(36).slice(2,10); try{localStorage.setItem('gt-device-id',d);}catch(e){} }
     return d;
   })();
-  let client = null;
-  try { client = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null; } catch(e) { console.warn('supabase init falhou',e); }
-  let localVersion = Number(localStorage.getItem(VERSION_KEY) || 0);
-  let base = (function(){ try{ const b = localStorage.getItem(BASE_KEY); return b ? JSON.parse(b) : null; }catch(e){ return null; } })();
+  let localVersion = 0;
+  let base = null;
   let pushTimer = null;
   let pushInflight = false;
   let pendingWhile = false;
   let statusEl = null;
   let applyingRemote = false;
+  let parado = false;
   const cl = o => JSON.parse(JSON.stringify(o));
-  const setBase = o => { base = cl(o); try{ localStorage.setItem(BASE_KEY, JSON.stringify(base)); }catch(e){} };
+  const setBase = o => { base = cl(o); try{ localStorage.setItem(CHAVES.base, JSON.stringify(base)); }catch(e){} };
+  function configurar(grupo){
+    definirChaves(grupo);
+    try{ localVersion = Number(localStorage.getItem(CHAVES.versao) || 0); }catch(e){ localVersion = 0; }
+    try{ const b = localStorage.getItem(CHAVES.base); base = b ? JSON.parse(b) : null; }catch(e){ base = null; }
+  }
+  function falhaSessao(e){
+    if(!(e && e.sessao) || parado) return false;
+    parado = true;
+    clearTimeout(pushTimer);
+    if(typeof sessaoEncerrada === 'function') sessaoEncerrada();
+    return true;
+  }
   const setStatus = (kind, txt) => {
     if(!statusEl) statusEl = document.getElementById('syncBadge');
     if(!statusEl) return;
@@ -1275,7 +1344,7 @@ const syncEngine = (function(){
     if(kind==='ok'){ statusEl._t = setTimeout(()=>{ statusEl.textContent=''; }, 800); }
   };
   const getVersion = () => localVersion;
-  const setLocalVersion = v => { localVersion = v; try{localStorage.setItem(VERSION_KEY, String(v));}catch(e){} };
+  const setLocalVersion = v => { localVersion = v; try{localStorage.setItem(CHAVES.versao, String(v));}catch(e){} };
   const temAlteracaoLocal = () => base ? !_eqJ(S, base) : false;
 
   // aplica um estado no S sem trocar a referência (o resto do app usa S direto)
@@ -1287,20 +1356,22 @@ const syncEngine = (function(){
       if(!S.events) S.events = [];
       if(!S.draft) S.draft = {};
       if(!S.check) S.check = {};
-      try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+      if(typeof prepararEstado === 'function') prepararEstado();
+      try{ localStorage.setItem(CHAVES.estado, JSON.stringify(S)); }catch(e){}
       if(typeof safeRender === 'function') safeRender();
     } finally { applyingRemote = false; }
   }
 
+  // documento do grupo da sessão: { data, version } (data = null se o grupo ainda não gravou nada)
   async function pullOnce(){
-    if(!client) throw new Error('no client');
-    const { data, error } = await client.from('treino_state').select('data,version').eq('id', ROW_ID).maybeSingle();
-    if(error) throw error;
-    return data;
+    const r = await rpc('pace_estado', { p_token: SESSAO.token });
+    if(r && r.conta && typeof atualizarConta === 'function') atualizarConta(r.conta);
+    return { data: (r && r.data && typeof r.data === 'object') ? r.data : null, version: Number((r && r.version) || 0) };
   }
 
   async function pushNow(){
-    if(!client){ setStatus('offline','offline'); return; }
+    if(parado || !SESSAO) return;
+    if(!SB){ setStatus('offline','offline'); return; }
     if(pushInflight){ pendingWhile = true; return; }
     if(!navigator.onLine){ setStatus('offline','offline'); return; }
     pushInflight = true;
@@ -1308,8 +1379,8 @@ const syncEngine = (function(){
     try {
       for(let tentativa=0; tentativa<4; tentativa++){
         const remote = await pullOnce();
-        const rv = remote ? Number(remote.version||0) : 0;
-        const remoteHas = remote && remote.data && typeof remote.data==='object' && Object.keys(remote.data).length;
+        const rv = remote.version;
+        const remoteHas = remote.data && Object.keys(remote.data).length;
         // outro aparelho enviou antes: combina antes de enviar, para não apagar nada
         if(remoteHas && rv !== localVersion){
           aplicar(merge3(base || undefined, cl(S), remote.data));
@@ -1317,19 +1388,9 @@ const syncEngine = (function(){
           setLocalVersion(rv);
         }
         const snap = cl(S);
-        const nextVersion = rv + 1;
-        const payload = { data: snap, version: nextVersion, updated_at: new Date().toISOString(), updated_by: DEVICE_ID };
-        let gravou = false;
-        if(remote){
-          const { data, error } = await client.from('treino_state').update(payload).eq('id', ROW_ID).eq('version', rv).select('version');
-          if(error) throw error;
-          gravou = Array.isArray(data) && data.length > 0;
-        } else {
-          const { error } = await client.from('treino_state').insert(Object.assign({ id: ROW_ID }, payload));
-          gravou = !error;
-        }
-        if(gravou){
-          setLocalVersion(nextVersion);
+        const r = await rpc('pace_gravar', { p_token: SESSAO.token, p_data: snap, p_versao: rv, p_dispositivo: DEVICE_ID });
+        if(r && r.ok){
+          setLocalVersion(Number(r.version));
           setBase(snap);
           setStatus('ok','sincronizado');
           return;
@@ -1339,27 +1400,28 @@ const syncEngine = (function(){
       setStatus('offline','tentando sincronizar…');
       pendingWhile = true;
     } catch(e){
+      if(falhaSessao(e)) return;
       console.warn('push falhou', e);
       setStatus('offline','offline');
     } finally {
       pushInflight = false;
-      if(pendingWhile){ pendingWhile = false; schedulePush(); }
+      if(pendingWhile && !parado){ pendingWhile = false; schedulePush(); }
     }
   }
 
   function schedulePush(){
-    if(applyingRemote) return;
+    if(applyingRemote || parado) return;
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushNow, 800);
   }
 
   async function pullAndMerge(){
-    if(!client || !navigator.onLine || pushInflight){ return; }
+    if(parado || !SESSAO || !SB || !navigator.onLine || pushInflight){ return; }
     try {
       const remote = await pullOnce();
-      if(!remote || pushInflight) return;
-      const rv = Number(remote.version || 0);
-      const remoteHas = remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length;
+      if(pushInflight || parado) return;
+      const rv = remote.version;
+      const remoteHas = remote.data && Object.keys(remote.data).length;
       if(rv > localVersion && remoteHas){
         if(temAlteracaoLocal()){
           aplicar(merge3(base, cl(S), remote.data));
@@ -1376,6 +1438,7 @@ const syncEngine = (function(){
         setStatus('ok','sincronizado');
       }
     } catch(e){
+      if(falhaSessao(e)) return;
       console.warn('pull falhou', e);
       setStatus('offline','offline');
     }
@@ -1383,10 +1446,11 @@ const syncEngine = (function(){
 
   async function bootstrap(){
     let remote = null;
-    try { remote = await pullOnce(); } catch(e){ console.warn('pull inicial falhou', e); }
+    try { remote = await pullOnce(); }
+    catch(e){ if(falhaSessao(e)) return; console.warn('pull inicial falhou', e); }
     const local = await store.get();
-    const remoteHas = remote && remote.data && typeof remote.data === 'object' && Object.keys(remote.data).length;
-    const rv = remote ? Number(remote.version||0) : 0;
+    const remoteHas = remote && remote.data && Object.keys(remote.data).length;
+    const rv = remote ? remote.version : 0;
     let enviar = false;
     if(remoteHas){
       if(local && base && !_eqJ(local, base)){
@@ -1399,7 +1463,7 @@ const syncEngine = (function(){
       }
       setBase(remote.data);
       setLocalVersion(rv);
-      try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+      try{ localStorage.setItem(CHAVES.estado, JSON.stringify(S)); }catch(e){}
       setStatus('ok','sincronizado');
     } else if(local){
       Object.assign(S, local);
@@ -1409,175 +1473,64 @@ const syncEngine = (function(){
     if(!navigator.onLine) setStatus('offline','offline');
   }
 
+  let iniciado = false;
   function start(){
+    if(iniciado) return; iniciado = true;
     setInterval(pullAndMerge, 15000);
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) pullAndMerge(); });
-    window.addEventListener('online', ()=>{ setStatus('saving','reconectando…'); pullAndMerge().then(()=>schedulePush()); });
+    window.addEventListener('online', ()=>{ if(parado) return; setStatus('saving','reconectando…'); pullAndMerge().then(()=>schedulePush()); });
     window.addEventListener('offline', ()=>setStatus('offline','offline'));
   }
+  // há algo neste aparelho que ainda não chegou ao servidor?
+  const pendente = () => base ? !_eqJ(S, base) : true;
 
-  return { schedulePush, pushNow, pullAndMerge, bootstrap, start, getVersion };
+  return { configurar, schedulePush, pushNow, pullAndMerge, bootstrap, start, getVersion, pendente, parado: ()=>parado };
 })();
 
 let salvaTimer = null;
 const salvaSoft = () => { clearTimeout(salvaTimer); salvaTimer = setTimeout(()=>store.set(S), 400); };
 
-/* ========================================================== plano padrão */
-const BASE = {
-  gabriel:{ label:"Gabriel", ac:"#3AD879", extra:"Jiu-jitsu", sigla:"JJ",
-    days:{
-      A:{t:"Superiores horizontal",cat:"sup",ex:[
-        {id:"a1",n:"Supino inclinado halter",p:"6-10",s:4,ty:"load",ap:""},
-        {id:"a2",n:"Remada low row (straps)",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"a3",n:"Pec deck (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
-        {id:"a4",n:"Crucifixo inverso (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
-        {id:"a5",n:"Tríceps testa (bi-set)",p:"10-12",s:2,ty:"load",ap:""},
-        {id:"a6",n:"Rosca martelo (bi-set)",p:"10-12",s:2,ty:"load",ap:""}]},
-      B:{t:"Pernas anterior",cat:"inf",ex:[
-        {id:"b1",n:"Agachamento ou hack",p:"6-10",s:4,ty:"load",ap:""},
-        {id:"b2",n:"Leg press",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"b3",n:"Cadeira abdutora (bi-set)",p:"15-20",s:3,ty:"load",ap:""},
-        {id:"b4",n:"Panturrilha em pé (bi-set)",p:"15-20",s:3,ty:"load",ap:""},
-        {id:"b5",n:"Abdominal com carga",p:"10-20",s:2,ty:"load",ap:""}]},
-      C:{t:"Superiores vertical",cat:"sup",ex:[
-        {id:"c1",n:"Puxada alta pronada",p:"6-10",s:4,ty:"load",ap:""},
-        {id:"c2",n:"Desenvolvimento máquina",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"c3",n:"Remada serrote (por lado)",p:"10",s:3,ty:"load",ap:""},
-        {id:"c4",n:"Elevação lateral cabo (bi-set)",p:"10-15",s:3,ty:"load",ap:""},
-        {id:"c5",n:"Rosca direta (bi-set)",p:"10-15",s:3,ty:"load",ap:""}]},
-      D:{t:"Pernas posterior e pegada",cat:"inf",ex:[
-        {id:"d1",n:"Terra romeno ou pélvica",p:"8-12",s:4,ty:"load",ap:""},
-        {id:"d2",n:"Flexora deitado (bi-set)",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"d3",n:"Panturrilha sentado (bi-set)",p:"15",s:3,ty:"load",ap:""},
-        {id:"d4",n:"Búlgaro (por perna)",p:"10",s:3,ty:"load",ap:""},
-        {id:"d5",n:"Farmer walk ou pendurado",p:"40 s",s:3,ty:"time",ap:""}]}
-    }},
-  eduarda:{ label:"Eduarda", ac:"#F06B95", extra:"Corrida", sigla:"CO",
-    days:{
-      A:{t:"Superiores horizontal",cat:"sup",ex:[
-        {id:"ea1",n:"Supino máquina",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"ea2",n:"Remada low row",p:"10-12",s:4,ty:"load",ap:""},
-        {id:"ea3",n:"Puxada supinada",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"ea4",n:"Isometria na barra",p:"4 tentativas",s:4,ty:"time",ap:""},
-        {id:"ea5",n:"Rosca martelo",p:"10-12",s:2,ty:"load",ap:""}]},
-      B:{t:"Pernas anterior",cat:"inf",ex:[
-        {id:"eb1",n:"Agachamento ou hack",p:"8-12",s:3,ty:"load",ap:""},
-        {id:"eb2",n:"Leg press pés altos",p:"10-12",s:3,ty:"load",ap:""},
-        {id:"eb3",n:"Cadeira abdutora",p:"15-20",s:3,ty:"load",ap:""},
-        {id:"eb4",n:"Abdominal supra 1 min",p:"1 min",s:3,ty:"reps",ap:""},
-        {id:"eb5",n:"Panturrilha em pé",p:"15",s:3,ty:"load",ap:""}]},
-      C:{t:"Superiores vertical",cat:"sup",ex:[
-        {id:"ec1",n:"Puxada alta ou graviton",p:"8-12",s:4,ty:"load",ap:""},
-        {id:"ec2",n:"Desenvolvimento máquina",p:"10-12",s:3,ty:"load",ap:""},
-        {id:"ec3",n:"Remada serrote (por lado)",p:"12",s:3,ty:"load",ap:""},
-        {id:"ec4",n:"Rosca direta",p:"10-12",s:3,ty:"load",ap:""},
-        {id:"ec5",n:"Isometria na barra",p:"4 tentativas",s:4,ty:"time",ap:""},
-        {id:"ec6",n:"Prancha",p:"40 s",s:3,ty:"time",ap:""}]},
-      D:{t:"Pernas posterior",cat:"inf",ex:[
-        {id:"ed1",n:"Elevação pélvica com barra",p:"10-12",s:4,ty:"load",ap:""},
-        {id:"ed2",n:"Flexora deitado",p:"10-12",s:3,ty:"load",ap:""},
-        {id:"ed3",n:"Búlgaro (por perna)",p:"10-12",s:3,ty:"load",ap:""},
-        {id:"ed4",n:"Pendurado na barra",p:"40 s",s:3,ty:"time",ap:""},
-        {id:"ed5",n:"Abdominal supra 1 min",p:"1 min",s:3,ty:"reps",ap:""}]}
-    }}
-};
-const ORDER = ["A","B","C","D"];
+/* ========================================================== perfis e plano
+   Treinos, cronograma, dieta e preferências de cada pessoa ficam só no
+   documento sincronizado do grupo dela (S). O código não guarda dados pessoais. */
+const LETRAS_POSSIVEIS = ["A","B","C","D","E","F","G","H"];
 const clone = o => JSON.parse(JSON.stringify(o));
-
-/* ================ Schedule semanal fixo do Gabriel ================ */
+/* letras do plano da pessoa, em ordem (A, B, C...) */
+function letras(p){
+  const d = (S.plan && S.plan[p]) || {};
+  return LETRAS_POSSIVEIS.filter(L => d[L] && typeof d[L]==="object" && Array.isArray(d[L].ex));
+}
+const temPlano = p => letras(p).length > 0;
 const WDK = ["dom","seg","ter","qua","qui","sex","sab"];
-const SCHED_GABRIEL = {
-  seg:{musc:"A",jiu:true,nota:"Upper leve pra jiu"},
-  ter:{musc:"B",jiu:false,nota:"Pernas — dia forte"},
-  qua:{musc:"C",jiu:true,nota:"Upper leve pra jiu"},
-  qui:{musc:null,jiu:true,nota:"Recuperação/mobilidade"},
-  sex:{musc:null,jiu:true,nota:"Descanso musculação"},
-  sab:{musc:"D",jiu:false,nota:"Posterior+glúteo+core"},
-  dom:{musc:null,jiu:false,nota:"Descanso completo"}
-};
-const DIETA_DIAS_GABRIEL = {seg:"musc_jiu",ter:"musc",qua:"musc_jiu",qui:"jiu",sex:"jiu",sab:"musc",dom:"descanso"};
-const DIETA_ALVOS_DIA_GABRIEL = {
-  musc_jiu:{kcal:2850,prot:175,carb:380,gord:70},
-  musc:{kcal:2700,prot:175,carb:340,gord:70},
-  jiu:{kcal:2700,prot:175,carb:340,gord:70},
-  descanso:{kcal:2400,prot:175,carb:250,gord:70},
-  // v27: jejum (estrito, sem sólido antes do 1º almoço)
-  jejum:{kcal:2400,prot:175,carb:250,gord:70},
-  // v27: jejum modificado (SuperCoffee + jiu à noite)
-  jejum_jiu:{kcal:2500,prot:175,carb:280,gord:70}
-};
-const SCHED_EDUARDA = {
-  seg:{musc:"A",corrida:false,nota:"Glúteo + posterior"},
-  ter:{musc:"B",corrida:true,nota:"Costas + barra (TAF) · corrida leve à noite"},
-  qua:{musc:"C",corrida:false,nota:"Quadríceps + glúteo"},
-  qui:{musc:"D",corrida:true,nota:"Ombros + abdominal (TAF) · corrida à noite"},
-  sex:{musc:"A",corrida:false,nota:"Glúteo + posterior"},
-  sab:{musc:"B",corrida:false,nota:"Costas + barra (TAF)"},
-  dom:{musc:null,corrida:false,nota:"Descanso completo"}
-};
-/* v35: programa de superiores da Eduarda — foco em costas e ombro, com os
-   testes do TAF da Brigada Militar (isometria na barra e abdominal remador).
-   Pernas (A e C) ficam como estão. */
-const EDU_V35 = {
-  B:{t:"Costas + barra (TAF)",cat:"sup",ex:[
-    {id:"eb_iso",n:"Isometria na barra fixa (TAF)",p:"máx · meta 20 s+",s:4,ty:"time",d:120,ap:"",no:"Queixo acima da barra, pegada pronada. Se não segurar 10 s: sobe pelo banco e desce o mais devagar possível"},
-    {id:"ec1",n:"Puxador frente aberto",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Puxa até o peito, escápulas pra baixo e pra trás"},
-    {id:"eb_rcurv",n:"Remada curvada com barra ou halter",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Tronco a ~45°, coluna neutra, puxa até o umbigo"},
-    {id:"ea2",n:"Remada baixa pegada neutra",p:"10-12",s:3,ty:"load",d:60,ap:"",no:"Segura 1 s com as costas contraídas"},
-    {id:"eb_pulld",n:"Pulldown braço estendido no cabo",p:"12-15",s:3,ty:"load",d:60,ap:"",no:"Braços quase retos, leva a barra até a coxa"},
-    {id:"ea5",n:"Rosca martelo",p:"10-12",s:3,ty:"load",d:60,ap:"",no:"Bíceps e antebraço ajudam a segurar o queixo na barra"},
-    {id:"eb_hang",n:"Pendurada na barra (pegada)",p:"máx",s:2,ty:"time",d:60,ap:"",no:"Braços estendidos, só segurando — treina a pegada"}]},
-  D:{t:"Ombros + abdominal (TAF)",cat:"sup",ex:[
-    {id:"ec2",n:"Desenvolvimento sentado com halter",p:"8-10",s:4,ty:"load",d:90,ap:"",no:"Não trava o cotovelo em cima"},
-    {id:"ed_elev",n:"Elevação lateral (bi-set)",p:"12-15",s:4,ty:"load",d:60,ap:"",no:"Bi-set com face pull"},
-    {id:"ed_face",n:"Face pull (bi-set)",p:"15",s:4,ty:"load",d:45,ap:"",no:"Puxa até a altura da testa, abrindo os cotovelos"},
-    {id:"ed_crinv",n:"Crucifixo inverso com halter",p:"12-15",s:3,ty:"load",d:60,ap:"",no:"Posterior do ombro e postura"},
-    {id:"ed_flex",n:"Flexão de braço",p:"máx (joelhos se precisar)",s:3,ty:"reps",d:60,ap:"",no:"Corpo reto da cabeça ao pé"},
-    {id:"ed_rem",n:"Abdominal remador (TAF)",p:"1 min · meta 32+",s:3,ty:"reps",d:90,ap:"",no:"Como no teste: deitada, braços estendidos atrás da cabeça, senta abraçando os joelhos. Anota quantas fez em 1 min"},
-    {id:"ec6",n:"Prancha isométrica",p:"45 s",s:3,ty:"time",d:45,ap:"",no:""}]}
-};
-// v35: padrão da Eduarda = programa atual (A e C sem mudança) + B/D novos — usado no 'restaurar padrão'
-BASE.eduarda.days = { A:{"t": "Glúteo + posterior", "cat": "inf", "ex": [{"id": "ed1", "n": "Hip thrust com barra", "p": "10-12", "s": 4, "ty": "load", "d": 120, "no": "Explode subida, controla descida", "ap": ""}, {"id": "ea_stiff", "n": "Stiff com halter", "p": "10-12", "s": 4, "ty": "load", "d": 90, "no": "Mantém coluna neutra, quadril pra trás", "ap": ""}, {"id": "ed2", "n": "Mesa flexora (bi-set)", "p": "12-15", "s": 3, "ty": "load", "d": 60, "no": "Bi-set com abdução no cabo", "ap": ""}, {"id": "ea_abd", "n": "Abdução no cabo (bi-set)", "p": "15 cada perna", "s": 3, "ty": "load", "d": 60, "no": "", "ap": ""}, {"id": "ea_hipuni", "n": "Elevação pélvica unilateral", "p": "12 cada perna", "s": 3, "ty": "load", "d": 60, "no": "Foca no glúteo médio", "ap": ""}, {"id": "ea_prlat", "n": "Prancha lateral", "p": "30 s cada lado", "s": 3, "ty": "time", "d": 45, "no": "", "ap": ""}]}, B:clone(EDU_V35.B), C:{"t": "Quadríceps + glúteo", "cat": "inf", "ex": [{"id": "eb1", "n": "Agachamento smith ou livre", "p": "10-12", "s": 4, "ty": "load", "d": 120, "no": "Descida controlada até paralela", "ap": ""}, {"id": "eb2", "n": "Leg press 45°", "p": "12-15", "s": 4, "ty": "load", "d": 90, "no": "Pés altos pra ativar mais glúteo", "ap": ""}, {"id": "ec_ext", "n": "Cadeira extensora (bi-set)", "p": "12-15", "s": 3, "ty": "load", "d": 60, "no": "Bi-set com búlgaro", "ap": ""}, {"id": "ed3", "n": "Búlgaro com halter (bi-set)", "p": "10 cada perna", "s": 3, "ty": "load", "d": 60, "no": "Joelho não passa da linha do pé", "ap": ""}, {"id": "ec_adu", "n": "Adução na máquina", "p": "15-20", "s": 3, "ty": "load", "d": 45, "no": "", "ap": ""}, {"id": "ec_absinf", "n": "Abdominal infra", "p": "15", "s": 3, "ty": "reps", "d": 45, "no": "", "ap": ""}]}, D:clone(EDU_V35.D) };
-const DIETA_DIAS_EDUARDA = {seg:"musc",ter:"musc_corrida",qua:"musc",qui:"musc_corrida",sex:"musc",sab:"musc",dom:"descanso"};
-const DIETA_ALVOS_DIA_EDUARDA = {
-  musc_corrida:{kcal:2100,prot:130,carb:260,gord:55},
-  musc:{kcal:1950,prot:130,carb:220,gord:55},
-  corrida:{kcal:2000,prot:130,carb:250,gord:55},
-  descanso:{kcal:1750,prot:130,carb:180,gord:55}
-};
 const TIPO_DIA_LABEL = {musc_jiu:"Musc + Jiu",musc:"Só Musc",jiu:"Só Jiu",musc_corrida:"Musc + Corrida",corrida:"Só Corrida",descanso:"Descanso",jejum:"Jejum",jejum_jiu:"Jejum + Jiu"};
-
-/* Atividades quick-action por perfil (chips no card do dia) — v27 inclui "jejum" p/ Gabriel */
-const ATIV_QUICK = {
-  gabriel: ["jiu","corrida","bike","jejum"],
-  eduarda: ["corrida","bike","jiu"]
-};
+const tipoDiaLabel = t => TIPO_DIA_LABEL[t] || String(t||"").split("_").map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(" + ");
 const ATIV_LABEL = { jiu:"Jiu", corrida:"Corrida", futebol:"Futebol", bike:"Bike", natacao:"Natação", caminhada:"Caminhada", jejum:"Jejum" };
+/* esporte principal fora da musculação: nome usado nos registros de atividade */
+const ESPORTE_NOME = { jiu:"Jiu-jitsu", corrida:"Corrida", futebol:"Futebol", bike:"Bike", natacao:"Natação", caminhada:"Caminhada" };
+const PERFIL_PADRAO = { label:"", extra:"", principal:"", agua:2.5, ativ:["corrida","bike","caminhada"], meta_semanal:null, jejum:null, coach:"" };
+const META_SEMANAL_PADRAO = { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:1, triceps:1, core:2, cardio:2, antebraco:0, panturrilha:0 };
 
 function getSchedule(p){
   const s = S.plan && S.plan[p] && S.plan[p].schedule;
-  if(s && typeof s==="object") return s;
-  return p==="gabriel" ? SCHED_GABRIEL : (p==="eduarda" ? SCHED_EDUARDA : null);
+  return (s && typeof s==="object") ? s : null;
 }
 function getDietaDias(p){
   const d = S.dieta && S.dieta[p] && S.dieta[p].dias;
-  if(d && typeof d==="object") return d;
-  return p==="gabriel" ? DIETA_DIAS_GABRIEL : (p==="eduarda" ? DIETA_DIAS_EDUARDA : null);
+  return (d && typeof d==="object") ? d : null;
 }
 function getAlvosDia(p){
   const a = S.dieta && S.dieta[p] && S.dieta[p].alvos_dia;
-  if(a && typeof a==="object") return a;
-  return p==="gabriel" ? DIETA_ALVOS_DIA_GABRIEL : (p==="eduarda" ? DIETA_ALVOS_DIA_EDUARDA : null);
+  return (a && typeof a==="object") ? a : null;
 }
 /* ============ Planejado (atividades dinâmicas por data) ============
    S.planejado[perfil][YYYY-MM-DD] = {jiu:true, corrida:true, musc:"A", ...} */
 function getPlanejado(p, dataISO){
-  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
+  if(!S.planejado) S.planejado = {};
   if(!S.planejado[p]) S.planejado[p] = {};
   return S.planejado[p][dataISO] || null;
 }
 function setPlanejado(p, dataISO, obj){
-  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
+  if(!S.planejado) S.planejado = {};
   if(!S.planejado[p]) S.planejado[p] = {};
   if(!obj || Object.keys(obj).length===0) delete S.planejado[p][dataISO];
   else S.planejado[p][dataISO] = obj;
@@ -1594,7 +1547,8 @@ async function togglePlanejado(p, dataISO, ativ){
         const dia = sch[WDK[d.getDay()]] || {};
         const muscOverride = (atual.musc !== undefined) ? atual.musc : dia.musc;
         if(muscOverride){
-          const ok = await confirmar("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\nSuperCoffee 05h45 fica liberado como pré-treino (jejum modificado).\n\nConfirmar jejum hoje?");
+          const jj = meta(p).jejum || {};
+          const ok = await confirmar("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\n"+(jj.confirmar ? jj.confirmar+"\n\n" : "")+"Confirmar jejum hoje?");
           if(!ok) return;
         }
       }
@@ -1621,24 +1575,25 @@ if(typeof window !== "undefined"){
   window.togglePlanejado = togglePlanejado;
   window.setPlanejadoMusc = setPlanejadoMusc;
 }
-/* Se existe atividade "principal" planejada no dia que conflita com o schedule (jiu/corrida
-   em dia de pernas), sugere trocar pra letra alternativa (A é a mais segura). */
+/* Atividade planejada no dia (jiu, corrida, futebol) em dia de treino de membros inferiores:
+   sugere trocar por um treino de superiores do plano. */
 function conflitoPlan(p, dataISO, letraEfetiva){
   const plan = getPlanejado(p, dataISO); if(!plan) return null;
   const sch = getSchedule(p); if(!sch) return null;
   const d = new Date(dataISO+"T12:00");
   const dia = sch[WDK[d.getDay()]]; if(!dia) return null;
-  // v29: usa letra EFETIVA (após override anti-repetição do avaliar()) quando fornecida,
-  // caso contrário cai no schedule bruto. Sem isso, o alerta amarelo dizia "treino
-  // sugerido é B (pernas)" mesmo quando o card principal já tinha trocado pra C (upper).
+  // usa a letra EFETIVA (depois do anti-repetição do avaliar()) quando fornecida; senão, a do cronograma
   const letraSchedule = letraEfetiva || plan.musc || dia.musc;
-  const isPernas = letraSchedule==="B" || letraSchedule==="D";
+  const days = dayset(p) || {};
+  const isPernas = !!(letraSchedule && days[letraSchedule] && days[letraSchedule].cat==="inf");
   const temAtividade = plan.jiu || plan.corrida || plan.futebol;
   if(isPernas && temAtividade){
+    const sup = letras(p).find(L => days[L].cat==="sup");
+    if(!sup) return null;
     const ativ = plan.jiu?"jiu":(plan.corrida?"corrida":"futebol");
     return {
       msg:`Você planejou ${ATIV_LABEL[ativ]||ativ} ${dataISO===shift(0)?"hoje":"neste dia"}. O treino sugerido (<b>${letraSchedule}</b>) é de pernas — pode sobrecarregar antes.`,
-      sugere:"A", ativ, letraAtual: letraSchedule
+      sugere: sup, ativ, letraAtual: letraSchedule
     };
   }
   return null;
@@ -1663,107 +1618,179 @@ function tipoDiaHoje(p){
   const dd = getDietaDias(p); if(!dd) return null;
   const iso = REF(); const d = new Date(iso+"T12:00");
   let tipo = dd[WDK[d.getDay()]] || null;
-  // Se planejou jiu/corrida hoje, promove tipo pro combinado (musc_jiu / musc_corrida)
   const plan = getPlanejado(p, iso);
   if(plan){
-    // v27: jejum sobrepõe outros tipos. Se combinado com jiu à noite (Gabriel) → jejum_jiu
+    // jejum sobrepõe os outros tipos; com jiu no mesmo dia vira jejum_jiu quando há meta para isso
     if(plan.jejum){
-      if(p==="gabriel" && plan.jiu) return "jejum_jiu";
+      const alvos = getAlvosDia(p) || {};
+      if(plan.jiu && alvos.jejum_jiu) return "jejum_jiu";
       return "jejum";
     }
-    if(p==="gabriel" && plan.jiu){
-      if(tipo==="musc") tipo = "musc_jiu";
-      else if(tipo==="descanso") tipo = "jiu";
-    }
-    if(p==="eduarda" && plan.corrida){
-      if(tipo==="musc") tipo = "musc_corrida";
-      else if(tipo==="descanso") tipo = "corrida";
+    // atividade principal planejada: musc vira musc_<atividade>; descanso vira <atividade>
+    const princ = meta(p).principal;
+    if(princ && plan[princ]){
+      if(tipo==="musc") tipo = "musc_"+princ;
+      else if(tipo==="descanso") tipo = princ;
     }
   }
   return tipo;
 }
 
-const DIETA = {
-  gabriel:{
-    alvo:{kcal:"2700",prot:"175 g",carb:"290 g",gord:"70 g"},
-    nota:"Recomposição: manter peso entre 79 e 81 kg e reduzir gordura. Proteína em peso cru, carboidrato em peso pronto.",
-    refs:[
-      {id:"r1",nome:"Refeição 1",hora:"07:00",itens:"Pão de forma fatiado, 3 unidades\nOvos, 3 unidades\nRequeijão light, 30 g\nFrutas variadas, 200 g"},
-      {id:"r2",nome:"Refeição 2",hora:"12:00",itens:"Frango, carne magra, suíno ou peixe branco, 200 g\nArroz ou macarrão, 200 g\nFeijão ou lentilha, 150 g\nSalada variada com 15 g de azeite"},
-      {id:"r3",nome:"Refeição 3",hora:"16:00",itens:"Iogurte zero ou leite desnatado, 200 g\nAveia em farelo, 60 g\nWhey protein, 40 g\nFrutas variadas, 200 g\nCastanhas, 20 g"},
-      {id:"r4",nome:"Refeição 4",hora:"20:00",itens:"Frango, carne magra, suíno ou peixe branco, 200 g\nArroz ou macarrão, 200 g, ou 250 g nos dias de tatame\nFeijão ou lentilha, 100 g\nSalada variada com 20 g de azeite"}],
-    extras:[{id:"x3",nome:"Vitamina D3 e ômega 3"}]},
-  eduarda:{
-    alvo:{kcal:"1900-2100",prot:"130 g",carb:"220-260 g",gord:"55 g"},
-    nota:"Objetivo: emagrecimento — redução de gordura corporal. Prescrição da nutricionista Giovanna Buarque. Regra dos 80% (parar quando saciar) e jantar até 19:30h. Cada refeição tem várias opções — escolha 1 de cada linha.",
-    refs:[
-      {id:"r1",nome:"Desjejum",hora:"07:00",itens:"Em jejum: 500 ml de água (auxilia intestino)\n1 dose de SuperCoffee + 1 dose de creatina (5 g)"},
-      {id:"r2",nome:"Almoço",hora:"12:00",itens:"PRATO 1 (à vontade): folhas + legumes crus — alface, rúcula, tomate, palmito, agrião, ervilha, vagem, couve-flor, berinjela, espinafre, abobrinha, aspargos, moranga, cenoura, brócolis, pimentão, repolho\nTemperar com 1 colher chá azeite extravirgem + 1 colher sopa gergelim + sal e pimenta\n\nPRATO 2:\n• Carboidrato (1 opção): 3 colheres sopa cheias arroz (75 g) OU 2 batatas médias (100 g) OU 1 aipim cozido (90 g) OU 1 pegador macarrão integral (70 g)\n• Leguminosa: 1 concha feijão ou lentilha (80 g)\n• Proteína (1 opção): 100 g frango grelhado OU 120 g peixe grelhado OU 90 g mignon OU 3 colheres sopa carne moída (95 g)\n• Legumes: metade do prato à vontade\n\nSOBREMESA (1 opção, até ~95 kcal): 1 mariola zero · 1 brownie fudge Santa Porção · 1 chocolate Gold Ko · 1 Biscoittino · 1 bombom Haoma · 1 colher sopa leite condensado + frutas · 100 g morango/melão · ½ laranja · 1 kiwi · 2 rodelas abacaxi\n\nAguardar 40 min para café/chá após almoço (taninos atrapalham ferro). Evitar leite/queijos/chocolate com refeições ricas em ferro."},
-      {id:"r3",nome:"Lanche da tarde",hora:"16:00",itens:"OPÇÃO 1 — Sanduíche natural (alta saciedade): 2 fatias pão integral (50 g) + 3 colheres sopa rasas frango desfiado OU atum (60 g) + 1 colher sopa creme ricota light (30 g) + 1 fatia mussarela light + cenoura ralada, alface e tomate\n\nOPÇÃO 2 — Iogurte proteico com frutas: 1 pote iogurte natural sem açúcar (160 g) + 50 g banana + 20 g Corn Flakes Australia + ½ dose whey isolado (15 g) + frutas vermelhas à vontade\n\nOPÇÃO 3 — Bolinho banana com cacau: 1 ovo + 1 banana média (70 g) + ½ scoop whey isolado (15 g) + 1 colher sopa farelo de aveia (15 g) + 1 colher café cacau 100% (opcional). Assar em forminhas.\n\nOPÇÃO 4 — Sorvete proteico (Ninja): 200 ml leite desnatado ou vegetal (Almond Breeze/Ades) + ½ dose whey isolado (15 g) + 1 banana pequena (50 g) + frutas vermelhas à vontade"},
-      {id:"r4",nome:"Jantar",hora:"19:00",itens:"OPÇÃO 1 — Prato montado:\n• Carbo: 70 g batata assada/cozida OU 50 g arroz integral OU 50 g macarrão integral\n• Proteína: 100 g frango OU 120 g peixe OU 3 colheres sopa carne moída (75 g) OU 2 ovos\n• Legumes: metade do prato à vontade\n\nOPÇÃO 2 — Veritá: 1 Super Coxinha de Frango OU 4 Verichicken OU 2 quibes low carb + salada e legumes à vontade\n\nOPÇÃO 3 — Santa Porção: 1 empada frango low carb OU 1 empada moranga+ricota OU 2 coxinhas frango OU 1 empada carne moída + salada e legumes à vontade\n\nOPÇÃO 4 — Hambúrguer saudável: 1 pão francês + 3 colheres sopa carne moída patinho (90 g) + 1 fatia mussarela light + alface e tomate\n\nOPÇÃO 5 — Pastinha + bolacha: 2 bolachas de arroz grandes OU 1 pacote magic toast + 100 g frango desfiado OU 1 lata atum + 1 colher sopa creme ricota light (30 g)\n\nOPÇÃO 6 — Bowl salada + proteína: folhas/tomate/palmito à vontade + 100 g frango ou 2 ovos + 50 g milho + 100 g moranga + brócolis e abobrinha grelhados\n\nOPÇÃO 7 — Omelete com legumes: 2 ovos (1 spray azeite) + 2 biscoitos de arroz grandes + espinafre/tomate cereja/abobrinha/brócolis\n\nOPÇÃO 8 — Wrap: 1 Rap10Fit + 3 colheres sopa frango desfiado (75 g) + 1 colher sopa creme ricota light (30 g) + 1 fatia mussarela light + molho de tomate e salada"}],
-    extras:[
-      {id:"x1",nome:"Água — no mínimo 2,5 L por dia (começar com 1 copo ao acordar)"},
-      {id:"x2",nome:"Creatina — 5 g/dia (no SuperCoffee do desjejum)"},
-      {id:"x3",nome:"Chá pra vontade de doce — casca de abacaxi + 1 pau canela + gengibre + carqueja (ferver, 10 min infusão)"},
-      {id:"x4",nome:"Rotina noturna — 1h antes de deitar: telefone em modo avião, luzes fracas, chá camomila/melissa + 10 gotas própolis"},
-      {id:"x5",nome:"Regra 80% — sair da mesa satisfeita, não estufada"},
-      {id:"x6",nome:"Compensação — jantou fora? 30 min caminhada em jejum no dia seguinte"},
-      {id:"x7",nome:"Comer devagar, mastigar bem, não beber líquido nas refeições"}]}
-};
-
 /* ================================================================= estado */
 let S = { events:[], draft:{}, plan:null, dieta:null, check:{}, metas:{} };
 
-/* ============================================================ auth */
-const AUTH_KEY = "gt-auth-v1";
-const CREDS = { gabriel:"gabriel123", eduarda:"eduarda123" };
-function getAuth(){
-  try{ const s = localStorage.getItem(AUTH_KEY); if(!s) return null;
-    const o = JSON.parse(s); if(!o || !CREDS[o.perfil]) return null; return o;
+/* ============================================================ conta e sessão
+   Entrada no servidor (pace_entrar), primeiro acesso por link de uso único
+   (#acesso=...) e sessão guardada neste aparelho. Cada grupo só lê e grava o
+   próprio documento. */
+const SESSAO_KEY = "pace-sessao-v1";
+let SESSAO = null;
+function lerSessao(){
+  try{
+    const o = JSON.parse(localStorage.getItem(SESSAO_KEY) || "null");
+    return (o && typeof o.token==="string" && o.conta && o.conta.perfil && o.conta.grupo) ? o : null;
   }catch(e){ return null; }
 }
-function setAuth(perfil){
-  try{ localStorage.setItem(AUTH_KEY, JSON.stringify({perfil, ts:Date.now()})); }catch(e){}
+function gravarSessao(s){ SESSAO = s; try{ localStorage.setItem(SESSAO_KEY, JSON.stringify(s)); }catch(e){} }
+function limparSessao(){ SESSAO = null; try{ localStorage.removeItem(SESSAO_KEY); localStorage.removeItem("gt-auth-v1"); }catch(e){} }
+/* dados da conta que vêm do servidor a cada sincronização (nome, perfis do grupo, administrador) */
+function atualizarConta(c){
+  if(!SESSAO || !c || c.id !== SESSAO.conta.id) return;
+  if(JSON.stringify(c) === JSON.stringify(SESSAO.conta)) return;
+  const antes = JSON.stringify(SESSAO.conta.perfis || []);
+  gravarSessao({ token: SESSAO.token, conta: c });
+  if(JSON.stringify(c.perfis || []) !== antes){
+    if(typeof prepararEstado==="function") prepararEstado();
+    if(typeof safeRender==="function") safeRender();
+  }
 }
-function clearAuth(){ try{ localStorage.removeItem(AUTH_KEY); }catch(e){} }
-function mostraLogin(msg){
+function perfisDaConta(){
+  if(!SESSAO) return [];
+  const l = Array.isArray(SESSAO.conta.perfis) ? SESSAO.conta.perfis.filter(x=>x && x.perfil) : [];
+  return l.length ? l : [{ perfil: SESSAO.conta.perfil, nome: SESSAO.conta.nome }];
+}
+const souAdmin = () => !!(SESSAO && SESSAO.conta && SESSAO.conta.admin);
+const agenteNav = () => String((typeof navigator!=="undefined" && navigator.userAgent) || "").slice(0,200);
+const primeiroNome = s => String(s||"").trim().split(/\s+/)[0] || "";
+const semHash = () => location.pathname + location.search;
+
+const MARCA_LOGIN = '<div class="login-brand"><svg class="login-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" class="mk-bg"/><path d="M32 13a19 19 0 1 1-19 19" class="mk-ring" fill="none" stroke-width="7" stroke-linecap="round"/><circle cx="18.6" cy="18.6" r="4.2" class="mk-dot"/></svg><div class="nm">pace</div></div>';
+function telaEntrada(html){
   document.getElementById("tabs").innerHTML = "";
-  document.getElementById("app").outerHTML =
-    '<div class="login-wrap" id="app">'+
-    '  <div class="login-card">'+
-    '    <div class="login-brand">'+
-    '      <svg class="login-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" class="mk-bg"/><path d="M32 13a19 19 0 1 1-19 19" class="mk-ring" fill="none" stroke-width="7" stroke-linecap="round"/><circle cx="18.6" cy="18.6" r="4.2" class="mk-dot"/></svg>'+
-    '      <div class="nm">pace</div>'+
-    '    </div>'+
-    '    <div class="login-sub">Registre o ritmo dos seus treinos.</div>'+
-    '    <label for="li-user">Usu&aacute;rio</label>'+
-    '    <input id="li-user" placeholder="Gabriel ou Eduarda" autocomplete="username" autocapitalize="none">'+
-    '    <label for="li-pass">Senha</label>'+
-    '    <input id="li-pass" type="password" placeholder="Senha" autocomplete="current-password">'+
-    '    <div class="login-err" id="li-err">'+(msg||"")+'</div>'+
-    '    <button class="login-btn" id="li-go">Entrar</button>'+
-    '    <div class="login-hint">Acesso privado &middot; sincroniza entre voc&ecirc;s dois</div>'+
-    '  </div>'+
-    '</div>';
-  const doLogin = ()=>{
-    const u = (document.getElementById("li-user").value||"").trim().toLowerCase();
-    const p = (document.getElementById("li-pass").value||"");
-    if(!CREDS[u]){ document.getElementById("li-err").textContent = "usuário inválido"; return; }
-    if(CREDS[u] !== p){ document.getElementById("li-err").textContent = "senha incorreta"; return; }
-    setAuth(u);
-    location.reload();
+  document.body.classList.remove("pc-session");
+  const sb = document.getElementById("syncBadge"); if(sb) sb.textContent = "";
+  document.getElementById("app").outerHTML = '<div class="login-wrap" id="app"><div class="login-card">' + MARCA_LOGIN + html + '</div></div>';
+}
+function mostraLogin(msg){
+  rpc('pace_preparar').catch(()=>{});
+  telaEntrada(
+    '<div class="login-sub">Registre o ritmo dos seus treinos.</div>'+
+    '<label for="li-user">Usuário ou e-mail</label>'+
+    '<input id="li-user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">'+
+    '<label for="li-pass">Senha</label>'+
+    '<input id="li-pass" type="password" autocomplete="current-password">'+
+    '<div class="login-err" id="li-err" role="alert">'+esc(msg||"")+'</div>'+
+    '<button class="login-btn" id="li-go">Entrar</button>'+
+    '<div class="login-hint">Primeiro acesso ou esqueceu a senha? Peça um link novo a quem te convidou.</div>');
+  const err = t => { const e = document.getElementById("li-err"); if(e) e.textContent = t || ""; };
+  let enviando = false;
+  const doLogin = async ()=>{
+    if(enviando) return;
+    const u = (document.getElementById("li-user").value || "").trim();
+    const s = document.getElementById("li-pass").value || "";
+    if(!u || !s){ err("Informe o usuário e a senha."); return; }
+    enviando = true; err("");
+    const bt = document.getElementById("li-go"); bt.disabled = true; bt.textContent = "Entrando…";
+    try{
+      const r = await rpc('pace_entrar', { p_login: u, p_senha: s, p_agente: agenteNav() });
+      if(!r || r.erro || !r.token || !r.conta){ err((r && r.erro) || "Não foi possível entrar."); return; }
+      gravarSessao({ token: r.token, conta: r.conta });
+      location.replace(semHash());
+    }catch(e){
+      err(navigator.onLine ? "Não foi possível falar com o servidor. Tente de novo." : "Sem internet. Conecte-se para entrar.");
+    }finally{
+      enviando = false;
+      const b = document.getElementById("li-go"); if(b && !SESSAO){ b.disabled = false; b.textContent = "Entrar"; }
+    }
   };
   document.getElementById("li-go").onclick = doLogin;
   document.getElementById("li-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
   document.getElementById("li-user").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("li-pass").focus(); });
-  setTimeout(()=>document.getElementById("li-user").focus(), 30);
+  setTimeout(()=>{ const u = document.getElementById("li-user"); if(u) u.focus(); }, 30);
 }
-function logout(){
-  clearAuth();
-  location.reload();
+/* link de primeiro acesso ou de senha nova: #acesso=<código> */
+async function mostraAtivacao(convite){
+  telaEntrada('<div class="login-sub">Conferindo o link…</div>');
+  let info = null;
+  try{ info = await rpc('pace_convite', { p_convite: convite }); }
+  catch(e){ info = { erro: navigator.onLine ? "Não foi possível conferir o link agora. Tente de novo." : "Sem internet. Conecte-se para abrir o link." }; }
+  if(!info || info.erro){
+    telaEntrada('<div class="login-sub">'+esc((info && info.erro) || "Link inválido.")+'</div><button class="login-btn" id="li-volta">Ir para a entrada</button>');
+    document.getElementById("li-volta").onclick = ()=>{ location.replace(semHash()); };
+    return;
+  }
+  const primeiro = !!info.primeiro;
+  telaEntrada(
+    '<div class="login-sub">Olá, '+esc(primeiroNome(info.nome))+'. '+(primeiro ? "Crie sua senha para entrar." : "Crie uma senha nova.")+'</div>'+
+    '<label>Seu usuário</label>'+
+    '<div class="login-user">'+esc(info.login)+'</div>'+
+    '<input type="text" autocomplete="username" value="'+esc(info.login)+'" style="display:none" aria-hidden="true" tabindex="-1">'+
+    '<label for="at-s1">Senha (mínimo de 8 caracteres)</label>'+
+    '<input id="at-s1" type="password" autocomplete="new-password">'+
+    '<label for="at-s2">Repita a senha</label>'+
+    '<input id="at-s2" type="password" autocomplete="new-password">'+
+    '<div class="login-err" id="li-err" role="alert"></div>'+
+    '<button class="login-btn" id="at-go">'+(primeiro ? "Criar senha e entrar" : "Salvar senha e entrar")+'</button>'+
+    '<div class="login-hint">O link vale uma vez. Depois, entre com o usuário e a senha.</div>');
+  const err = t => { const e = document.getElementById("li-err"); if(e) e.textContent = t || ""; };
+  let enviando = false;
+  const go = async ()=>{
+    if(enviando) return;
+    const s1 = document.getElementById("at-s1").value || "", s2 = document.getElementById("at-s2").value || "";
+    if(s1.length < 8){ err("A senha precisa ter pelo menos 8 caracteres."); return; }
+    if(s1.length > 72){ err("A senha pode ter no máximo 72 caracteres."); return; }
+    if(s1 !== s2){ err("As duas senhas não são iguais."); return; }
+    enviando = true; err("");
+    const bt = document.getElementById("at-go"); bt.disabled = true; bt.textContent = "Salvando…";
+    try{
+      const r = await rpc('pace_ativar', { p_convite: convite, p_senha: s1, p_agente: agenteNav() });
+      if(!r || r.erro || !r.token || !r.conta){ err((r && r.erro) || "Não foi possível salvar a senha."); return; }
+      gravarSessao({ token: r.token, conta: r.conta });
+      location.replace(semHash());
+    }catch(e){
+      err(navigator.onLine ? "Não foi possível falar com o servidor. Tente de novo." : "Sem internet. Conecte-se para continuar.");
+    }finally{
+      enviando = false;
+      const b = document.getElementById("at-go"); if(b && !SESSAO){ b.disabled = false; b.textContent = primeiro ? "Criar senha e entrar" : "Salvar senha e entrar"; }
+    }
+  };
+  document.getElementById("at-go").onclick = go;
+  document.getElementById("at-s2").addEventListener("keydown", e=>{ if(e.key==="Enter") go(); });
+  document.getElementById("at-s1").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("at-s2").focus(); });
+  setTimeout(()=>{ const s = document.getElementById("at-s1"); if(s) s.focus(); }, 30);
+}
+/* a sessão foi encerrada no servidor (saiu em outro lugar, senha trocada, acesso desativado) */
+function sessaoEncerrada(){
+  limparSessao();
+  try{ fecharSugestao(); }catch(e){}
+  mostraLogin("Sua sessão terminou. Entre de novo.");
+}
+async function logout(){
+  if(!(await confirmar("Sair da conta?\n\nO que você registrou fica salvo na sua conta. Neste aparelho, os dados são apagados.", {ok:"Sair", perigo:true}))) return;
+  toast("Enviando o que falta…", 4000);
+  for(let i=0; i<3 && syncEngine.pendente(); i++){
+    try{ await Promise.race([ syncEngine.pushNow(), new Promise(r=>setTimeout(r, 6000)) ]); }catch(e){}
+    if(syncEngine.pendente()) await new Promise(r=>setTimeout(r, 700));
+  }
+  if(syncEngine.pendente() && !(await confirmar("Há registros deste aparelho que ainda não foram enviados.\n\nSe sair agora, eles se perdem. Conecte-se à internet e tente de novo, ou saia mesmo assim.", {ok:"Sair mesmo assim", perigo:true, cancelar:"Ficar"}))) return;
+  const tok = SESSAO && SESSAO.token;
+  try{ if(tok) await Promise.race([ rpc('pace_sair', { p_token: tok }), new Promise(r=>setTimeout(r, 4000)) ]); }catch(e){}
+  try{ [CHAVES.estado, CHAVES.versao, CHAVES.base].forEach(k=>{ if(k) localStorage.removeItem(k); }); }catch(e){}
+  limparSessao();
+  location.replace(semHash());
 }
 
-let ui = { perfil:"gabriel", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editId:null, saving:false, obsOpen:{}, dietTab:"diario", evoTab:"resumo", evoEx:null };
+let ui = { perfil:"", view:"hoje", dia:"A", off:0, edit:false, edieta:false, mes:0, toast:null, saved:false, editId:null, saving:false, obsOpen:{}, dietTab:"diario", evoTab:"resumo", evoEx:null };
 
 const iso = d => {
   const y = d.getFullYear();
@@ -1783,8 +1810,18 @@ const WD = ["dom","seg","ter","qua","qui","sex","sáb"];
 const MES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const WDL = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 
-const meta = p => BASE[p];
-const dayset = p => S.plan[p];
+/* perfil de cada pessoa (fica no documento do grupo): nome, esporte principal, atividades rápidas,
+   meta de água, metas por grupo muscular, orientações para o coach */
+function nomeDoPerfil(p){
+  const x = perfisDaConta().find(y => y.perfil === p);
+  return x ? primeiroNome(x.nome) : "";
+}
+function meta(p){
+  const pf = (S.perfis && S.perfis[p]) || {};
+  const label = pf.label || nomeDoPerfil(p) || (p ? p.charAt(0).toUpperCase()+p.slice(1) : "");
+  return Object.assign({}, PERFIL_PADRAO, pf, { label, ativ: (Array.isArray(pf.ativ) && pf.ativ.length) ? pf.ativ : PERFIL_PADRAO.ativ });
+}
+const dayset = p => (S.plan && S.plan[p]) || {};
 const evs = (p,t) => S.events.filter(e=>e.perfil===p && (!t||e.tipo===t)).sort((a,b)=> a.data<b.data?1:-1);
 const mainSport = p => (meta(p).extra || "").toLowerCase();
 const isMainExtra = (p,e) => e.tipo==="extra" && (!e.atividade || String(e.atividade).toLowerCase()===mainSport(p));
@@ -1811,9 +1848,11 @@ const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typ
      3. Sem letra base (dia de descanso) → schedRest:true, musc:null.
      4. ANTI-REPETIÇÃO UNIVERSAL: olha os eventos musc dos ÚLTIMOS 3 DIAS
         antes de dataISO. Se a letra base foi feita em algum deles, escolhe a
-        alternativa A/B/C/D parada há mais tempo (excluindo todas que
-        aparecem nesses 3 dias). Isso resolve o bug recorrente: "Gabriel fez
-        B ontem, hoje o schedule pede B → app continuava mostrando B".
+        alternativa do plano parada há mais tempo (excluindo todas que
+        aparecem nesses 3 dias). Assim, quem fez B ontem e tem B no cronograma
+        de hoje não recebe B de novo.
+     5. Se o cronograma aponta para uma letra que não existe mais no plano
+        (plano trocado), sugere a letra parada há mais tempo.
 
    Retorno estável:
      { musc, motivo, jaTreinou, override, letraOriginal,
@@ -1863,20 +1902,35 @@ function sugestaoTreino(perfil, dataISO){
     if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
   }
   const recSet = new Set(recentes.map(x=>x.dia));
+  const ordem = letras(perfil);
+  const rankParado = lista => lista.map(L => {
+    const ultEv = S.events
+      .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
+      .sort((a,b)=> a.data<b.data?1:-1)[0];
+    const diasParado = ultEv
+      ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000)
+      : 999;
+    return {L, diasParado};
+  }).sort((a,b)=> b.diasParado-a.diasParado || ordem.indexOf(a.L)-ordem.indexOf(b.L));
+  const fmtParado = x => x.diasParado===999 ? 'nunca feito' : (x.diasParado===1 ? 'parado há 1 dia' : `parado há ${x.diasParado} dias`);
+
+  // 5) A letra do cronograma não existe mais no plano: sugere a parada há mais tempo
+  if(!days[letraBase] && ordem.length){
+    const lista = ordem.filter(L => !recSet.has(L));
+    const escolhida = rankParado(lista.length ? lista : ordem)[0];
+    return {
+      musc: escolhida.L,
+      motivo: `O cronograma pede o treino <b>${letraBase}</b>, que não está no plano atual. Sugerindo <b>${escolhida.L}</b> (${fmtParado(escolhida)}).`,
+      jaTreinou: false, override: true, letraOriginal: letraBase,
+      schedRest: false, schedJiu: jiu, schedNota: nota
+    };
+  }
 
   if(recSet.has(letraBase)){
     // Escolhe alternativa parada há mais tempo (excluindo letras dos 3 dias)
-    const alternativas = ORDER.filter(L => !recSet.has(L) && days[L]);
+    const alternativas = ordem.filter(L => !recSet.has(L) && days[L]);
     if(alternativas.length > 0){
-      const rank = alternativas.map(L => {
-        const ultEv = S.events
-          .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
-          .sort((a,b)=> a.data<b.data?1:-1)[0];
-        const diasParado = ultEv
-          ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000)
-          : 999;
-        return {L, diasParado};
-      }).sort((a,b)=> b.diasParado-a.diasParado || ORDER.indexOf(a.L)-ORDER.indexOf(b.L));
+      const rank = rankParado(alternativas);
       const escolhida = rank[0];
       const rec = recentes.find(x=>x.dia===letraBase);
       const qdo = rec.distancia===1 ? 'ontem'
@@ -1895,7 +1949,7 @@ function sugestaoTreino(perfil, dataISO){
     }
   }
 
-  // 5) Letra base OK — sem repetição recente
+  // 6) Letra base OK — sem repetição recente
   const diaSem = WDL[d.getDay()];
   let motivo;
   if(muscOverride !== null){
@@ -1916,7 +1970,13 @@ function avaliar(p){
   const musc = evs(p,"musc").filter(e=>e.data<=ref);
   const ultimo = musc[0];
   const days = dayset(p);
+  const ordem = letras(p);
   const eH = temExtra(p,0), eO = temExtra(p,-1), eA = temExtra(p,1);
+
+  // sem plano ainda (primeiro acesso): nada a sugerir
+  if(!ordem.length){
+    return { win:{ d:null, score:0, bloq:null, notas:[], desde:0, motivo:"" }, resto:[], descanso:true, semPlano:true };
+  }
 
   /* ==== v30: Schedule fixo delega pra sugestaoTreino (anti-repetição universal) ==== */
   const sched = getSchedule(p);
@@ -1924,10 +1984,10 @@ function avaliar(p){
     const sug = sugestaoTreino(p, ref);
     if(!sug.musc){
       // Dia sem musc (recuperação/descanso)
-      const fallbackD = ORDER[0];
+      const fallbackD = ordem[0];
       const win = { d:fallbackD, score:0, bloq:"sem musc hoje", notas:[], desde:0,
                     motivo: sug.motivo, schedJiu: sug.schedJiu, schedNota: sug.schedNota, schedRest: true };
-      const resto = ORDER.filter(d=>d!==fallbackD).map(d=>({d,score:0,notas:[],desde:0}));
+      const resto = ordem.filter(d=>d!==fallbackD).map(d=>({d,score:0,notas:[],desde:0}));
       return { win, resto, descanso:true, schedRest:true, schedJiu:sug.schedJiu };
     }
     const win = {
@@ -1939,46 +1999,37 @@ function avaliar(p){
       schedJiu: sug.schedJiu, schedNota: sug.schedNota,
       antiRepeticao: sug.override, letraOriginal: sug.letraOriginal
     };
-    const resto = ORDER.filter(d=>d!==sug.musc).map(d=>({d,score:0,notas:[],desde:0}));
+    const resto = ordem.filter(d=>d!==sug.musc).map(d=>({d,score:0,notas:[],desde:0}));
     return { win, resto, descanso:false, schedRest:false, schedJiu:sug.schedJiu };
   }
 
-
+  /* Sem cronograma semanal: rotação pelo treino parado há mais tempo, evitando repetir
+     o mesmo tipo (superiores, inferiores) em 48 h e perna perto da atividade principal. */
+  const princ = String(meta(p).extra || "").trim();
+  const princTxt = princ.toLowerCase();
+  const CAT_NOME = { sup:"superiores", inf:"inferiores", full:"corpo inteiro" };
   const desde = {};
-  ORDER.forEach(d=>{ const u = musc.find(e=>e.dia===d); desde[d] = u ? dias(u.data) : 99; });
+  ordem.forEach(d=>{ const u = musc.find(e=>e.dia===d); desde[d] = u ? dias(u.data) : 99; });
 
-  const cand = ORDER.map(d=>{
+  const cand = ordem.map(d=>{
     const c = days[d].cat;
     let score = Math.min(desde[d],14);
     const notas = []; let bloq = null;
 
     if(ultimo && ultimo.data===ref) bloq = "já treinou neste dia";
-    else if(ultimo && days[ultimo.dia].cat===c && dias(ultimo.data) < 2)
-      bloq = (c==="sup"?"superiores":"inferiores") + " em recuperação do " + ultimo.dia;
+    else if(ultimo && days[ultimo.dia] && c && days[ultimo.dia].cat===c && dias(ultimo.data) < 2)
+      bloq = (CAT_NOME[c] || "mesmo tipo de treino") + " em recuperação do " + ultimo.dia;
 
-    if(p==="gabriel"){
-      if(eA && d==="C"){ score -= 7; notas.push("tatame no dia seguinte e puxada pesada entrega a pegada morta para o kimono"); }
-      else if(eH && d==="C"){ score -= 6; notas.push("puxada pesada não combina com o tatame do dia"); }
-      else if(eO && d==="C"){ score -= 2; notas.push("pegada vem cansada do tatame da véspera, use straps"); }
-      if((eH||eA) && d==="A"){ score += 3; notas.push("empurrar quase não usa pegada, é o que menos compromete o tatame"); }
-      if(eA && d==="B"){ score += 1; notas.push("perna na véspera do tatame é aceitável, só não force a última série"); }
-      if(d==="D"){
-        if(eA){ score -= 3; notas.push("pule o farmer walk, tem tatame no dia seguinte"); }
-        else if(eH||eO){ score -= 1; notas.push("farmer walk leve, a pegada já está em uso"); }
-        else notas.push("dias livres à frente, bom momento para o trabalho de pegada");
-      }
-    }else{
-      if(c==="inf"){
-        if(eA){ score -= 6; notas.push("corrida no dia seguinte, perna hoje derruba o ritmo"); }
-        else if(eH){ score -= 6; notas.push("correu no dia, perna logo depois atrapalha as duas coisas"); }
-        else if(eO){ score -= 6; notas.push("correu na véspera, dê 48 h antes de perna"); }
-      }else if(eH||eO||eA){ score += 2; notas.push("superiores não conflita com a corrida"); }
-    }
+    if(princTxt && c==="inf"){
+      if(eA){ score -= 6; notas.push(`${princTxt} no dia seguinte, perna hoje pode atrapalhar`); }
+      else if(eH){ score -= 6; notas.push(`${princTxt} no mesmo dia, perna junto atrapalha as duas coisas`); }
+      else if(eO){ score -= 6; notas.push(`${princTxt} na véspera, dê 48 h antes de perna`); }
+    }else if(princTxt && c==="sup" && (eH||eO||eA)){ score += 2; notas.push(`superiores não conflita com ${princTxt}`); }
     return {d,score,bloq,notas,desde:desde[d]};
   });
 
   const livres = cand.filter(x=>!x.bloq);
-  const lista = (livres.length?livres:cand).sort((a,b)=> b.score-a.score || ORDER.indexOf(a.d)-ORDER.indexOf(b.d));
+  const lista = (livres.length?livres:cand).sort((a,b)=> b.score-a.score || ordem.indexOf(a.d)-ordem.indexOf(b.d));
   const resto = cand.filter(x=>x.d!==lista[0].d).sort((a,b)=> (a.bloq?1:0)-(b.bloq?1:0) || b.score-a.score);
   const win = lista[0];
 
@@ -1986,8 +2037,8 @@ function avaliar(p){
   let motivo;
   if(win.notas.length) motivo = win.notas[0].charAt(0).toUpperCase()+win.notas[0].slice(1)+".";
   else if(ultimo) motivo = `Último treino foi o <b>${ultimo.dia}</b>${dias(ultimo.data)===0?" neste dia":" há "+dias(ultimo.data)+(dias(ultimo.data)===1?" dia":" dias")}. O ${win.d} é o que está parado há mais tempo.`;
-  else motivo = "Sem registros ainda. Comece pelo A e siga a rotação.";
-  if(marcas.length) motivo += ` <b>${meta(p).extra} marcado ${marcas.join(", ")}.</b>`;
+  else motivo = `Sem registros ainda. Comece pelo ${ordem[0]} e siga a rotação.`;
+  if(marcas.length && princ) motivo += ` <b>${esc(princ)} marcado ${marcas.join(", ")}.</b>`;
 
   return { win:Object.assign({},win,{motivo}), resto, descanso: livres.length===0 };
 }
@@ -2001,31 +2052,55 @@ function avaliar(p){
      - conta dias desde último estímulo por grupo
      - jiu conta como cardio + core + 30% fadiga em perna (MI leve)
      - devolve top-1 candidato + evita 48h entre grupos grandes
-   Depois entrega tudo pra IA (edge function pace-sugestao-ia).
+   Depois entrega tudo pra IA (função pace-ia, ação "dia").
    ========================================================================== */
-const PACE_IA_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/pace-sugestao-ia';
-
-const PACE_GRUPOS_LETRA = {
-  gabriel: {
-    A: ['peito','costas','triceps','biceps','core'],
-    B: ['perna_ant','core'],
-    C: ['costas','ombro','triceps','biceps'],
-    D: ['perna_post','core','antebraco']
-  },
-  // v35: A glúteo/posterior · B costas + barra (TAF) · C quadríceps · D ombros + abdominal (TAF)
-  eduarda: {
-    A: ['perna_post','core'],
-    B: ['costas','biceps','antebraco'],
-    C: ['perna_ant','core'],
-    D: ['ombro','peito','triceps','core']
+/* grupos musculares de cada treino: os gravados no plano ou, se faltarem,
+   deduzidos do título e dos nomes dos exercícios */
+const GRUPOS_TREINO = ['peito','costas','ombro','biceps','triceps','antebraco','perna_ant','perna_post','panturrilha','core','cardio'];
+const GRUPO_PALAVRAS = [
+  ['peito', /supino|peito|peitoral|crucifixo(?! inverso)|pec ?deck|voador|crossover|flex[aã]o de bra/],
+  ['costas', /costas|remada|puxada|pulldown|pull ?down|barra fixa|graviton|serrote|levantamento terra/],
+  ['ombro', /ombro|desenvolvimento|eleva[cç][aã]o lateral|eleva[cç][aã]o frontal|face ?pull|crucifixo inverso|arnold|deltoide/],
+  ['biceps', /b[ií]ceps|rosca/],
+  ['triceps', /tr[ií]ceps|testa|franc[eê]s|mergulho|paralelas|coice/],
+  ['antebraco', /antebra[cç]o|pegada|farmer|pendurad/],
+  ['perna_ant', /agachamento|leg ?press|extensora|hack|quadr[ií]ceps|afundo|passada|b[uú]lgaro|sissy/],
+  ['perna_post', /stiff|flexora|terra romeno|posterior|gl[uú]teo|p[eé]lvica|hip thrust|abdu[cç][aã]o|abdutora/],
+  ['panturrilha', /panturrilha|g[eê]meos/],
+  ['core', /abdominal|abd[oô]men|prancha|\bcore\b|lombar|infra|supra|remador/],
+  ['cardio', /esteira|bike|bicicleta|corrida|el[ií]ptico|cardio|escada|hiit|pular corda/]
+];
+function gruposDoTreino(t){
+  if(!t) return [];
+  if(Array.isArray(t.grupos) && t.grupos.length) return t.grupos.filter(g=>GRUPOS_TREINO.includes(g));
+  const txt = [t.t||""].concat((t.ex||[]).map(e=>e.n||"")).join(" | ").toLowerCase();
+  return GRUPO_PALAVRAS.filter(([,re])=>re.test(txt)).map(([g])=>g);
+}
+function gruposPorLetra(p){
+  const d = dayset(p), out = {};
+  letras(p).forEach(L=>{ out[L] = gruposDoTreino(d[L]); });
+  return out;
+}
+/* treino de uma sessão registrada: o do plano atual ou, se o plano foi trocado depois,
+   o plano arquivado que tem os exercícios dessa sessão */
+function treinoDaSessao(e, days){
+  if(!e || !e.dia) return null;
+  const atual = (days || dayset(e.perfil))[e.dia];
+  const ids = Object.keys(e.entries || {});
+  if(!ids.length) return atual || null;
+  // o treino (atual ou arquivado) que tem mais exercícios desta sessão; empate fica com o atual
+  const conta = t => (t && Array.isArray(t.ex)) ? ids.filter(id=>t.ex.some(x=>x.id===id)).length : 0;
+  let melhor = atual || null, n = conta(atual);
+  if(n === ids.length) return melhor;
+  for(const h of ((S.planHist && S.planHist[e.perfil]) || [])){
+    const t = (h.plano || {})[e.dia], c = conta(t);
+    if(c > n){ melhor = t; n = c; if(c === ids.length) break; }
   }
-};
-const PACE_META_SEMANAL = {
-  gabriel: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:1, biceps:2, triceps:2, core:2, cardio:2, antebraco:1, panturrilha:0 },
-  eduarda: { peito:1, costas:2, perna_ant:1, perna_post:1, ombro:2, biceps:1, triceps:1, core:3, cardio:2, panturrilha:0, antebraco:1 }
-};
-function _paceContribMusc(perfil, letra){
-  const grupos = (PACE_GRUPOS_LETRA[perfil]||{})[letra] || [];
+  return melhor;
+}
+const metaSemanalGrupos = p => { const m = meta(p).meta_semanal; return (m && typeof m==="object") ? m : META_SEMANAL_PADRAO; };
+function _paceContribMusc(perfil, letra, ev){
+  const grupos = gruposDoTreino(ev ? treinoDaSessao(ev) : dayset(perfil)[letra]);
   const c = {};
   grupos.forEach(g=>{ c[g] = (g==='core'||g==='panturrilha'||g==='antebraco') ? 0.5 : 1.0; });
   return c;
@@ -2061,7 +2136,7 @@ const PaceScoring = {
       const dias = Math.max(0, Math.floor((hoje - dEv)/86400000));
       const decay = Math.pow(0.5, dias/2);
       let contrib = {};
-      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia);
+      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia, e);
       else if(e.tipo==='extra')    contrib = _paceContribAtiv(e.atividade);
       Object.entries(contrib).forEach(([g,peso])=>{ fad[g] = (fad[g]||0) + peso*decay; });
     });
@@ -2070,13 +2145,13 @@ const PaceScoring = {
   diasDesde(perfil, hist){
     const hoje = new Date(REF()+'T12:00:00');
     const all = new Set();
-    Object.values(PACE_GRUPOS_LETRA[perfil]||{}).forEach(gs=> gs.forEach(g=> all.add(g)));
+    Object.values(gruposPorLetra(perfil)).forEach(gs=> gs.forEach(g=> all.add(g)));
     all.add('cardio');
     const gap = {};
     all.forEach(g=>{ gap[g] = 999; });
     (hist||[]).forEach(e=>{
       let contrib = {};
-      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia);
+      if(e.tipo==='musc' && e.dia) contrib = _paceContribMusc(perfil, e.dia, e);
       else if(e.tipo==='extra')    contrib = _paceContribAtiv(e.atividade);
       const dEv = new Date(e.data+'T12:00:00');
       const dias = Math.max(0, Math.floor((hoje - dEv)/86400000));
@@ -2090,8 +2165,8 @@ const PaceScoring = {
     const hist = this.carregarHistorico(perfil, 14);
     const fad  = this.calcularFadiga(perfil, hist);
     const gap  = this.diasDesde(perfil, hist);
-    const meta = PACE_META_SEMANAL[perfil] || {};
-    const gruposDia = PACE_GRUPOS_LETRA[perfil] || {};
+    const meta = metaSemanalGrupos(perfil);
+    const gruposDia = gruposPorLetra(perfil);
     const GRANDES = new Set(['peito','costas','perna_ant','perna_post']);
 
     // v31.2: pós-jiu vira consciência (não bloqueio). Fadiga já penaliza o score
@@ -2106,7 +2181,7 @@ const PaceScoring = {
     const jiu72_2x = jiuDias.filter(d=>d<=3).length >= 2; // sinal informativo, não bloqueio
     const jiu48    = jiuDias.some(d=>d<=2);
 
-    const scores = ORDER.map(letra=>{
+    const scores = letras(perfil).map(letra=>{
       const grupos = gruposDia[letra] || [];
       let s = 0, bloq = null;
       grupos.forEach(g=>{
@@ -2164,7 +2239,7 @@ const PaceScoring = {
       historico: hist.map(e=>({
         data: e.data,
         tipo: e.tipo,
-        grupos: e.tipo==='musc' ? (gruposDia[e.dia]||[]) : Object.keys(_paceContribAtiv(e.atividade||'')),
+        grupos: e.tipo==='musc' ? gruposDoTreino(treinoDaSessao(e)) : Object.keys(_paceContribAtiv(e.atividade||'')),
         duracao_min: e.duracao || null,
         intensidade: e.intensidade || null,
         atividade: e.atividade || null,
@@ -2173,6 +2248,42 @@ const PaceScoring = {
     };
   }
 };
+
+/* ============================================================ IA do app
+   Todas as chamadas passam pela função pace-ia, que confere a sessão da conta. */
+async function iaChamar(acao, payload, o){
+  o = o || {};
+  if(!SESSAO) throw new Error("Entre de novo no app.");
+  const ctrl = new AbortController(), timer = setTimeout(()=>ctrl.abort(), o.tempo || 60000);
+  let resp, j = null;
+  try{
+    resp = await fetch(IA_URL, { method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(Object.assign({}, payload, { acao, token: SESSAO.token })), signal: ctrl.signal });
+    try{ j = await resp.json(); }catch(e){ j = null; }
+  }catch(e){
+    clearTimeout(timer);
+    throw new Error(e && e.name==='AbortError' ? 'A IA demorou demais para responder. Tente de novo.'
+      : (navigator.onLine ? 'Não foi possível falar com a IA agora. Tente de novo.' : 'Sem internet. Conecte-se e tente de novo.'));
+  }
+  clearTimeout(timer);
+  if(resp.status===401 || (j && j.sessao)){
+    try{ syncEngine.pullAndMerge(); }catch(e){}
+    throw new Error((j && j.error) || 'Sua sessão terminou. Entre de novo.');
+  }
+  if(!resp.ok || !j || j.ok===false){ const err = new Error((j && j.error) || ('Erro '+resp.status+' na IA.')); err.dados = j; throw err; }
+  return j;
+}
+/* o que a IA precisa saber do perfil: nome, esporte, orientações e os treinos do plano */
+function iaPerfil(p){
+  const m = meta(p), d = dayset(p);
+  return {
+    perfil_nome: m.label,
+    esporte: m.extra || "",
+    esporte_chave: m.principal || "",
+    contexto: m.coach || "",
+    letras: letras(p).map(L=>({ letra:L, nome: d[L].t || "", cat: d[L].cat || "", grupos: gruposDoTreino(d[L]) }))
+  };
+}
 
 const PaceIA = {
   cache: {},
@@ -2186,7 +2297,7 @@ const PaceIA = {
     let s;
     try { s = PaceScoring.scoreCandidato(perfil); }
     catch(err){ console.warn('[PaceScoring]', err); return; }
-    const meta = PACE_META_SEMANAL[perfil] || {};
+    const meta = metaSemanalGrupos(perfil);
 
     const gaps = Object.entries(s.dias_desde)
       .filter(([g,d])=>d<99 && (meta[g]||0)>0)
@@ -2219,25 +2330,20 @@ const PaceIA = {
     const key = perfil+':'+hoje;
     if(this.cache[key]){ this._render(this.cache[key]); return; }
 
-    const payload = {
+    const payload = Object.assign({
       perfil, hoje,
       ultimos_14_dias: s.historico,
       meta_semanal: meta,
       candidato_regras: s.candidato,
       fadiga_atual: s.fadiga,
       dias_desde: s.dias_desde
-    };
+    }, iaPerfil(perfil));
     try {
-      const resp = await fetch(PACE_IA_URL, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      if(!resp.ok){ this._renderErr('IA indisponível ('+resp.status+') — usando só as regras.'); return; }
-      const j = await resp.json();
+      const j = await iaChamar('dia', payload, { tempo: 45000 });
       this.cache[key] = j;
       this._render(j);
     } catch(e){
-      this._renderErr('Offline ou rede falhou — usando só as regras.');
+      this._renderErr(navigator.onLine ? 'IA indisponível agora; valem as regras acima.' : 'Sem internet; valem as regras acima.');
     }
   },
   _render(j){
@@ -2309,24 +2415,44 @@ const ICON = {
   auto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"/></svg>'
 };
 
+/* primeiro acesso: sem treino no plano (ou sem dieta e sem ter pulado essa etapa) */
+function precisaBoasVindas(p){
+  if(!temPlano(p)) return true;
+  const pf = (S.perfis && S.perfis[p]) || {};
+  const D = (S.dieta && S.dieta[p]) || {};
+  return !pf.onb && !(D.refs || []).length;
+}
 function render(){
+  if(!SESSAO || !document.getElementById("tabs")) return;
+  if(!perfisDaConta().some(x=>x.perfil===ui.perfil)) ui.perfil = SESSAO.conta.perfil;
   const p = ui.perfil, m = meta(p);
   document.documentElement.style.removeProperty("--ac");
-  const sessao = ui.view==="treino";
+  // primeiro acesso: sem treino, só as boas-vindas (e as configurações); com treino e sem dieta, as boas-vindas ficam no Início
+  const semTreino = !temPlano(p);
+  const boasVindas = precisaBoasVindas(p) && ui.view!=="config" && ui.view!=="admin" && (semTreino || ui.view==="hoje");
+  if(!boasVindas && ui.view==="treino" && !dayset(p)[ui.dia]){
+    ui.dia = avaliar(p).win.d || letras(p)[0] || null;
+    if(!ui.dia){ ui.view = "hoje"; ui.edit = false; }
+  }
+  const sessao = !boasVindas && ui.view==="treino";
   if(sessao && ui.editId==null && ui.off===0){ const _m = S.draftMeta && S.draftMeta[p+":"+ui.dia]; if(viraDia(_m) && temValores((S.draft||{})[p+":"+ui.dia]||{})) ui.off = -1; }
   document.body.classList.toggle("pc-session", sessao);
   let out = "";
-  if(ui.view==="hoje") out += viewHoje(p,m);
-  if(ui.view==="treinos") out += viewTreinos(p,m);
-  if(ui.view==="treino") out += viewTreino(p,m);
-  if(ui.view==="cal") out += viewCal(p,m);
-  if(ui.view==="agenda") out += viewAgenda(p,m);
-  if(ui.view==="dieta") out += viewDieta(p,m);
-  if(ui.view==="config") out += pcTopo() + viewConfig(p,m);
+  if(boasVindas) out += viewBoasVindas(p,m);
+  else {
+    if(ui.view==="hoje") out += viewHoje(p,m);
+    if(ui.view==="treinos") out += viewTreinos(p,m);
+    if(ui.view==="treino") out += viewTreino(p,m);
+    if(ui.view==="cal") out += viewCal(p,m);
+    if(ui.view==="agenda") out += viewAgenda(p,m);
+    if(ui.view==="dieta") out += viewDieta(p,m);
+    if(ui.view==="config") out += pcTopo() + viewConfig(p,m);
+    if(ui.view==="admin") out += pcTopo() + viewAdmin(p,m);
+  }
   if(ui.toast) out += `<div class="toast" role="status">${ui.toast}</div>`;
   document.getElementById("app").innerHTML = out;
   const NAV = [["hoje","Início","home"],["treinos","Treinos","dumbbell"],["dieta","Dieta","fork"],["agenda","Calendário","cal"],["cal","Evolução","chart"]];
-  document.getElementById("tabs").innerHTML = sessao ? "" : NAV.map(([k,l,i])=>
+  document.getElementById("tabs").innerHTML = (sessao || (boasVindas && semTreino)) ? "" : NAV.map(([k,l,i])=>
     `<button class="tb ${ui.view===k?"on":""}" data-view="${k}" ${ui.view===k?'aria-current="page"':""}>${pic(i)}<span>${l}</span></button>`).join("");
   ligar();
   atualizaTelaLigada();
@@ -2359,30 +2485,34 @@ function verificarConflitoIniciar(p, dEscolhido){
   const dataRef = REF();
   const sch = schedHoje(p);
   const avisos = [];
+  const t = dayset(p)[dEscolhido];
+  const pernas = !!(t && t.cat==="inf");
   if(sch){
     if(sch.musc && sch.musc !== dEscolhido){
       const diaSem = WDL[new Date(dataRef+"T12:00").getDay()];
-      let av = `Schedule de ${diaSem} sugere treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu ${dEscolhido}.`;
-      if(sch.jiu && (dEscolhido==="B" || dEscolhido==="D")) av += " Tem jiu à noite — pernas pesadas antes podem prejudicar o tatame.";
+      let av = `O cronograma de ${diaSem} prevê o treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu o ${dEscolhido}.`;
+      if(sch.jiu && pernas) av += " Tem jiu à noite: pernas pesadas antes podem prejudicar o tatame.";
       avisos.push(av);
-    } else if(!sch.musc && (dEscolhido==="B" || dEscolhido==="D") && sch.jiu){
-      avisos.push(`Hoje é dia de recuperação + jiu à noite. Treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
+    } else if(!sch.musc && pernas && sch.jiu){
+      avisos.push(`Hoje é dia de recuperação e tem jiu à noite. O treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
     }
   }
-  // v30: passa a letra escolhida efetiva pra conflitoPlan (não schedule bruto),
-  // consistente com o card principal que também usa a letra pós-anti-repetição.
+  // usa a letra escolhida (não o cronograma bruto), igual ao card principal
   const conf = (typeof conflitoPlan==="function") ? conflitoPlan(p, dataRef, dEscolhido) : null;
-  if(conf && (dEscolhido==="B" || dEscolhido==="D") && (!sch || sch.musc===dEscolhido)){
+  if(conf && pernas && (!sch || sch.musc===dEscolhido)){
     avisos.push(conf.msg.replace(/<[^>]+>/g,""));
   }
   return avisos.length ? avisos.join("\n\n") + "\n\nContinuar mesmo assim?" : null;
 }
 
 function sessaoCard(s,days,acoes){
-  const t = days[s.dia]; if(!t) return "";
+  const t = treinoDaSessao(s, days); if(!t) return "";
+  // exercícios do treino + os registrados nesta sessão que saíram do plano depois
+  const lista = (t.ex || []).slice(), vistos = new Set(lista.map(x=>x.id));
+  Object.keys(s.entries || {}).forEach(id=>{ if(!vistos.has(id)){ const e = exInfo(s.perfil, id); if(e){ lista.push(e); vistos.add(id); } } });
   return `<div class="card"><div class="h-h"><span class="h-d">${s.dia} · ${esc(t.t)}</span>
     <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">${brd(s.data)}</span></div>` +
-    t.ex.map(ex=>{ const r = resumo(ex,(s.entries||{})[ex.id]);
+    lista.map(ex=>{ const r = resumo(ex,(s.entries||{})[ex.id]);
       return r?`<div class="hist"><span class="n">${esc(ex.n)}</span><span class="v">${r}</span></div>`:""; }).join("") +
     (Number(s.rapido)>0 ? `<p class="h-rapido">Marcado como feito · ${Number(s.rapido)} ${Number(s.rapido)===1?"série":"séries"} com o valor da última vez</p>` : "") +
     (acoes||"") + `</div>`;
@@ -2390,162 +2520,28 @@ function sessaoCard(s,days,acoes){
 
 /* ------------------------------------------------------------------ DIETA */
 function viewDietaEdicao(p,m){
-  const D = S.dieta[p], sel = REF();
-  const marc = S.check[p+":"+sel] || {};
-  const st = id => marc[id] || null;
-  const cls = id => st(id)==="ok" ? "on" : st(id)==="no" ? "no" : "";
-  const sim = id => st(id)==="ok" ? "✓" : st(id)==="no" ? "✕" : "";
-
-  // Modo edição (via config)
-  if(true){
-    let out = `<div class="tbar"><div class="t">Editar dieta</div>
-      <button class="edt on" data-edieta="1">Concluir</button></div>`;
+  const D = S.dieta[p] || {}, A = D.alvo || {};
+  let out = `<div class="tbar"><div class="t">Editar dieta</div>
+    <button class="edt on" data-edieta="1">Concluir</button></div>`;
+  out += `<div class="card ed">
+    <div class="eyebrow" style="margin-bottom:9px">Alvo diário</div>
+    ${[["kcal","calorias"],["prot","proteína"],["carb","carboidrato"],["gord","gordura"]].map(([k,l])=>
+      `<input class="ed-f" data-dieta="alvo.${k}" value="${esc(A[k])}" placeholder="${l}">`).join("")}
+    <textarea class="ta" data-dieta="nota" placeholder="observações">${esc(D.nota)}</textarea></div>`;
+  (D.refs||[]).forEach(r=>{
     out += `<div class="card ed">
-      <div class="eyebrow" style="margin-bottom:9px">Alvo diário</div>
-      ${[["kcal","calorias"],["prot","proteína"],["carb","carboidrato"],["gord","gordura"]].map(([k,l])=>
-        `<input class="ed-f" data-dieta="alvo.${k}" value="${esc(D.alvo[k])}" placeholder="${l}">`).join("")}
-      <textarea class="ta" data-dieta="nota" placeholder="observações">${esc(D.nota)}</textarea></div>`;
-    D.refs.forEach(r=>{
-      out += `<div class="card ed">
-        <div style="display:flex;gap:8px">
-          <input class="ed-f" data-dieta="ref.${r.id}.nome" value="${esc(r.nome)}" style="flex:1" placeholder="nome da refeição">
-          <input class="ed-f" data-dieta="ref.${r.id}.hora" value="${esc(r.hora||'')}" placeholder="HH:mm" style="width:90px;text-align:center;font-family:var(--mono)">
-        </div>
-        <textarea class="ta" data-dieta="ref.${r.id}.itens" placeholder="um alimento por linha">${esc(r.itens)}</textarea></div>`;
-    });
-    out += `<div class="card ed"><div class="eyebrow" style="margin-bottom:9px">Itens fixos do dia</div>
-      ${D.extras.map(x=>`<input class="ed-f" data-dieta="extra.${x.id}.nome" value="${esc(x.nome)}">`).join("")}</div>
-      <div style="height:70px"></div>`;
-    return out;
-  }
-
-  // ---------- Novo layout Dietbox ----------
-  const nome = m.label || (p==="gabriel"?"Gabriel":"Eduarda");
-  const inic = (nome[0]||"?").toUpperCase();
-  const hoje = new Date(REF()+"T12:00");
-  const diaSemana = WDL[hoje.getDay()];
-  const dataFmt = hoje.getDate()+" de "+MES[hoje.getMonth()];
-  const totRefs = D.refs.length;
-  const feitasHoje = D.refs.filter(r=>st(r.id)==="ok").length;
-
-  // Tipo de dia + alvos dinâmicos
-  const tipo = tipoDiaHoje(p);
-  const alvos = getAlvosDia(p);
-  const alvoHoje = (tipo && alvos && alvos[tipo]) ? alvos[tipo] : null;
-  const tipoLbl = tipo ? (TIPO_DIA_LABEL[tipo]||tipo) : "";
-  const alvoKcalHoje = alvoHoje ? alvoHoje.kcal : (D.alvo && D.alvo.kcal) || "—";
-  // v27: chip âmbar quando dia é jejum
-  const isJejumDia = tipo==="jejum" || tipo==="jejum_jiu";
-  const chipStyleBg = isJejumDia
-    ? "background:rgba(245,158,11,.16);color:#f59e0b"
-    : "background:rgba(58,216,121,.14);color:var(--ac)";
-  const chipTipo = tipo ? `<span style="display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;${chipStyleBg};font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:600">${esc(tipoLbl)}${alvoHoje?` · ${alvoHoje.kcal} kcal`:""}</span>` : "";
-
-  let out = `<div class="diet-hero">
-    <div class="row">
-      <div class="avatar">${esc(inic)}</div>
-      <div class="greet">
-        <div class="hi">Olá,</div>
-        <div class="nm">${esc(nome)}</div>
+      <div style="display:flex;gap:8px">
+        <input class="ed-f" data-dieta="ref.${r.id}.nome" value="${esc(r.nome)}" style="flex:1" placeholder="nome da refeição">
+        <input class="ed-f" data-dieta="ref.${r.id}.hora" value="${esc(r.hora||'')}" placeholder="HH:mm" style="width:90px;text-align:center;font-family:var(--mono)">
       </div>
-    </div>
-    <div class="today"><b>${esc(diaSemana)}, ${esc(dataFmt)}</b>${chipTipo}<span class="dt-sep">·</span><span>${feitasHoje}/${totRefs} refeições registradas</span></div>
-  </div>`;
-
-  // Acessos rápidos
-  out += `<div class="qa-title">Acessos rápidos</div>
-    <div class="qa-grid">
-      <button class="qa-btn accent" data-diario="1"><div class="ic">📔</div><div class="lb">Diário</div></button>
-      <button class="qa-btn" data-openia="1"><div class="ic">🤖</div><div class="lb">Sugestão IA</div></button>
-      <button class="qa-btn" data-metas="1"><div class="ic">🎯</div><div class="lb">Metas</div></button>
-      <button class="qa-btn" data-editdieta="1"><div class="ic">✎</div><div class="lb">Editar</div></button>
-    </div>`;
-
-  // Macros
-  out += `<div class="macros-lite">
-    ${[[D.alvo.kcal||"—","kcal"],[D.alvo.prot||"—","proteína"],[D.alvo.carb||"—","carbo"],[D.alvo.gord||"—","gordura"]]
-      .map(([v,k])=>`<div><div class="v">${esc(v)}</div><div class="k">${k}</div></div>`).join("")}</div>`;
-
-  // v27: banner de jejum
-  if(isJejumDia){
-    const jTxt = tipo==="jejum_jiu"
-      ? "🌙 <b>Jejum matinal hoje (até o almoço)</b> — pular café/pré-treino/lanches da manhã. SuperCoffee 05h45 liberado se houver musc/jiu (jejum modificado). Primeira refeição sólida às 12h. Depois seguir o resto do plano normal (lanche 15h, jantar). Hidratação intensa até o almoço."
-      : "🌙 <b>Jejum matinal hoje (até o almoço)</b> — pular refeições da manhã. Primeira refeição sólida às 12h. Depois seguir o resto do plano normal (lanche 15h, jantar). Hidratação intensa até o almoço.";
-    out += `<div class="hero" style="border:1px solid rgba(245,158,11,.35);background:linear-gradient(135deg,rgba(245,158,11,.10),rgba(245,120,0,.04));margin:8px 0 6px"><div class="why" style="padding:2px 0 8px">${jTxt}</div></div>`;
-  }
-
-  // Plano alimentar
-  out += `<div class="plan-head"><div class="t">Plano alimentar</div>
-    <button class="a" data-editdieta="1">Editar</button></div>`;
-
-  D.refs.forEach(r=>{
-    const stat = st(r.id);
-    const doneCls = stat==="ok" ? "done" : (stat==="no" ? "faltou" : "");
-    const chkCls = stat==="ok" ? "on" : (stat==="no" ? "no" : "");
-    const chkSim = stat==="ok" ? "✓" : (stat==="no" ? "✕" : "");
-    const regTxt = stat==="ok" ? "Registrado" : "Registrar";
-    const regCls = stat==="ok" ? "done" : "";
-    const hora = r.hora || "";
-    const itens = r.itens ? esc(r.itens) : `<span style='color:var(--faint)'>vazio — toque em Editar para preencher</span>`;
-
-    // v27: em jejum, refs antes das 12h ficam com opacity reduzida + tag "pular"
-    const horaNum = /^\d{2}/.test(hora) ? parseInt(hora.slice(0,2),10) : null;
-    const isManha = isJejumDia && horaNum!==null && horaNum < 12;
-    const skipStyle = isManha ? 'opacity:.42;filter:grayscale(.35)' : '';
-    const skipTag = isManha ? ' <span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background:#f59e0b;color:#000;font-size:9.5px;font-weight:700;letter-spacing:.05em;vertical-align:middle;text-transform:uppercase">pular</span>' : '';
-
-    out += `<div class="mealx ${doneCls}" style="${skipStyle}">
-      <div class="mx-head">
-        <span class="badge"></span>
-        <div class="mx-name">${esc(r.nome)}${skipTag}</div>
-        ${hora?`<div class="mx-hora">${esc(hora)}${(r.kcal!=null&&r.kcal!=="")?" · "+r.kcal+" kcal":""}</div>`:((r.kcal!=null&&r.kcal!=="")?`<div class="mx-hora">${r.kcal} kcal</div>`:"")}
-        <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações">${pic("more")}</button>
-      </div>
-      <div class="mx-items">${itens}</div>
-      <div class="mx-foot">
-        <button class="mx-check-mini ${chkCls}" data-chk="${r.id}" title="marcar feito / faltou">${chkSim||"○"}</button>
-        <button class="mx-reg ${regCls}" data-mealmenu="${r.id}">
-          ${stat==="ok"?"✓ Registrado":"📝 Registrar"}
-        </button>
-      </div>
-    </div>`;
+      <textarea class="ta" data-dieta="ref.${r.id}.itens" placeholder="um alimento por linha">${esc(r.itens)}</textarea>
+      <div class="ed-row" style="margin-bottom:0"><button class="del" data-delref="${esc(r.id)}">Remover refeição</button></div></div>`;
   });
-
-  // Extras / itens fixos
-  if(D.extras && D.extras.length){
-    out += `<div class="extras-card">
-      <div class="eh">Itens fixos do dia</div>
-      ${D.extras.map(x=>{
-        const chkCls = st(x.id)==="ok" ? "on" : (st(x.id)==="no" ? "no" : "");
-        const chkSim = st(x.id)==="ok" ? "✓" : (st(x.id)==="no" ? "✕" : "○");
-        return `<div class="ei">
-          <button class="mx-check-mini ${chkCls}" style="width:28px;height:28px;font-size:13px" data-chk="${x.id}">${chkSim}</button>
-          <span style="flex:1">${esc(x.nome)}</span>
-        </div>`;
-      }).join("")}
-    </div>`;
-  }
-
-  // Nota do nutricionista
-  if(D.nota){
-    out += `<div class="diet-nota">${esc(D.nota)}</div>`;
-  }
-
-  // Diário — últimos registros
-  const logRecentes = (D.log||[]).slice(0,3);
-  out += `<div class="diary-title"><span>Atualizações do diário</span>${(D.log||[]).length?`<button data-diario="1">Ver tudo →</button>`:""}</div>`;
-  if(!logRecentes.length){
-    out += `<div class="diary-empty">Ainda sem registros. Toque em <b>Registrar</b> numa refeição pra começar a alimentar o coach.</div>`;
-  } else {
-    logRecentes.forEach(l=>{
-      out += `<div class="diary-mini">
-        <div class="top"><span class="rn">${esc(l.refNome||"")}</span><span class="dm">${_fmtDataDiario(l.data)} · ${esc(l.hora||"")}</span></div>
-        <div class="tx">${esc(l.texto||"")}</div>
-      </div>`;
-    });
-  }
-
-  out += `<div style="height:16px"></div>`;
+  out += `<button class="addx" data-addref="1">+ Adicionar refeição</button>`;
+  out += `<div class="card ed"><div class="eyebrow" style="margin-bottom:9px">Itens fixos do dia</div>
+    ${(D.extras||[]).map(x=>`<div class="ed-row"><input class="ed-f" style="margin:0;flex:1" data-dieta="extra.${x.id}.nome" value="${esc(x.nome)}"><button class="del" style="width:48px;flex:none" data-delextra="${esc(x.id)}" aria-label="Remover ${esc(x.nome)}">×</button></div>`).join("")}
+    <button class="addx" style="margin:4px 0 0" data-addextra="1">+ Adicionar item fixo</button></div>
+    <div style="height:70px"></div>`;
   return out;
 }
 
@@ -2592,7 +2588,6 @@ const PI = {
 };
 const pic = (k, cls) => `<svg class="pc-ic ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${PI[k]||""}</svg>`;
 const cap = s => String(s||"").charAt(0).toUpperCase() + String(s||"").slice(1);
-const AGUA_META = { gabriel:3.5, eduarda:2.5 };
 const fmtL = n => Number(n||0).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
 
 /* ---------- treino em andamento (rascunho datado) ---------- */
@@ -2614,7 +2609,7 @@ function contaSeries(t, dr){
 /* Um treino só está "em andamento" se tem rascunho com valores iniciado HOJE e ainda não foi salvo. */
 function sessaoAberta(p){
   const hoje = shift(0);
-  for(const L of ORDER){
+  for(const L of letras(p)){
     const k = p+":"+L, m = S.draftMeta && S.draftMeta[k], dr = S.draft && S.draft[k], t = dayset(p)[L];
     if(m && (m.data===hoje || viraDia(m)) && dr && t && temValores(dr)) return Object.assign({ L, t, inicio:m.inicio, data:m.data }, contaSeries(t, dr));
   }
@@ -2677,10 +2672,10 @@ function pcSemana(p){
   <div class="pc-legend"><span><i class="d"></i>Feito</span><span><i class="p"></i>Em andamento</span><span><i class="x"></i>Extra</span></div>`;
 }
 function pcAgua(p){
-  const k = p+":"+REF(), v = (S.agua && S.agua[k]) || 0, meta = AGUA_META[p] || 3;
+  const k = p+":"+REF(), v = (S.agua && S.agua[k]) || 0, alvoL = Number(meta(p).agua) || 2.5;
   return `<div class="pc-row">${pic("drop")}<div class="main"><div class="t">Água</div>
-      <div class="pc-bar" style="margin-top:8px" aria-hidden="true"><i style="width:${Math.min(100, v/meta*100)}%;background:var(--water)"></i></div></div>
-    <span class="end" style="color:var(--muted);font-weight:500">${fmtL(v)} / ${fmtL(meta)} L</span>
+      <div class="pc-bar" style="margin-top:8px" aria-hidden="true"><i style="width:${Math.min(100, v/alvoL*100)}%;background:var(--water)"></i></div></div>
+    <span class="end" style="color:var(--muted);font-weight:500">${fmtL(v)} / ${fmtL(alvoL)} L</span>
     ${v>0?`<button class="pc-ib" data-agua="-0.35" aria-label="Remover 350 ml">${pic("minus")}</button>`:""}
     <button class="pc-btn sm oac" data-agua="0.35">${pic("plus","sm")} 350 ml</button></div>`;
 }
@@ -2777,7 +2772,7 @@ function viewHoje(p,m){
 
   // ---- atividades do dia ----
   const planHoje = getPlanejado(p, dataRef) || {};
-  const quicks = ATIV_QUICK[p] || ["jiu","corrida","bike"];
+  const quicks = meta(p).ativ;
   out += pcSec(ui.off===0 ? "Planejar hoje" : "Atividades do dia");
   out += `<div class="chips" style="margin-bottom:10px">${quicks.map(a=>{
     const on = !!planHoje[a];
@@ -2790,7 +2785,7 @@ function viewHoje(p,m){
     out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${esc(e.atividade)}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div>
       <button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
   });
-  out += `<button class="pc-row" data-atv="1">${pic("run")}<div class="main"><div class="t">Registrar atividade extra</div><div class="s">${esc(m.extra)}, corrida, bike, caminhada…</div></div><span class="chev">${pic("right")}</span></button>
+  out += `<button class="pc-row" data-atv="1">${pic("run")}<div class="main"><div class="t">Registrar atividade extra</div><div class="s">${esc([m.extra,"corrida","bike","caminhada"].filter((x,i,a)=>x && a.findIndex(y=>String(y).toLowerCase()===String(x).toLowerCase())===i).join(", "))}…</div></div><span class="chev">${pic("right")}</span></button>
     <button class="pc-row" data-skip="1">${pic("moon")}<div class="main"><div class="t">${skipAtivo?"Marcado como descanso":"Não treinei"}</div><div class="s">${skipAtivo?"Toque para desfazer":"Marca o dia como descanso"}</div></div><span class="chev">${pic("right")}</span></button>
     <button class="pc-row" data-coach="1">${pic("spark")}<div class="main"><div class="t">Pergunte ao coach</div><div class="s">Dúvidas sobre treino e alimentação</div></div><span class="chev">${pic("right")}</span></button>
   </div>`;
@@ -2800,7 +2795,7 @@ function viewHoje(p,m){
 /* ------------------------------------------------------------------ TREINOS */
 function viewTreinos(p,m){
   const days = dayset(p), ab = sessaoAberta(p), sug = avaliar(p).win.d;
-  let out = pcTopo() + `<h1 class="pc-h1">Treinos</h1><p class="pc-sub">Seu plano em blocos A · B · C · D</p>`;
+  let out = pcTopo() + `<h1 class="pc-h1">Treinos</h1><p class="pc-sub">Seu plano em blocos ${letras(p).join(" · ")}</p>`;
   if(ab){
     out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Em andamento</div>
       <div class="ttl">${esc(ab.t.t)}</div><div class="meta">Treino ${ab.L} · ${ab.ok} de ${ab.total} séries concluídas</div>
@@ -2809,7 +2804,7 @@ function viewTreinos(p,m){
   if(ui.off!==0) out += `<div class="pc-warn">Você está em <b>${esc(dataLonga(REF()))}</b>. O treino que abrir aqui será registrado nesse dia.
       <div class="acts"><button class="pc-btn sm oac" data-hoje="1">Voltar para hoje</button></div></div>`;
   out += pcSec("Plano", `<span class="aside">${ui.off===0?"sugestão de hoje":"sugestão para "+esc(pcTituloDia().toLowerCase())}: ${sug}</span>`) + `<div class="pc-list">`;
-  ORDER.forEach(L=>{
+  letras(p).forEach(L=>{
     const t = days[L]; if(!t) return;
     const u = evs(p,"musc").filter(e=>e.data<=shift(0)).find(e=>e.dia===L);
     out += `<button class="pc-row" data-abrir="${L}"><span class="pc-st-pl">${L}</span>
@@ -2818,6 +2813,7 @@ function viewTreinos(p,m){
   });
   out += `</div><div class="pc-list nb">
     <button class="pc-row" data-editplan="1">${pic("edit")}<div class="main"><div class="t">Editar plano</div><div class="s">Exercícios, séries, repetições e ordem</div></div><span class="chev">${pic("right")}</span></button>
+    <button class="pc-row" data-importar="treino">${pic("spark")}<div class="main"><div class="t">Trocar o treino pela IA</div><div class="s">Envie o treino novo em texto, PDF, foto ou print</div></div><span class="chev">${pic("right")}</span></button>
     <button class="pc-row" data-view="agenda">${pic("cal")}<div class="main"><div class="t">Registrar em outro dia</div><div class="s">Escolha o dia no calendário</div></div><span class="chev">${pic("right")}</span></button>
   </div>`;
   return out;
@@ -2867,7 +2863,7 @@ function viewTreino(p,m){
     </div>`;
   if(ui.editId!=null) out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
   out += `<div class="segs">`;
-  ORDER.forEach(k=>{
+  letras(p).forEach(k=>{
     const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
     const t = u ? (dias(u.data)===0?"feito":"há "+dias(u.data)+"d") : "nunca";
     out += `<button class="sg ${k===d?"on":""}" data-dia="${k}" aria-label="Treino ${k}, ${t}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
@@ -2889,7 +2885,15 @@ function viewTreino(p,m){
           <button class="del" data-mv="${ex.id}:1" style="width:48px" aria-label="Descer">↓</button>
           <button class="del" data-del="${ex.id}">Remover exercício</button></div></div>`;
     });
-    out += `<button class="addx" data-add="1">+ Adicionar exercício</button><button class="reset" data-reset="1">Restaurar o treino ${d} original</button><div style="height:70px"></div>`;
+    const temPadrao = !!(S.padrao && S.padrao[p] && S.padrao[p][d]);
+    const proxL = LETRAS_POSSIVEIS.find(L=>!days[L]);
+    out += `<div class="card ed"><div class="eyebrow" style="margin-bottom:9px">Tipo do treino ${d}</div>
+      <div class="ed-row tys" style="margin-bottom:0">${[["sup","superiores"],["inf","inferiores"],["full","corpo inteiro"]].map(([k,l])=>`<button class="ty ${treino.cat===k?"on":""}" data-cat="${k}">${l}</button>`).join("")}</div></div>`;
+    out += `<button class="addx" data-add="1">+ Adicionar exercício</button>`
+      + (proxL ? `<button class="addx" data-addletra="${proxL}">+ Novo treino ${proxL}</button>` : "")
+      + (temPadrao ? `<button class="reset" data-reset="1">Restaurar o treino ${d} original</button>` : "")
+      + (letras(p).length > 1 ? `<button class="reset" style="color:var(--danger)" data-delletra="${d}">Excluir o treino ${d}</button>` : "")
+      + `<div style="height:70px"></div>`;
     return out;
   }
 
@@ -2964,7 +2968,7 @@ function viewCal(p,m){
   out += pcGraficoSemanas(p, ano, mes);
 
   // por exercício — só exercícios presentes nas sessões do período
-  const todos = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L}, ex)));
+  const todos = letras(p).flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L}, ex)));
   const presentes = todos.filter(ex=>ses.some(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])));
   if(!presentes.find(x=>x.id===ui.evoEx)) ui.evoEx = presentes.length ? presentes[0].id : null;
   out += pcSec("Por exercício");
@@ -2998,7 +3002,7 @@ function viewCal(p,m){
   out += pcSec("Últimas sessões") + `<div class="pc-list">`;
   if(ab) out += `<button class="pc-row" data-continuar="${ab.L}"><div class="main"><div class="t">Hoje, ${brd(hj)}</div><div class="s">Treino ${ab.L} · ${esc(ab.t.t)}</div></div><span class="pc-pill">Em andamento</span><span class="chev">${pic("right")}</span></button>`;
   const lista = ses.slice().reverse().slice(0, 6);
-  lista.forEach(e=>{ const t = days[e.dia];
+  lista.forEach(e=>{ const t = treinoDaSessao(e, days);
     out += `<button class="pc-row" data-evodt="${e.data}"><div class="main"><div class="t">${e.data===hj?"Hoje, ":""}${brd(e.data)}</div><div class="s">Treino ${e.dia}${t?" · "+esc(t.t):""}</div></div>
       <span class="pc-pill" style="background:transparent"><span class="pc-st-ok" style="width:22px;height:22px">${pic("check")}</span>Concluído</span><span class="chev">${pic("right")}</span></button>`; });
   if(!ab && !lista.length) out += `<p class="pc-note" style="font-size:15px">Sem sessões neste período.</p>`;
@@ -3092,7 +3096,7 @@ function pcCalendario(p, m, ano, mes){
       ${xx?`<span class="dot"></span>`:`<span class="dot" style="background:transparent"></span>`}</button>`;
   }
   out += `</div></div>`;
-  out += `<div class="pc-legend"><span><b style="color:var(--ac)">A–D</b> treino concluído</span><span>${pic("clock","sm")} em andamento</span><span><i class="x"></i>extra</span><span>— descanso</span></div>`;
+  out += `<div class="pc-legend"><span><b style="color:var(--ac)">${(()=>{ const Ls = letras(p); return Ls.length>1 ? Ls[0]+"–"+Ls[Ls.length-1] : (Ls[0]||"A"); })()}</b> treino concluído</span><span>${pic("clock","sm")} em andamento</span><span><i class="x"></i>extra</span><span>— descanso</span></div>`;
   out += `<div class="pc-macros" style="margin-top:14px"><div><b>${nT}</b><span>musculação</span></div><div><b>${nX}</b><span>extras</span></div><div><b>${nS}</b><span>descansos</span></div></div>`;
 
   const ss = S.events.filter(e=>e.perfil===p&&e.tipo==="musc"&&e.data===sel);
@@ -3100,7 +3104,7 @@ function pcCalendario(p, m, ano, mes){
   out += pcSec(cap(dataLonga(sel)));
   if(sk) out += `<div class="pc-row">${pic("moon")}<div class="main"><div class="t">Marcado como descanso</div>${sk.motivo?`<div class="s">${esc(sk.motivo)}</div>`:""}</div><button class="pc-btn sm ghost" data-skip="1">Desfazer</button></div>`;
   xs.forEach(e=>{
-    out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${e.atividade?esc(e.atividade):esc(m.extra)}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div><button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
+    out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${e.atividade?esc(e.atividade):esc(m.extra||"Atividade")}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div><button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
   });
   if(ss.length>1) out += `<div class="warn-dup">Há ${ss.length} treinos registrados neste dia. Exclua os repetidos ou edite para mudar a data.</div>`;
   ss.forEach(ev=>{ out += sessaoCard(ev,days,`<div class="cal-acts"><button data-caledit="${ev.id}">Editar ou mudar data</button><button class="del-x" data-caldel="${ev.id}">Excluir</button></div>`); });
@@ -3117,6 +3121,14 @@ function viewDieta(p,m){
   if(ui.edieta) return viewDietaEdicao(p,m);
   const D = S.dieta[p], R = pcRefeicoesDia(p), tab = ui.dietTab || "diario";
   let out = pcTopo() + `<h1 class="pc-h1">Alimentação</h1>` + pcDataNav();
+  if(!R.refs.length){
+    return out + `<section class="pc-hl" aria-label="Sem dieta"><div class="ey">${pic("fork","sm")}Sem plano alimentar</div>
+      <div class="ttl">Envie sua dieta</div>
+      <div class="meta">Texto, PDF, foto ou print. A IA monta as refeições no app e você confere antes de salvar.</div>
+      <button class="pc-btn hl" data-importar="dieta"><span>Enviar dieta</span>${pic("arrow")}</button></section>
+      <div class="pc-list nb">${pcAgua(p)}
+      <button class="pc-row" data-editdieta="1">${pic("edit")}<div class="main"><div class="t">Montar a dieta à mão</div><div class="s">Refeições, horários e itens fixos</div></div><span class="chev">${pic("right")}</span></button></div>`;
+  }
   out += pcTabs("diet", [["diario","Diário"],["plano","Plano"]], tab);
   if(tab==="plano") return out + viewDietaPlano(p,m,R);
 
@@ -3131,7 +3143,7 @@ function viewDieta(p,m){
     <div class="pc-macros"><div><b>${esc(String(alv("prot")).replace(/\s*g$/,""))} g</b><span>Proteína</span></div><div><b>${esc(String(alv("carb")).replace(/\s*g$/,""))} g</b><span>Carbo</span></div><div><b>${esc(String(alv("gord")).replace(/\s*g$/,""))} g</b><span>Gordura</span></div></div>
     </section>`;
   if(R.tipo==="jejum" || R.tipo==="jejum_jiu"){
-    out += `<div class="pc-jejum"><b>Jejum matinal ${ui.off===0?"hoje":"neste dia"} (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu"?" SuperCoffee às 05h45 liberado se houver treino.":""}</div>`;
+    out += `<div class="pc-jejum"><b>Jejum matinal ${ui.off===0?"hoje":"neste dia"} (até o almoço).</b> Pule as refeições da manhã; primeira refeição sólida às 12h.${R.tipo==="jejum_jiu" && (meta(p).jejum||{}).dieta ? " "+esc(meta(p).jejum.dieta) : ""}</div>`;
   }
   const prox = R.refs.find(r=>!R.marc[r.id]);
   out += `<div style="margin-top:18px"><button class="pc-btn pri" data-regprox="${prox?prox.id:(R.refs[0]||{}).id||""}">${pic("plus")} Registrar ${prox?esc(prox.nome.toLowerCase()):"refeição"}</button></div>`;
@@ -3168,6 +3180,8 @@ function viewDietaPlano(p,m,R){
         <button class="mx-dots" data-mealmenu="${r.id}" aria-label="Ações de ${esc(r.nome)}">${pic("more")}</button></div>
       <div class="mx-items">${r.itens?esc(r.itens):`<span style="color:var(--faint)">vazio — toque em Editar para preencher</span>`}</div></div>`;
   });
+  out += `<div class="pc-list nb" style="margin-top:14px">
+    <button class="pc-row" data-importar="dieta">${pic("spark")}<div class="main"><div class="t">Trocar a dieta pela IA</div><div class="s">Envie o plano novo em texto, PDF, foto ou print</div></div><span class="chev">${pic("right")}</span></button></div>`;
   return out;
 }
 
@@ -3230,20 +3244,22 @@ const cfgSeg = (k, titulo, opcoes) => `<div class="cfg-sub"><div class="eyebrow"
   opcoes.map(([v,l])=>`<button class="${String(pref(k))===String(v)?"on":""}" data-prefv="${k}" data-v="${v}">${l}</button>`).join("")}</div></div>`;
 
 function viewConfig(p,m){
-  const AUTHNOW = getAuth();
-  const meLabel = AUTHNOW ? BASE[AUTHNOW.perfil].label : "";
+  const conta = SESSAO ? SESSAO.conta : {};
   const themeAtual = getTheme();
   const metas = (S.metas && S.metas[p]) || {};
+  const perfis = perfisDaConta();
 
   let out = `<div class="tbar" style="margin-bottom:20px"><div class="t">Configurações</div></div>`;
 
-  // Perfil ativo
-  out += `<div class="cfg-sec">
-    <div class="lbl">Perfil ativo</div>
-    <div class="cfg-list"><div class="cfg-perfil">
-      ${Object.keys(BASE).map(k=>`<button class="${k===p?"on":""}" data-cfp="${k}">${BASE[k].label}</button>`).join("")}
-    </div></div>
-  </div>`;
+  // Perfil ativo (só quando a conta compartilha o documento com outra pessoa)
+  if(perfis.length > 1){
+    out += `<div class="cfg-sec">
+      <div class="lbl">Perfil ativo</div>
+      <div class="cfg-list"><div class="cfg-perfil">
+        ${perfis.map(x=>`<button class="${x.perfil===p?"on":""}" data-cfp="${esc(x.perfil)}">${esc(meta(x.perfil).label)}</button>`).join("")}
+      </div></div>
+    </div>`;
+  }
 
   // Durante o treino
   const temWake = typeof navigator!=="undefined" && "wakeLock" in navigator;
@@ -3261,7 +3277,7 @@ function viewConfig(p,m){
     </div>
   </div>`;
 
-  // Tela Hoje
+  // Tela Início
   out += `<div class="cfg-sec">
     <div class="lbl">Tela Início</div>
     <div class="cfg-list">
@@ -3271,20 +3287,48 @@ function viewConfig(p,m){
     <div class="cfg-note">“Auto” usa os dias de musculação do seu cronograma semanal.</div>
   </div>`;
 
-  // Meus treinos e Dieta
+  // Plano de treino e dieta
   out += `<div class="cfg-sec">
     <div class="lbl">Plano de treino e dieta</div>
     <div class="cfg-list">
       <button class="cfg-row" data-editplan="A"><span class="em">${pic("dumbbell")}</span>
-        <span class="lb"><span class="tt">Meus treinos</span><span class="st">editar exercícios, séries, repetições dos blocos A · B · C · D</span></span>
+        <span class="lb"><span class="tt">Meus treinos</span><span class="st">editar exercícios, séries, repetições dos blocos ${letras(p).join(" · ")||"do plano"}</span></span>
+        <span class="caret">${pic("right","sm")}</span></button>
+      <button class="cfg-row" data-importar="treino"><span class="em">${pic("spark")}</span>
+        <span class="lb"><span class="tt">Trocar o treino pela IA</span><span class="st">envie o treino novo em texto, PDF, foto ou print</span></span>
         <span class="caret">${pic("right","sm")}</span></button>
       <button class="cfg-row" data-editdieta="1"><span class="em">${pic("fork")}</span>
         <span class="lb"><span class="tt">Minha dieta</span><span class="st">alvos, refeições e itens fixos</span></span>
+        <span class="caret">${pic("right","sm")}</span></button>
+      <button class="cfg-row" data-importar="dieta"><span class="em">${pic("spark")}</span>
+        <span class="lb"><span class="tt">Trocar a dieta pela IA</span><span class="st">envie o plano alimentar novo</span></span>
         <span class="caret">${pic("right","sm")}</span></button>
       <button class="cfg-row" data-diario="1"><span class="em">${pic("note")}</span>
         <span class="lb"><span class="tt">Diário de refeições</span><span class="st">registros dos últimos 30 dias</span></span>
         <span class="caret">${pic("right","sm")}</span></button>
     </div>
+  </div>`;
+
+  // Perfil esportivo
+  const princ = m.principal || "";
+  const ativ = m.ativ || [];
+  out += `<div class="cfg-sec">
+    <div class="lbl">Seu perfil<span class="hint">só para ${esc(m.label)}</span></div>
+    <div class="cfg-list">
+      <div class="cfg-sub" style="padding-left:16px;padding-top:14px"><div class="eyebrow">Esporte principal fora da musculação</div><div class="cfg-seg">
+        ${[["","Nenhum"]].concat(Object.entries(ESPORTE_NOME)).map(([k,l])=>`<button class="${princ===k?"on":""}" data-princ="${k}">${esc(l)}</button>`).join("")}
+      </div></div>
+      <div class="cfg-sub" style="padding-left:16px"><div class="eyebrow">Atalhos de atividade no Início</div><div class="cfg-seg">
+        ${Object.entries(ATIV_LABEL).map(([k,l])=>`<button class="${ativ.includes(k)?"on":""}" data-ativq="${k}" aria-pressed="${ativ.includes(k)}">${esc(l)}</button>`).join("")}
+      </div></div>
+      <div class="cfg-sub" style="padding-left:16px"><div class="eyebrow">Meta de água por dia</div><div class="cfg-seg">
+        ${[2,2.5,3,3.5,4,4.5].map(v=>`<button class="${Number(m.agua)===v?"on":""}" data-aguameta="${v}">${fmtL(v)} L</button>`).join("")}
+      </div></div>
+      <div class="cfg-sub" style="padding-left:16px"><div class="eyebrow">Objetivo e observações para o coach</div>
+        <textarea class="ta" style="margin:0" data-perfil="coach" placeholder="Ex.: ganhar massa magra, treino de manhã, joelho sensível.">${esc(m.coach||"")}</textarea>
+      </div>
+    </div>
+    <div class="cfg-note">O coach e as sugestões de IA usam estas informações. Não substituem orientação de médico, nutricionista ou professor.</div>
   </div>`;
 
   // Metas
@@ -3321,14 +3365,30 @@ function viewConfig(p,m){
     </div></div>
   </div>`;
 
+  // Comentários sobre o app
+  out += `<div class="cfg-sec">
+    <div class="lbl">Comentários sobre o app</div>
+    <div class="cfg-list" style="padding:14px 16px">
+      <textarea class="ta" id="fbTexto" style="margin:0 0 10px" maxlength="4000" placeholder="O que funcionou, o que confundiu, o que faltou."></textarea>
+      <button class="pc-btn pri" id="fbEnviar">Enviar comentário</button>
+    </div>
+    <div class="cfg-note">Vai para quem administra o app.</div>
+  </div>`;
+
   // Conta
   out += `<div class="cfg-sec">
     <div class="lbl">Conta</div>
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("user")}</span>
-        <span class="lb"><span class="tt">Logado como ${esc(meLabel)}</span><span class="st">sessão privada</span></span>
+        <span class="lb"><span class="tt">${esc(conta.nome||"")}</span><span class="st">${esc(conta.login||"")}</span></span>
       </div>
+      ${souAdmin() ? `<button class="cfg-row" data-view="admin"><span class="em">${pic("lock")}</span>
+        <span class="lb"><span class="tt">Acessos e comentários</span><span class="st">criar acessos, gerar links e ler o que os amigos acharam</span></span>
+        <span class="caret">${pic("right","sm")}</span></button>` : ""}
+      <button class="cfg-row" data-trocarsenha="1"><span class="em">${pic("lock")}</span>
+        <span class="lb"><span class="tt">Trocar senha</span></span>
+        <span class="caret">${pic("right","sm")}</span></button>
       <button class="cfg-row danger" data-logout="1"><span class="em">${pic("logout")}</span>
         <span class="lb"><span class="tt">Sair</span></span>
         <span class="caret">${pic("right","sm")}</span></button>
@@ -3341,11 +3401,11 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v43 · encerrar o treino antes do fim e marcar dias anteriores como feitos</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v44 · contas individuais e treino e dieta lidos pela IA</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
-        <span class="lb"><span class="tt">Sincronização</span><span class="st">Supabase — automático em todos dispositivos</span></span>
+        <span class="lb"><span class="tt">Sincronização</span><span class="st">automática em todos os seus aparelhos</span></span>
       </div>
     </div>
   </div>`;
@@ -3664,7 +3724,7 @@ async function marcarFeitoRapido(){
   const ja = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===data);
   if(ja){ toast(`Já existe o treino ${ja.dia} em ${brd(data)}.`); return; }
   const sug = (sugestaoTreino(p, data)||{}).musc || avaliar(p).win.d;
-  const ops = ORDER.filter(L=>days[L]).map(L=>{
+  const ops = letras(p).filter(L=>days[L]).map(L=>{
     const u = evs(p,"musc").find(e=>e.data<data && e.dia===L);
     return { k:L, pri: L===sug, tag: L===sug ? "sugerido" : "",
       t: `Treino ${L} · ${days[L].t}`, s: u ? `Última vez em ${brd(u.data)}` : "Sem registro anterior" };
@@ -3735,7 +3795,7 @@ function abrirPickTreino(){
   const body = `
     <div class="eyebrow" style="margin-bottom:8px">Escolher treino</div>
     <div class="chips" id="pickTreinoChips">
-      ${ORDER.map(d=>`<button class="chip" data-pickabrir="${d}"><b>${d}</b> · ${_escSug(days[d].t)}</button>`).join("")}
+      ${letras(p).map(d=>`<button class="chip" data-pickabrir="${d}"><b>${d}</b> · ${_escSug(days[d].t)}</button>`).join("")}
     </div>
     <div style="font-size:11px;color:var(--faint);margin-top:10px;line-height:1.55">
       O cronograma não tem musculação neste dia. Você pode escolher qualquer treino — o registro conta normal.
@@ -3858,7 +3918,6 @@ function abrirMealMenu(refId){
 }
 
 /* ================================================================ sugestão IA */
-const SUGESTAO_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/treino-sugestao';
 function fecharSugestao(){
   const m = document.getElementById('sugModal'); if(m) m.innerHTML='';
   document.body.style.overflow='';
@@ -3881,21 +3940,19 @@ function _renderSugestaoShell(titulo, subtitulo, corpoHTML){
 async function abrirSugestao(refId){
   const p = ui.perfil, D = S.dieta[p], r = D.refs.find(x=>x.id===refId);
   if(!r) return;
-  const perfilNome = p==='gabriel'?'Gabriel':'Eduarda';
+  const mp = meta(p);
   _renderSugestaoShell(r.nome||'Sugestões', 'Alternativas para essa refeição', `<div class="sug-load">Buscando 3 sugestões com IA...</div>`);
   try{
-    const resp = await fetch(SUGESTAO_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ perfil: perfilNome, refeicao: r.nome||'', itens_atuais: r.itens||'' })
-    });
-    const j = await resp.json();
-    if(!resp.ok || !j.sugestoes){
-      document.getElementById('sugCorpo').innerHTML = `<div class="sug-err">Não consegui buscar sugestões agora. ${_escSug(j.error||'')}</div>`;
+    let j;
+    try{ j = await iaChamar('refeicao', { perfil_nome: mp.label, contexto: mp.coach || '', refeicao: r.nome||'', itens_atuais: r.itens||'' }, { tempo: 45000 }); }
+    catch(e){ j = { error: e.message }; }
+    if(!j || !Array.isArray(j.sugestoes) || !j.sugestoes.length){
+      const c0 = document.getElementById('sugCorpo');
+      if(c0) c0.innerHTML = `<div class="sug-err">Não consegui buscar sugestões agora. ${_escSug((j && j.error)||'')}</div>`;
       return;
     }
     const html = j.sugestoes.map((s,i)=>`<div class="sug-card">
-      <div class="n">&#127869;&#65039; ${_escSug(s.nome)}</div>
+      <div class="n">${_escSug(s.nome)}</div>
       <div class="i">${_escSug(s.itens)}</div>
       <button class="u" data-usar="${i}">Usar essa</button>
     </div>`).join('');
@@ -4034,7 +4091,6 @@ function abrirDiario(){
 }
 
 /* ================================================================ coach IA */
-const COACH_URL = 'https://ojqyjbzlkmsayxmigsay.supabase.co/functions/v1/treino-coach';
 
 function _resumoSeries(ex, sets){
   if(!Array.isArray(sets) || !sets.length) return '';
@@ -4054,7 +4110,7 @@ function _historicoParaCoach(p, n){
   return evts.map(e=>{
     const base = { data: e.data, tipo: e.tipo };
     if(e.tipo==='musc'){
-      const dia = plan[e.dia];
+      const dia = treinoDaSessao(e, plan);
       const exArr = [];
       if(dia && dia.ex){
         dia.ex.forEach(ex=>{
@@ -4063,6 +4119,14 @@ function _historicoParaCoach(p, n){
           if(s) exArr.push({ nome: ex.n, series: s });
         });
       }
+      // exercícios registrados nesta sessão que saíram do plano depois
+      const vistos = new Set(((dia && dia.ex) || []).map(x=>x.id));
+      Object.keys(e.entries||{}).forEach(id=>{
+        if(vistos.has(id)) return;
+        const ex = exInfo(p, id); if(!ex) return;
+        const s = _resumoSeries(ex, e.entries[id]);
+        if(s) exArr.push({ nome: ex.n, series: s });
+      });
       return Object.assign(base, { dia: e.dia, titulo: dia ? dia.t : '', exercicios: exArr });
     }
     if(e.tipo==='extra'){
@@ -4081,8 +4145,8 @@ async function abrirCoach(){
   const p = ui.perfil, m = meta(p);
   const r = avaliar(p);
   const days = dayset(p);
-  const d = days[r.win.d];
-  const perfilNome = p==='gabriel' ? 'Gabriel' : 'Eduarda';
+  const d = days[r.win.d] || { t:'', ex:[] };
+  const perfilNome = m.label;
   const D = S.dieta[p] || {};
   const check = (S.check && S.check[p+':'+REF()]) || {};
 
@@ -4094,7 +4158,7 @@ async function abrirCoach(){
     .slice(0,30)
     .map(l=>({ data:l.data, hora:l.hora, refeicao:l.refNome, texto:l.texto }));
 
-  const payload = {
+  const payload = Object.assign(iaPerfil(p), {
     perfil: p,
     hoje: REF(),
     plano_dia_sugerido: {
@@ -4128,7 +4192,7 @@ async function abrirCoach(){
       }
       return out;
     })()
-  };
+  });
 
   _renderSugestaoShell(
     'Análise do coach',
@@ -4137,32 +4201,25 @@ async function abrirCoach(){
   );
 
   try{
-    const resp = await fetch(COACH_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const j = await resp.json();
-    if(!resp.ok){
-      document.getElementById('sugCorpo').innerHTML = `<div class="sug-err">Não consegui buscar a análise agora. ${_escSug(j.error||resp.status)}</div>`;
-      return;
-    }
+    const j = await iaChamar('coach', payload, { tempo: 50000 });
     _coachUltimo = j;
     _renderCoach(j);
   }catch(e){
     const c = document.getElementById('sugCorpo');
-    if(c) c.innerHTML = `<div class="sug-err">Erro de rede: ${_escSug(String(e&&e.message||e))}</div>`;
+    if(c) c.innerHTML = `<div class="sug-err">Não consegui buscar a análise agora. ${_escSug(String(e&&e.message||e))}</div>`;
   }
 }
 
+/* letra do plano no começo da recomendação ("B - Costas e Bíceps"), só se existir no plano */
 function _extraiLetraDia(reco){
-  const m = String(reco||'').match(/[A-D]/);
-  return m ? m[0] : null;
+  const m = String(reco||'').trim().match(/^[^A-Za-z0-9]*([A-H])(?![A-Za-zÀ-ÿ])/);
+  const L = m ? m[1] : null;
+  return (L && dayset(ui.perfil)[L]) ? L : null;
 }
 
 function _renderCoach(j){
   const letra = _extraiLetraDia(j.recomendacao_treino);
-  const nomeSemLetra = String(j.recomendacao_treino||'').replace(/^[^A-Za-z0-9]*[A-D][^A-Za-z0-9]*/, '').trim();
+  const nomeSemLetra = letra ? String(j.recomendacao_treino||'').replace(/^[^A-Za-z0-9]*[A-H][^A-Za-z0-9À-ÿ]*/, '').trim() : String(j.recomendacao_treino||'').trim();
   const cargas = Array.isArray(j.cargas_sugeridas) ? j.cargas_sugeridas : [];
   let html = '';
 
@@ -4234,6 +4291,7 @@ function ligar(){
     ui.view=b.dataset.view; ui.saved=false;
     if(ui.view!=="treino") ui.edit=false;
     if(ui.view!=="dieta") ui.edieta=false;
+    if(ui.view==="admin") carregarAdmin();
     render(); window.scrollTo(0,0);});
   document.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=async ()=>{
     // Abre o registro na data que está na tela (hoje ou um dia passado escolhido nas setas/calendário).
@@ -4301,13 +4359,13 @@ function ligar(){
     if(sessaoAberta(ui.perfil)) toastUndo("Treino minimizado — continue pela tela Início"); });
   document.querySelectorAll("[data-hoje]").forEach(b=>b.onclick=()=>{ ui.off = 0; ui.dia = avaliar(ui.perfil).win.d; render(); });
   document.querySelectorAll("[data-exobs]").forEach(b=>b.onclick=()=>{ const k = b.dataset.exobs+":*"; ui.obsOpen[k] = !ui.obsOpen[k]; render(); });
-  document.querySelectorAll("[data-pctab]").forEach(b=>b.onclick=()=>{ const [g,k] = b.dataset.pctab.split(":"); if(g==="evo") ui.evoTab = k; else ui.dietTab = k; render(); });
+  document.querySelectorAll("[data-pctab]").forEach(b=>b.onclick=()=>{ const [g,k] = b.dataset.pctab.split(":"); if(g==="evo") ui.evoTab = k; else if(g==="adm"){ ui.adm = ui.adm || {}; ui.adm.tab = k; } else ui.dietTab = k; render(); });
   document.querySelectorAll("[data-evodt]").forEach(b=>b.onclick=()=>{ ui.view = "agenda"; ui.off = offDe(b.dataset.evodt); render(); window.scrollTo(0,0); });
   document.querySelectorAll("[data-evoex]").forEach(b=>b.onclick=()=>{
     const p = ui.perfil, days = dayset(p), base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+ui.mes);
     const ym = `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,"0")}`;
     const ses = S.events.filter(e=>e.perfil===p && e.tipo==="musc" && e.data.startsWith(ym));
-    const lista = ORDER.flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L},ex))).filter(ex=>ses.some(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])));
+    const lista = letras(p).flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L},ex))).filter(ex=>ses.some(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])));
     _renderSugestaoShell("Exercício", "Só aparecem exercícios com registro no período", `<div class="pc-list">${lista.map(ex=>{
       const n = ses.filter(e=>e.dia===ex.L && pcMelhor(ex,(e.entries||{})[ex.id])).length;
       return `<button class="pc-row" data-pickex="${ex.id}"><div class="main"><div class="t">${esc(ex.n)}</div><div class="s">Treino ${ex.L} · ${n} ${n===1?"sessão":"sessões"}</div></div>${ex.id===ui.evoEx?`<span style="color:var(--ac)">${pic("check")}</span>`:""}</button>`; }).join("")}</div>`);
@@ -4374,8 +4432,30 @@ function ligar(){
     dayset(ui.perfil)[ui.dia].ex.push({id:"x"+Date.now(),n:"Novo exercício",p:"8-12",s:3,ty:"load",ap:""});
     store.set(S); render(); window.scrollTo(0,document.body.scrollHeight);});
   document.querySelectorAll("[data-reset]:not([data-sugclose])").forEach(b=>b.onclick=async ()=>{
+    const orig = S.padrao && S.padrao[ui.perfil] && S.padrao[ui.perfil][ui.dia];
+    if(!orig) return;
     if(await confirmar(`Restaurar o treino ${ui.dia} como estava no plano original?\n\nAs mudanças que você fez nos exercícios deste bloco serão perdidas.`, {ok:"Restaurar", perigo:true})){
-      S.plan[ui.perfil][ui.dia] = clone(BASE[ui.perfil].days[ui.dia]); store.set(S); render(); }});
+      const atual = S.plan[ui.perfil][ui.dia] || {}, novo = clone(orig);
+      // grupos musculares do treino não são editáveis: o original sem grupos mantém os atuais
+      if(!(Array.isArray(novo.grupos) && novo.grupos.length) && Array.isArray(atual.grupos) && atual.grupos.length) novo.grupos = atual.grupos.slice();
+      S.plan[ui.perfil][ui.dia] = novo; store.set(S); render(); }});
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{
+    const t = dayset(ui.perfil)[ui.dia]; if(!t) return;
+    t.cat = b.dataset.cat; store.set(S); render(); });
+  document.querySelectorAll("[data-addletra]").forEach(b=>b.onclick=()=>{
+    const L = b.dataset.addletra, plano = S.plan[ui.perfil];
+    if(!plano || plano[L]) return;
+    plano[L] = { t:"Treino "+L, cat:"full", ex:[{ id:novoId("x"), n:"Novo exercício", p:"8-12", s:3, ty:"load", ap:"" }] };
+    ui.dia = L; store.set(S); render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-delletra]").forEach(b=>b.onclick=async ()=>{
+    const L = b.dataset.delletra, plano = S.plan[ui.perfil];
+    if(!plano || !plano[L] || letras(ui.perfil).length < 2) return;
+    if(!(await confirmar(`Excluir o treino ${L} do plano?\n\nOs treinos ${L} já registrados continuam no histórico.`, {ok:"Excluir", perigo:true}))) return;
+    arquivarPlano(ui.perfil);
+    delete plano[L];
+    if(S.draft) delete S.draft[ui.perfil+":"+L];
+    limpaDraftMeta(ui.perfil, L);
+    ui.dia = letras(ui.perfil)[0]; store.set(S); render(); window.scrollTo(0,0); });
 
   document.querySelectorAll("[data-mes]").forEach(b=>b.onclick=()=>{ ui.mes += Number(b.dataset.mes); render(); });
   document.querySelectorAll("[data-dt]").forEach(b=>b.onclick=()=>{
@@ -4396,7 +4476,7 @@ function ligar(){
   document.querySelectorAll("[data-metas]").forEach(b=>b.onclick=()=>{ ui.view="config"; render(); window.scrollTo(0,0); });
   document.querySelectorAll("[data-dieta]").forEach(el=>el.oninput=()=>{
     const D = S.dieta[ui.perfil], parts = el.dataset.dieta.split(".");
-    if(parts[0]==="alvo") D.alvo[parts[1]] = el.value;
+    if(parts[0]==="alvo"){ if(!D.alvo) D.alvo = {}; D.alvo[parts[1]] = el.value; }
     else if(parts[0]==="nota") D.nota = el.value;
     else if(parts[0]==="ref"){ const r = D.refs.find(x=>x.id===parts[1]); if(r) r[parts[2]] = el.value; }
     else if(parts[0]==="extra"){ const x = D.extras.find(y=>y.id===parts[1]); if(x) x[parts[2]] = el.value; }
@@ -4432,10 +4512,57 @@ function ligar(){
   document.querySelectorAll("[data-editdieta]").forEach(b=>b.onclick=()=>{
     ui.view="dieta"; ui.edieta=true; render(); window.scrollTo(0,0);
   });
-  document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=async ()=>{
-    if(await confirmar("Sair da conta?", {ok:"Sair", perigo:true})) logout();
-  });
+  document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=()=>logout());
   /* [data-meta] tratado pela delegação global (ligarDelegacaoUmaVez) */
+
+  /* ---- dieta: refeições e itens fixos ---- */
+  document.querySelectorAll("[data-addref]").forEach(b=>b.onclick=()=>{
+    const D = S.dieta[ui.perfil]; if(!D) return;
+    if(!Array.isArray(D.refs)) D.refs = [];
+    D.refs.push({ id:novoId("r"), nome:"Nova refeição", hora:"", itens:"" });
+    store.set(S); render(); window.scrollTo(0,document.body.scrollHeight); });
+  document.querySelectorAll("[data-delref]").forEach(b=>b.onclick=async ()=>{
+    const D = S.dieta[ui.perfil]; const r = (D.refs||[]).find(x=>x.id===b.dataset.delref); if(!r) return;
+    if(!(await confirmar(`Remover a refeição "${r.nome}"?\n\nO que já foi escrito no diário continua salvo.`, {ok:"Remover", perigo:true}))) return;
+    D.refs = D.refs.filter(x=>x.id!==r.id); store.set(S); render(); });
+  document.querySelectorAll("[data-addextra]").forEach(b=>b.onclick=()=>{
+    const D = S.dieta[ui.perfil]; if(!D) return;
+    if(!Array.isArray(D.extras)) D.extras = [];
+    D.extras.push({ id:novoId("x"), nome:"" }); store.set(S); render(); });
+  document.querySelectorAll("[data-delextra]").forEach(b=>b.onclick=()=>{
+    const D = S.dieta[ui.perfil]; if(!D || !Array.isArray(D.extras)) return;
+    D.extras = D.extras.filter(x=>x.id!==b.dataset.delextra); store.set(S); render(); });
+
+  /* ---- perfil ---- */
+  document.querySelectorAll("button[data-princ]").forEach(b=>b.onclick=()=>{
+    const k = b.dataset.princ, pf = perfilEditavel(ui.perfil);
+    pf.principal = k; pf.extra = k ? (ESPORTE_NOME[k] || "") : "";
+    if(k && k!=="jejum"){ const a = meta(ui.perfil).ativ.slice(); if(!a.includes(k)) a.unshift(k); pf.ativ = a; }
+    store.set(S); render(); });
+  document.querySelectorAll("button[data-ativq]").forEach(b=>b.onclick=()=>{
+    const k = b.dataset.ativq, pf = perfilEditavel(ui.perfil);
+    const a = meta(ui.perfil).ativ.slice(), i = a.indexOf(k);
+    if(i>=0) a.splice(i,1); else a.push(k);
+    pf.ativ = Object.keys(ATIV_LABEL).filter(x=>a.includes(x));
+    if(!pf.ativ.length) pf.ativ = [];
+    store.set(S); render(); });
+  document.querySelectorAll("button[data-aguameta]").forEach(b=>b.onclick=()=>{
+    perfilEditavel(ui.perfil).agua = Number(b.dataset.aguameta); store.set(S); render(); });
+  document.querySelectorAll("[data-trocarsenha]").forEach(b=>b.onclick=()=>abrirTrocarSenha());
+  const fb = document.getElementById("fbEnviar"); if(fb) fb.onclick=()=>enviarComentario();
+
+  /* ---- primeiro acesso e IA ---- */
+  document.querySelectorAll("[data-importar]").forEach(b=>b.onclick=()=>abrirImportarIA(b.dataset.importar));
+  document.querySelectorAll("[data-planovazio]").forEach(b=>b.onclick=()=>{
+    const p = ui.perfil;
+    if(!S.plan[p]) S.plan[p] = {};
+    if(!temPlano(p)) S.plan[p].A = { t:"Treino A", cat:"full", ex:[{ id:novoId("x"), n:"Novo exercício", p:"8-12", s:3, ty:"load", ap:"" }] };
+    ui.dia = "A"; ui.view = "treino"; ui.edit = true; store.set(S); render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-pulardieta]").forEach(b=>b.onclick=()=>{
+    perfilEditavel(ui.perfil).onb = true; ui.view = "hoje"; store.set(S); render(); window.scrollTo(0,0); });
+
+  /* ---- administrador ---- */
+  if(ui.view==="admin") ligarAdmin();
 }
 
 /* Delegação global de INPUT nas séries — registrada UMA vez.
@@ -4484,6 +4611,12 @@ function ligarDelegacaoUmaVez(){
       salvaSoft();
       return;
     }
+    // perfil (orientações para o coach)
+    if(el.matches('[data-perfil]')){
+      perfilEditavel(ui.perfil)[el.dataset.perfil] = el.value;
+      salvaSoft();
+      return;
+    }
     // config de perfil (peso/kcal/prot etc)
     if(el.matches('[data-meta]')){
       if(!S.metas) S.metas={};
@@ -4499,78 +4632,535 @@ function ligarDelegacaoUmaVez(){
   catch(err){ console.warn('[PaceIA hydrate]', err); }
 }
 
+/* ================================================================ estrutura do documento
+   Garante as partes que o app usa para cada perfil do grupo (plano, dieta, perfil). */
+function prepararEstado(){
+  if(!Array.isArray(S.events)) S.events = [];
+  if(!S.draft || typeof S.draft!=="object") S.draft = {};
+  if(!S.check || typeof S.check!=="object") S.check = {};
+  if(!S.metas || typeof S.metas!=="object") S.metas = {};
+  if(!S.plan || typeof S.plan!=="object") S.plan = {};
+  if(!S.dieta || typeof S.dieta!=="object") S.dieta = {};
+  if(!S.perfis || typeof S.perfis!=="object") S.perfis = {};
+  if(!S.planejado || typeof S.planejado!=="object") S.planejado = {};
+  Object.keys(S.check).forEach(k=>{
+    if(Array.isArray(S.check[k])){ const novo = {}; S.check[k].forEach(id=>novo[id]="ok"); S.check[k] = novo; }
+  });
+  perfisDaConta().forEach(({ perfil:p, nome })=>{
+    if(!S.plan[p] || typeof S.plan[p]!=="object") S.plan[p] = {};
+    if(!S.dieta[p] || typeof S.dieta[p]!=="object") S.dieta[p] = { alvo:{}, nota:"", refs:[], extras:[], log:[] };
+    const D = S.dieta[p];
+    if(!D.alvo || typeof D.alvo!=="object") D.alvo = {};
+    if(!Array.isArray(D.refs)) D.refs = [];
+    if(!Array.isArray(D.extras)) D.extras = [];
+    if(!Array.isArray(D.log)) D.log = [];
+    D.refs.forEach(r=>{ if(typeof r.hora !== 'string') r.hora = ''; });
+    if(!S.perfis[p] || typeof S.perfis[p]!=="object") S.perfis[p] = { label: primeiroNome(nome) || p };
+    if(!S.planejado[p] || typeof S.planejado[p]!=="object") S.planejado[p] = {};
+    letras(p).forEach(L=>{ (S.plan[p][L].ex||[]).forEach(e=>{ if(e.ap===undefined) e.ap=""; }); });
+  });
+}
+const novoId = pre => pre + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+/* perfil gravável (cria o registro do perfil no documento se ainda não existir) */
+function perfilEditavel(p){
+  if(!S.perfis) S.perfis = {};
+  if(!S.perfis[p] || typeof S.perfis[p]!=="object") S.perfis[p] = { label: meta(p).label };
+  return S.perfis[p];
+}
+/* guarda o plano atual antes de trocar: o histórico continua mostrando os exercícios antigos */
+function arquivarPlano(p){
+  const atual = dayset(p), so = {};
+  letras(p).forEach(L=>{ so[L] = clone(atual[L]); });
+  if(!Object.keys(so).length) return;
+  if(!S.planHist) S.planHist = {};
+  const h = Array.isArray(S.planHist[p]) ? S.planHist[p] : [];
+  h.unshift({ em: new Date().toISOString(), plano: so });
+  S.planHist[p] = h.slice(0, 8);
+}
+/* exercício pelo id: plano atual primeiro, depois planos arquivados */
+function exInfo(p, id){
+  const atual = dayset(p);
+  for(const L of letras(p)){ const e = (atual[L].ex||[]).find(x=>x.id===id); if(e) return e; }
+  for(const h of ((S.planHist && S.planHist[p]) || [])){
+    for(const t of Object.values(h.plano || {})){ const e = (t.ex||[]).find(x=>x.id===id); if(e) return e; }
+  }
+  return null;
+}
+const brdHora = s => { if(!s) return ""; const d = new Date(s); if(isNaN(d)) return ""; return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; };
+async function copiarTexto(t){
+  try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  try{
+    const ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly",""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok;
+  }catch(e){ return false; }
+}
+
+/* ================================================================ primeiro acesso */
+function viewBoasVindas(p, m){
+  const D = (S.dieta && S.dieta[p]) || {};
+  const temT = temPlano(p), temD = (D.refs || []).length > 0, Ls = letras(p);
+  let out = pcTopo() + `<h1 class="pc-h1">${temT ? "Agora, a dieta" : "Olá, " + esc(m.label)}</h1>
+    <p class="pc-sub">${temT ? "Envie o seu plano alimentar para acompanhar as refeições. Se preferir, pule e faça depois." : "Para começar, envie o seu treino. A IA monta o plano no app e você confere antes de salvar."}</p>`;
+  out += `<div class="pc-list" style="margin-top:18px">
+    <div class="pc-row">${temT ? `<span class="pc-st-ok" aria-hidden="true">${pic("check")}</span>` : `<span class="pc-st-pl" aria-hidden="true">1</span>`}
+      <div class="main"><div class="t">Treino</div><div class="s">${temT ? `${Ls.length} ${Ls.length===1 ? "treino" : "treinos"} no plano: ${Ls.join(", ")}` : "Texto, PDF, foto ou print da ficha"}</div></div></div>
+    <div class="pc-row">${temD ? `<span class="pc-st-ok" aria-hidden="true">${pic("check")}</span>` : `<span class="pc-st-pl" aria-hidden="true">2</span>`}
+      <div class="main"><div class="t">Dieta</div><div class="s">${temD ? `${D.refs.length} refeições` : "Plano alimentar em texto, PDF, foto ou print"}</div></div></div>
+  </div>`;
+  out += `<div style="margin-top:18px;display:grid;gap:10px">` + (temT
+    ? `<button class="pc-btn pri" data-importar="dieta">${pic("spark","sm")} Enviar dieta</button>
+       <button class="pc-btn ghost" data-pulardieta="1">Pular por enquanto</button>`
+    : `<button class="pc-btn pri" data-importar="treino">${pic("spark","sm")} Enviar treino</button>
+       <button class="pc-btn ghost" data-planovazio="1">Montar o treino à mão</button>`) + `</div>`;
+  out += `<p class="pc-note" style="margin-top:16px;font-size:13.5px">A IA só transcreve o que estiver no que você enviar, sem criar exercícios ou alimentos. As informações ficam só na sua conta.</p>`;
+  return out;
+}
+
+/* ================================================================ IA: ler treino ou dieta */
+const IMP = { tipo:"treino", arquivos:[], texto:"", ocupado:false, resultado:null, pedido:0 };
+const tamTxt = n => n >= 1048576 ? (n/1048576).toLocaleString("pt-BR",{maximumFractionDigits:1})+" MB" : Math.max(1, Math.round(n/1024))+" KB";
+function abrirImportarIA(tipo){
+  IMP.tipo = tipo==="dieta" ? "dieta" : "treino";
+  IMP.arquivos = []; IMP.texto = ""; IMP.ocupado = false; IMP.resultado = null;
+  desenharImportar();
+}
+function desenharImportar(erro){
+  const tr = IMP.tipo==="treino", p = ui.perfil;
+  const substitui = tr ? temPlano(p) : (((S.dieta[p]||{}).refs)||[]).length > 0;
+  const lista = IMP.arquivos.map((a,i)=>`<div class="imp-arq"><div class="main"><div class="t">${esc(a.nome)}</div><div class="s">${a.mime==="application/pdf" ? "PDF" : "Imagem"} · ${tamTxt(a.tam)}</div></div>
+    <button class="pc-ib" data-imprm="${i}" aria-label="Tirar ${esc(a.nome)}">${pic("x","sm")}</button></div>`).join("");
+  const corpo = `${erro ? `<div class="pc-warn" role="alert" style="margin:0 0 12px">${esc(erro)}</div>` : ""}
+    <p class="pc-note" style="margin:0 0 12px;font-size:14px">${tr ? "Envie a ficha de treino: PDF, foto, print ou o texto copiado." : "Envie o plano alimentar: PDF, foto, print ou o texto copiado."}${substitui ? (tr ? " O plano atual será substituído depois que você conferir; o histórico continua salvo." : " A dieta atual será substituída depois que você conferir; o diário continua salvo.") : ""}</p>
+    <label class="pc-btn ghost imp-escolher">${pic("plus","sm")}<span>Escolher arquivo</span><input type="file" id="impArq" accept="image/*,application/pdf,.pdf,.txt,text/plain" multiple></label>
+    <div class="imp-lista">${lista}</div>
+    <textarea class="ta" id="impTexto" style="margin-top:12px" placeholder="Ou cole aqui o texto ${tr ? "do treino" : "da dieta"}">${esc(IMP.texto)}</textarea>
+    <button class="sug-save" id="impLer">Ler com IA</button>
+    <p class="pc-note" style="font-size:12.5px">A IA só transcreve o que estiver no arquivo. Você confere tudo antes de salvar. Word: salve como PDF ou copie o texto.</p>`;
+  _renderSugestaoShell(tr ? "Enviar treino" : "Enviar dieta", "Texto, PDF, foto ou print", corpo);
+  const arq = document.getElementById("impArq");
+  if(arq) arq.onchange = async ()=>{
+    const files = Array.from(arq.files || []);
+    if(!files.length) return;
+    const e = await lerArquivosImportar(files);
+    desenharImportar(e);
+  };
+  const ta = document.getElementById("impTexto"); if(ta) ta.oninput = ()=>{ IMP.texto = ta.value; };
+  document.querySelectorAll("#sugCorpo [data-imprm]").forEach(b=>b.onclick=()=>{ IMP.arquivos.splice(Number(b.dataset.imprm), 1); desenharImportar(); });
+  const ler = document.getElementById("impLer"); if(ler) ler.onclick = ()=>enviarImportacao();
+}
+function paraBase64(blob){
+  return new Promise((res, rej)=>{ const r = new FileReader(); r.onload = ()=>res(String(r.result).split(",")[1] || ""); r.onerror = ()=>rej(r.error); r.readAsDataURL(blob); });
+}
+async function comprimirImagem(f){
+  const url = URL.createObjectURL(f);
+  try{
+    const img = await new Promise((res, rej)=>{ const i = new Image(); i.onload = ()=>res(i); i.onerror = ()=>rej(new Error("imagem")); i.src = url; });
+    const fator = Math.min(1, 2000 / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
+    const w = Math.max(1, Math.round((img.naturalWidth || 1) * fator)), h = Math.max(1, Math.round((img.naturalHeight || 1) * fator));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+    const b64 = (c.toDataURL("image/jpeg", 0.85).split(",")[1]) || "";
+    if(!b64) throw new Error("imagem");
+    return { mime:"image/jpeg", base64:b64, tam: Math.round(b64.length * 0.75) };
+  } finally { URL.revokeObjectURL(url); }
+}
+async function lerArquivosImportar(files){
+  let erro = "";
+  for(const f of files){
+    const tipo = String(f.type || "").toLowerCase(), nome = f.name || "arquivo";
+    if(IMP.arquivos.length >= 6){ erro = "Envie no máximo 6 arquivos por vez."; break; }
+    try{
+      if(tipo==="text/plain" || /\.txt$/i.test(nome)){
+        const t = await f.text();
+        IMP.texto = ((IMP.texto ? IMP.texto + "\n\n" : "") + t).slice(0, 30000);
+      } else if(tipo==="application/pdf" || /\.pdf$/i.test(nome)){
+        if(f.size > 8*1024*1024){ erro = `${nome}: PDF grande demais (máximo de 8 MB). Envie só as páginas do ${IMP.tipo==="treino" ? "treino" : "plano"}.`; continue; }
+        IMP.arquivos.push({ nome, mime:"application/pdf", base64: await paraBase64(f), tam: f.size });
+      } else if(tipo.startsWith("image/") || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(nome)){
+        const im = await comprimirImagem(f);
+        IMP.arquivos.push(Object.assign({ nome }, im));
+      } else {
+        erro = `${nome}: formato não aceito. Envie PDF, foto, print ou texto.`;
+      }
+    }catch(e){
+      erro = `${nome}: não consegui abrir o arquivo. Tente um print da tela ou um PDF.`;
+    }
+  }
+  let total = IMP.arquivos.reduce((a,x)=>a + x.base64.length, 0);
+  while(total > 12000000 && IMP.arquivos.length){
+    const x = IMP.arquivos.pop(); total -= x.base64.length;
+    erro = "Arquivos grandes demais juntos (cerca de 9 MB no total). Envie menos páginas.";
+  }
+  return erro;
+}
+async function enviarImportacao(){
+  if(IMP.ocupado) return;
+  const texto = (IMP.texto || "").trim();
+  if(!texto && !IMP.arquivos.length){ desenharImportar("Escolha um arquivo ou cole o texto."); return; }
+  IMP.ocupado = true;
+  const pedido = ++IMP.pedido;
+  const c = document.getElementById("sugCorpo");
+  if(c) c.innerHTML = `<div class="sug-load">Lendo ${IMP.tipo==="treino" ? "o treino" : "a dieta"}…<br><br><span style="font-size:12px;color:var(--faint)">Pode levar até 1 minuto. Não feche esta janela.</span></div>`;
+  try{
+    const r = await iaChamar("importar", { tipo: IMP.tipo, texto, arquivos: IMP.arquivos.map(a=>({ nome:a.nome, mime:a.mime, base64:a.base64 })) }, { tempo: 150000 });
+    IMP.ocupado = false;
+    if(pedido !== IMP.pedido || !document.getElementById("sugCorpo")) return;
+    IMP.resultado = r;
+    desenharPrevia();
+  }catch(e){
+    IMP.ocupado = false;
+    if(pedido !== IMP.pedido || !document.getElementById("sugCorpo")) return;
+    desenharImportar(e.message || "Não foi possível ler agora.");
+  }
+}
+/* o cronograma atual continua valendo se todas as letras dele existirem no plano novo */
+function cronogramaCompativel(p, plano){
+  const sch = getSchedule(p); if(!sch) return false;
+  return Object.values(sch).every(d=>!d || !d.musc || (plano[d.musc] && Array.isArray(plano[d.musc].ex)));
+}
+const CAT_NOME = { sup:"superiores", inf:"inferiores", full:"corpo inteiro" };
+function desenharPrevia(){
+  const r = IMP.resultado, tr = IMP.tipo==="treino", p = ui.perfil;
+  let h = "";
+  if(r.avisos && r.avisos.length) h += `<div class="pc-warn" style="margin:0 0 12px"><b>Confira:</b><ul class="imp-av">${r.avisos.slice(0,8).map(a=>`<li>${esc(a)}</li>`).join("")}</ul></div>`;
+  if(tr){
+    Object.keys(r.plano || {}).forEach(L=>{
+      const t = r.plano[L];
+      h += `<div class="imp-t"><b>${esc(L)}</b><span>${esc(t.t)}</span><small>${esc(CAT_NOME[t.cat] || "")}</small></div>
+        <table class="imp-tab"><thead><tr><th>Exercício</th><th>Séries</th><th>Repetições</th></tr></thead><tbody>
+        ${t.ex.map(e=>`<tr><td>${esc(e.n)}${e.no ? `<small>${esc(e.no)}</small>` : ""}</td><td>${e.s}</td><td>${esc(e.p || (e.ty==="time" ? "tempo" : "—"))}</td></tr>`).join("")}
+        </tbody></table>`;
+    });
+    if(r.schedule){
+      const nomes = { seg:"Seg", ter:"Ter", qua:"Qua", qui:"Qui", sex:"Sex", sab:"Sáb", dom:"Dom" };
+      h += `<div class="imp-t"><span>Semana</span></div><div class="imp-sem">${Object.keys(nomes).map(k=>`<div><small>${nomes[k]}</small><b>${esc((r.schedule[k] && r.schedule[k].musc) || "—")}</b></div>`).join("")}</div>`;
+    }
+    const subst = temPlano(p);
+    const sched = r.schedule ? "O cronograma da semana também é atualizado."
+      : (getSchedule(p) ? (cronogramaCompativel(p, r.plano) ? "O cronograma semanal atual continua valendo." : "O arquivo não traz os dias da semana; o app passa a sugerir o treino parado há mais tempo.") : "");
+    h += `<p class="pc-note" style="font-size:13px">${subst ? `Substitui o plano atual (${letras(p).join(", ")}). O histórico de treinos continua salvo. ` : ""}${sched}</p>`;
+    h += `<button class="sug-save" id="impUsar">Usar este treino</button>`;
+  } else {
+    const d = r.dieta, A = d.alvo || {};
+    const alvo = [A.kcal && A.kcal+" kcal", A.prot && "proteína "+A.prot, A.carb && "carboidrato "+A.carb, A.gord && "gordura "+A.gord].filter(Boolean).join(" · ");
+    if(alvo) h += `<div class="imp-t"><span>Meta do dia</span><small>${esc(alvo)}</small></div>`;
+    (d.refs || []).forEach(x=>{
+      h += `<div class="imp-t"><b>${esc(x.hora || "")}</b><span>${esc(x.nome)}</span>${x.kcal ? `<small>${x.kcal} kcal</small>` : ""}</div><div class="imp-itens">${esc(x.itens)}</div>`;
+    });
+    if((d.extras || []).length) h += `<div class="imp-t"><span>Itens fixos do dia</span></div><ul class="imp-av">${d.extras.map(x=>`<li>${esc(x.nome)}</li>`).join("")}</ul>`;
+    if(r.agua) h += `<p class="pc-note">Água: ${fmtL(r.agua)} L por dia.</p>`;
+    if(d.nota) h += `<p class="pc-note" style="white-space:pre-line">${esc(d.nota)}</p>`;
+    const subst = (((S.dieta[p]||{}).refs) || []).length > 0;
+    if(subst) h += `<p class="pc-note" style="font-size:13px">Substitui a dieta atual. O diário de refeições continua salvo.</p>`;
+    h += `<button class="sug-save" id="impUsar">Usar esta dieta</button>`;
+  }
+  h += `<button class="reset" id="impOutro">Enviar outro arquivo</button>`;
+  _renderSugestaoShell(tr ? "Confira o treino" : "Confira a dieta", "Lido pela IA a partir do que você enviou", h);
+  const usar = document.getElementById("impUsar");
+  if(usar) usar.onclick = async ()=>{
+    usar.disabled = true;
+    const antes = clone({ plan: S.plan[p] || {}, padrao: (S.padrao && S.padrao[p]) || null, perfil: (S.perfis && S.perfis[p]) || null,
+      hist: (S.planHist && S.planHist[p]) || null, dieta: S.dieta[p] || null });
+    if(tr) aplicarTreinoImportado(p, r); else aplicarDietaImportada(p, r);
+    IMP.resultado = null; IMP.arquivos = []; IMP.texto = "";
+    fecharSugestao();
+    if(tr){ ui.dia = avaliar(p).win.d || letras(p)[0]; ui.edit = false; if(ui.view==="treino") ui.view = "treinos"; }
+    else { ui.edieta = false; }
+    await store.set(S); render(); window.scrollTo(0,0);
+    toastUndo(tr ? "Treino salvo no app" : "Dieta salva no app", async ()=>{
+      S.plan[p] = antes.plan;
+      if(!S.padrao) S.padrao = {};
+      if(antes.padrao) S.padrao[p] = antes.padrao; else delete S.padrao[p];
+      if(antes.perfil) S.perfis[p] = antes.perfil;
+      if(!S.planHist) S.planHist = {};
+      if(antes.hist) S.planHist[p] = antes.hist; else delete S.planHist[p];
+      if(antes.dieta) S.dieta[p] = antes.dieta;
+      prepararEstado();
+      ui.dia = avaliar(p).win.d || letras(p)[0];
+      await store.set(S); render();
+    });
+  };
+  const outro = document.getElementById("impOutro"); if(outro) outro.onclick = ()=>desenharImportar();
+}
+const normNome = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\([^)]*\)/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+function aplicarTreinoImportado(p, r){
+  const atual = dayset(p);
+  // mesmo exercício (mesmo nome) mantém o id: o histórico e a "última vez" continuam ligados a ele
+  const idx = new Map();
+  letras(p).forEach(L=>(atual[L].ex || []).forEach(e=>{ const k = normNome(e.n); if(k && !idx.has(k)) idx.set(k, e.id); }));
+  ((S.planHist && S.planHist[p]) || []).forEach(h=>Object.values(h.plano || {}).forEach(t=>(t.ex || []).forEach(e=>{ const k = normNome(e.n); if(k && !idx.has(k)) idx.set(k, e.id); })));
+  const usados = new Set(), novo = {};
+  Object.keys(r.plano || {}).forEach(L=>{
+    const t = r.plano[L];
+    novo[L] = { t: t.t, cat: t.cat || "full", grupos: Array.isArray(t.grupos) ? t.grupos : [], ex: (t.ex || []).map(e=>{
+      let id = idx.get(normNome(e.n));
+      if(!id || usados.has(id)) id = novoId("e");
+      usados.add(id);
+      const out = { id, n: e.n, p: e.p || "", s: Number(e.s) || 3, ty: e.ty || "load", ap: "" };
+      if(e.d) out.d = e.d;
+      if(e.no) out.no = e.no;
+      return out;
+    }) };
+  });
+  const schedAntigo = getSchedule(p);
+  if(temPlano(p)) arquivarPlano(p);
+  if(r.schedule) novo.schedule = r.schedule;
+  else if(schedAntigo && cronogramaCompativel(p, novo)) novo.schedule = schedAntigo;
+  // rascunhos de treinos que deixaram de existir
+  letras(p).forEach(L=>{ if(!novo[L]){ if(S.draft) delete S.draft[p+":"+L]; limpaDraftMeta(p, L); } });
+  S.plan[p] = novo;
+  if(!S.padrao) S.padrao = {};
+  const pad = {}; Object.keys(novo).filter(k=>k!=="schedule").forEach(k=>{ pad[k] = clone(novo[k]); });
+  S.padrao[p] = pad;
+  if(Array.isArray(r.atividades) && r.atividades.length){
+    const a = meta(p).ativ.slice();
+    r.atividades.forEach(x=>{ if(ATIV_LABEL[x] && !a.includes(x)) a.push(x); });
+    perfilEditavel(p).ativ = Object.keys(ATIV_LABEL).filter(x=>a.includes(x));
+  }
+}
+function aplicarDietaImportada(p, r){
+  if(!S.dieta[p]) S.dieta[p] = { log:[] };
+  const D = S.dieta[p], d = r.dieta || {}, A = d.alvo || {};
+  D.alvo = { kcal: A.kcal || "", prot: A.prot || "", carb: A.carb || "", gord: A.gord || "" };
+  D.nota = d.nota || "";
+  D.refs = (d.refs || []).map(x=>{ const o = { id: novoId("r"), nome: x.nome, hora: x.hora || "", itens: x.itens || "" }; if(x.kcal) o.kcal = x.kcal; return o; });
+  D.extras = (d.extras || []).map(x=>({ id: novoId("x"), nome: x.nome }));
+  delete D.alvos_dia;   // metas por tipo de dia eram do plano anterior
+  if(!Array.isArray(D.log)) D.log = [];
+  const pf = perfilEditavel(p);
+  if(r.agua) pf.agua = r.agua;
+  pf.onb = true;
+}
+
+/* ================================================================ conta: senha e comentários */
+function abrirTrocarSenha(){
+  const corpo = `<label class="eyebrow" for="ts1" style="display:block;margin-bottom:6px">Senha atual</label>
+    <input class="ed-f" id="ts1" type="password" autocomplete="current-password">
+    <label class="eyebrow" for="ts2" style="display:block;margin-bottom:6px">Senha nova (mínimo de 8 caracteres)</label>
+    <input class="ed-f" id="ts2" type="password" autocomplete="new-password">
+    <label class="eyebrow" for="ts3" style="display:block;margin-bottom:6px">Repita a senha nova</label>
+    <input class="ed-f" id="ts3" type="password" autocomplete="new-password">
+    <div class="login-err" id="tsErr" role="alert" style="margin:0 0 8px"></div>
+    <button class="sug-save" id="tsOk">Trocar senha</button>
+    <p class="pc-note" style="font-size:12.5px">Os outros aparelhos conectados à sua conta vão pedir para entrar de novo.</p>`;
+  _renderSugestaoShell("Trocar senha", (SESSAO && SESSAO.conta.login) || "", corpo);
+  const err = t => { const e = document.getElementById("tsErr"); if(e) e.textContent = t || ""; };
+  document.getElementById("tsOk").onclick = async ()=>{
+    const a = document.getElementById("ts1").value, n1 = document.getElementById("ts2").value, n2 = document.getElementById("ts3").value;
+    if(!a){ err("Informe a senha atual."); return; }
+    if(n1.length < 8){ err("A senha nova precisa ter pelo menos 8 caracteres."); return; }
+    if(n1.length > 72){ err("A senha nova pode ter no máximo 72 caracteres."); return; }
+    if(n1 !== n2){ err("As duas senhas novas não são iguais."); return; }
+    const bt = document.getElementById("tsOk"); bt.disabled = true; bt.textContent = "Trocando…"; err("");
+    try{
+      const r = await rpc("pace_trocar_senha", { p_token: SESSAO.token, p_atual: a, p_nova: n1 });
+      if(r && r.erro){ err(r.erro); return; }
+      fecharSugestao(); toastUndo("Senha trocada.");
+    }catch(e){
+      if(e.sessao){ fecharSugestao(); sessaoEncerrada(); return; }
+      err(navigator.onLine ? "Não foi possível trocar agora. Tente de novo." : "Sem internet.");
+    }finally{
+      const b = document.getElementById("tsOk"); if(b){ b.disabled = false; b.textContent = "Trocar senha"; }
+    }
+  };
+}
+async function enviarComentario(){
+  const ta = document.getElementById("fbTexto"), bt = document.getElementById("fbEnviar");
+  const t = ((ta && ta.value) || "").trim();
+  if(!t){ toastUndo("Escreva o comentário antes de enviar."); return; }
+  bt.disabled = true; bt.textContent = "Enviando…";
+  try{
+    const r = await rpc("pace_feedback_enviar", { p_token: SESSAO.token, p_texto: t, p_tela: ui.view, p_versao: "v44" });
+    if(r && r.erro) toastUndo(r.erro);
+    else { if(ta) ta.value = ""; toastUndo("Comentário enviado. Obrigado."); }
+  }catch(e){
+    if(e.sessao){ sessaoEncerrada(); return; }
+    toastUndo(navigator.onLine ? "Não foi possível enviar agora. Tente de novo." : "Sem internet. O texto continua no campo.");
+  }finally{
+    const b = document.getElementById("fbEnviar"); if(b){ b.disabled = false; b.textContent = "Enviar comentário"; }
+  }
+}
+
+/* ================================================================ administrador */
+const linkAcesso = tok => location.origin + location.pathname + "#acesso=" + tok;
+async function carregarAdmin(){
+  ui.adm = Object.assign({ tab:"contas", nome:"", email:"" }, ui.adm || {}, { carregando:true, erro:"" });
+  try{
+    const [contas, fb] = await Promise.all([
+      rpc("pace_admin_contas", { p_token: SESSAO.token }),
+      rpc("pace_admin_feedback", { p_token: SESSAO.token })
+    ]);
+    ui.adm.contas = Array.isArray(contas) ? contas : [];
+    ui.adm.feedback = Array.isArray(fb) ? fb : [];
+  }catch(e){
+    if(e.sessao){ sessaoEncerrada(); return; }
+    ui.adm.erro = /restrito/i.test(e.message) ? "Acesso restrito ao administrador." : (navigator.onLine ? "Não foi possível carregar agora." : "Sem internet.");
+  }
+  ui.adm.carregando = false;
+  if(ui.view==="admin") render();
+}
+function blocoLinkAdmin(L){
+  return `<section class="pc-hl" aria-label="Link de acesso" style="margin-top:14px">
+    <div class="ey">${pic("lock","sm")}${L.primeiro ? "Primeiro acesso" : "Senha nova"} · ${esc(primeiroNome(L.nome))}</div>
+    <div class="adm-link" id="admLinkTxt">${esc(L.url)}</div>
+    <div class="meta">Vale uma vez, até ${esc(brdHora(L.expira))}. Quem abrir o link cria a própria senha.</div>
+    <div class="adm-acts">
+      <button class="pc-btn sm hl" data-admcopiar="1">Copiar link</button>
+      <button class="pc-btn sm hl" data-admzap="1">WhatsApp</button>
+      ${navigator.share ? `<button class="pc-btn sm hl" data-admshare="1">Compartilhar</button>` : ""}
+    </div></section>`;
+}
+function viewAdmin(p, m){
+  const A = ui.adm || { carregando:true, tab:"contas" };
+  let out = `<div class="tbar" style="margin-bottom:6px"><div class="t">Acessos</div><button class="edt" data-view="config">Voltar</button></div>
+    <p class="pc-sub" style="font-size:15px;margin-bottom:6px">Crie acessos para os amigos testarem e leia o que eles comentaram.</p>`;
+  if(!souAdmin()) return out + `<p class="pc-note">Acesso restrito ao administrador.</p>`;
+  const novos = (A.feedback || []).filter(f=>!f.lido).length;
+  out += pcTabs("adm", [["contas","Acessos"],["coment", novos ? `Comentários (${novos})` : "Comentários"]], A.tab || "contas");
+  if(A.erro) out += `<div class="pc-warn">${esc(A.erro)}<div class="acts"><button class="pc-btn sm oac" data-admrecarregar="1">Tentar de novo</button></div></div>`;
+  if(A.carregando && !A.contas) return out + `<div class="sug-load">Carregando…</div>`;
+  if((A.tab || "contas")==="contas"){
+    out += pcSec("Novo acesso") + `<div class="cfg-list" style="padding:14px 16px">
+      <label class="eyebrow" for="admNome" style="display:block;margin-bottom:6px">Nome</label>
+      <input class="ed-f" id="admNome" autocomplete="off" placeholder="Nome e sobrenome" value="${esc(A.nome || "")}">
+      <label class="eyebrow" for="admEmail" style="display:block;margin-bottom:6px">E-mail (vira o usuário)</label>
+      <input class="ed-f" id="admEmail" type="email" inputmode="email" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="nome@exemplo.com" value="${esc(A.email || "")}">
+      <button class="pc-btn pri" id="admCriar">Criar acesso e gerar link</button>
+      <p class="pc-note" style="font-size:12.5px">Cada acesso novo tem os próprios dados: ninguém vê os treinos e a dieta de outra conta.</p>
+    </div>`;
+    if(A.link) out += blocoLinkAdmin(A.link);
+    out += pcSec("Quem tem acesso", `<span class="aside">${(A.contas || []).length}</span>`) + `<div class="pc-list">`;
+    (A.contas || []).forEach(c=>{
+      const sit = c.situacao==="ativo" ? "Ativo" : c.situacao==="aguardando" ? "Ainda não entrou" : "Desativado";
+      const ult = c.ultimo_uso ? "último uso " + brdHora(c.ultimo_uso) : "";
+      out += `<div class="pc-row adm-row"><div class="main">
+        <div class="t">${esc(c.nome)}${c.eu ? " (você)" : ""}</div>
+        <div class="s">${esc(c.login)} · ${sit}${ult && c.situacao!=="desativado" ? " · " + ult : ""}${c.ia_30d ? " · IA " + c.ia_30d + "x em 30 dias" : ""}${c.compartilhado && !c.eu ? " · mesmo grupo que você" : ""}</div>
+        <div class="adm-acts">
+          ${c.ativo ? `<button class="pc-btn sm ghost" data-admlink="${esc(c.id)}">${c.situacao==="aguardando" ? "Gerar link de acesso" : "Link para senha nova"}</button>` : ""}
+          ${c.eu ? "" : (c.ativo ? `<button class="pc-btn sm ghost adm-perigo" data-admativo="${esc(c.id)}:0">Desativar</button>` : `<button class="pc-btn sm ghost" data-admativo="${esc(c.id)}:1">Reativar</button>`)}
+        </div></div></div>`;
+    });
+    out += `</div>`;
+  } else {
+    out += `<div class="pc-list" style="margin-top:14px">`;
+    if(!(A.feedback || []).length) out += `<p class="pc-note" style="font-size:15px">Nenhum comentário ainda.</p>`;
+    (A.feedback || []).forEach(f=>{
+      out += `<div class="pc-row adm-row ${f.lido ? "lido" : ""}"><div class="main">
+        <div class="t">${esc(f.nome || "")} <small class="adm-data">${esc(brdHora(f.criado_em))}${f.tela ? " · tela " + esc(f.tela) : ""}</small></div>
+        <div class="adm-txt">${esc(f.texto)}</div>
+        <div class="adm-acts"><button class="pc-btn sm ghost" data-fblido="${f.id}:${f.lido ? 0 : 1}">${f.lido ? "Marcar como não lido" : "Marcar como lido"}</button></div>
+      </div></div>`;
+    });
+    out += `</div>`;
+  }
+  return out;
+}
+function msgLinkAdmin(L){
+  return L.primeiro
+    ? `Oi, ${primeiroNome(L.nome)}. Este é o seu acesso ao Pace, o app de treino: ${L.url} . Abra o link e crie a sua senha (o link vale uma vez).`
+    : `Oi, ${primeiroNome(L.nome)}. Este é o link para criar uma senha nova no Pace: ${L.url} (vale uma vez).`;
+}
+function ligarAdmin(){
+  const A = ui.adm || {};
+  document.querySelectorAll("[data-admrecarregar]").forEach(b=>b.onclick=()=>carregarAdmin());
+  const nome = document.getElementById("admNome"), email = document.getElementById("admEmail");
+  if(nome) nome.oninput = ()=>{ A.nome = nome.value; };
+  if(email) email.oninput = ()=>{ A.email = email.value; };
+  const criar = document.getElementById("admCriar");
+  if(criar) criar.onclick = async ()=>{
+    const n = (nome.value || "").trim(), e = (email.value || "").trim().toLowerCase();
+    if(n.length < 2){ toastUndo("Informe o nome."); nome.focus(); return; }
+    if(!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(e)){ toastUndo("Informe um e-mail válido."); email.focus(); return; }
+    criar.disabled = true; criar.textContent = "Criando…";
+    try{
+      const r = await rpc("pace_admin_criar", { p_token: SESSAO.token, p_nome: n, p_login: e });
+      if(r && r.erro){ toastUndo(r.erro); return; }
+      A.link = { nome: r.nome, url: linkAcesso(r.convite), expira: r.expira, primeiro: true };
+      A.nome = ""; A.email = "";
+      await carregarAdmin();
+      window.scrollTo(0,0);
+    }catch(err){
+      if(err.sessao){ sessaoEncerrada(); return; }
+      toastUndo(navigator.onLine ? "Não foi possível criar agora." : "Sem internet.");
+    }finally{
+      const b = document.getElementById("admCriar"); if(b){ b.disabled = false; b.textContent = "Criar acesso e gerar link"; }
+    }
+  };
+  document.querySelectorAll("[data-admlink]").forEach(b=>b.onclick=async ()=>{
+    b.disabled = true;
+    try{
+      const r = await rpc("pace_admin_link", { p_token: SESSAO.token, p_conta: b.dataset.admlink });
+      if(r && r.erro){ toastUndo(r.erro); b.disabled = false; return; }
+      A.link = { nome: r.nome, url: linkAcesso(r.convite), expira: r.expira, primeiro: !!r.primeiro };
+      render(); window.scrollTo(0,0);
+    }catch(err){
+      if(err.sessao){ sessaoEncerrada(); return; }
+      toastUndo("Não foi possível gerar o link agora."); b.disabled = false;
+    }
+  });
+  document.querySelectorAll("[data-admativo]").forEach(b=>b.onclick=async ()=>{
+    const [id, v] = b.dataset.admativo.split(":"), ativo = v==="1";
+    const c = (A.contas || []).find(x=>String(x.id)===id); if(!c) return;
+    if(!ativo && !(await confirmar(`Desativar o acesso de ${c.nome}?\n\nA pessoa sai do app em todos os aparelhos. Os dados dela continuam guardados e o acesso pode ser reativado.`, { ok:"Desativar", perigo:true }))) return;
+    try{
+      const r = await rpc("pace_admin_ativo", { p_token: SESSAO.token, p_conta: id, p_ativo: ativo });
+      if(r && r.erro){ toastUndo(r.erro); return; }
+      if(A.link && !ativo && A.link.nome===c.nome) A.link = null;
+      await carregarAdmin();
+    }catch(err){
+      if(err.sessao){ sessaoEncerrada(); return; }
+      toastUndo("Não foi possível alterar agora.");
+    }
+  });
+  document.querySelectorAll("[data-fblido]").forEach(b=>b.onclick=async ()=>{
+    const [id, v] = b.dataset.fblido.split(":");
+    try{
+      await rpc("pace_admin_feedback_lido", { p_token: SESSAO.token, p_id: Number(id), p_lido: v==="1" });
+      const f = (A.feedback || []).find(x=>String(x.id)===id); if(f) f.lido = v==="1";
+      render();
+    }catch(err){ if(err.sessao){ sessaoEncerrada(); return; } toastUndo("Não foi possível marcar agora."); }
+  });
+  document.querySelectorAll("[data-admcopiar]").forEach(b=>b.onclick=async ()=>{
+    if(!A.link) return;
+    toastUndo((await copiarTexto(A.link.url)) ? "Link copiado." : "Não consegui copiar. Toque e segure o link para copiar.");
+  });
+  document.querySelectorAll("[data-admzap]").forEach(b=>b.onclick=()=>{
+    if(!A.link) return;
+    window.open("https://wa.me/?text=" + encodeURIComponent(msgLinkAdmin(A.link)), "_blank", "noopener");
+  });
+  document.querySelectorAll("[data-admshare]").forEach(b=>b.onclick=async ()=>{
+    if(!A.link || !navigator.share) return;
+    try{ await navigator.share({ title:"Pace", text: msgLinkAdmin(A.link) }); }catch(e){}
+  });
+}
+
 /* ================================================================ início */
 (async function(){
-  const AUTH = getAuth();
-  if(!AUTH){ mostraLogin(); return; }
+  // link de primeiro acesso ou de senha nova
+  const mAcesso = /[#&]acesso=([A-Za-z0-9_-]{20,80})/.exec(location.hash || "");
+  if(mAcesso){ mostraAtivacao(mAcesso[1]); return; }
+  SESSAO = lerSessao();
+  if(!SESSAO){ mostraLogin(); return; }
+  try{ localStorage.removeItem("gt-auth-v1"); }catch(e){}
   ligarDelegacaoUmaVez();
+  syncEngine.configurar(SESSAO.conta.grupo);
   await syncEngine.bootstrap();
-  if(!S.events) S.events = [];
-  if(!S.draft) S.draft = {};
-  if(!S.plan) S.plan = { gabriel: clone(BASE.gabriel.days), eduarda: clone(BASE.eduarda.days) };
-  if(!S.dieta) S.dieta = clone(DIETA);
-  if(!S.check) S.check = {};
-  if(!S.metas) S.metas = {};
-  Object.keys(S.check).forEach(k=>{
-    if(Array.isArray(S.check[k])){
-      const novo = {}; S.check[k].forEach(id=>novo[id]="ok"); S.check[k] = novo;
-    }
-  });
-  ["gabriel","eduarda"].forEach(p=>{
-    if(!S.dieta[p]) S.dieta[p] = clone(DIETA[p]);
-    if(!Array.isArray(S.dieta[p].log)) S.dieta[p].log = [];
-    if(Array.isArray(S.dieta[p].refs)) S.dieta[p].refs.forEach(r=>{ if(typeof r.hora !== 'string') r.hora = ''; });
-  });
-  ORDER.forEach(d=>{ ["gabriel","eduarda"].forEach(p=>{
-    if(!S.plan[p][d]) S.plan[p][d] = clone(BASE[p].days[d]);
-    S.plan[p][d].ex.forEach(e=>{ if(e.ap===undefined) e.ap=""; }); }); });
-  // Seed schedule/dias/alvos_dia se faltarem (v22)
-  if(S.plan.gabriel && !S.plan.gabriel.schedule) S.plan.gabriel.schedule = clone(SCHED_GABRIEL);
-  if(S.plan.eduarda && !S.plan.eduarda.schedule) S.plan.eduarda.schedule = clone(SCHED_EDUARDA);
-  if(S.dieta.gabriel){
-    if(!S.dieta.gabriel.dias) S.dieta.gabriel.dias = clone(DIETA_DIAS_GABRIEL);
-    if(!S.dieta.gabriel.alvos_dia) S.dieta.gabriel.alvos_dia = clone(DIETA_ALVOS_DIA_GABRIEL);
-    // v27: garante presença dos novos tipos de dia jejum / jejum_jiu
-    if(S.dieta.gabriel.alvos_dia){
-      if(!S.dieta.gabriel.alvos_dia.jejum) S.dieta.gabriel.alvos_dia.jejum = clone(DIETA_ALVOS_DIA_GABRIEL.jejum);
-      if(!S.dieta.gabriel.alvos_dia.jejum_jiu) S.dieta.gabriel.alvos_dia.jejum_jiu = clone(DIETA_ALVOS_DIA_GABRIEL.jejum_jiu);
-    }
-    // Migração: remove extras x1/x2 (água/creatina) — agora só r1 tem hidratação
-    if(Array.isArray(S.dieta.gabriel.extras)){
-      S.dieta.gabriel.extras = S.dieta.gabriel.extras.filter(x=>x && x.id!=='x1' && x.id!=='x2');
-    }
-  }
-  if(S.dieta.eduarda){
-    if(!S.dieta.eduarda.dias) S.dieta.eduarda.dias = clone(DIETA_DIAS_EDUARDA);
-    if(!S.dieta.eduarda.alvos_dia) S.dieta.eduarda.alvos_dia = clone(DIETA_ALVOS_DIA_EDUARDA);
-  }
-  // v23: Sistema de atividades planejadas (jiu/corrida/futebol/bike + override musc por dia)
-  if(!S.planejado) S.planejado = {gabriel:{},eduarda:{}};
-  if(!S.planejado.gabriel) S.planejado.gabriel = {};
-  if(!S.planejado.eduarda) S.planejado.eduarda = {};
+  if(syncEngine.parado()) return;
+  const antes = JSON.stringify(S);
+  prepararEstado();
   try{
     Object.keys(S.draft||{}).forEach(k=>{
-      const [pp,dd] = k.split(":"); const ant = ultimaSessao(pp,dd);
+      const [pp,dd] = k.split(":"); if(!dayset(pp)[dd]) return;
+      const ant = ultimaSessao(pp,dd);
       if(Object.keys(ant).length && JSON.stringify(S.draft[k])===JSON.stringify(ant)) S.draft[k] = {};
     });
   }catch(e){}
-  // v35: aplica uma única vez o novo B/D da Eduarda (costas/ombro + TAF) e corrige as notas da semana
-  let migrouPlano = false;
-  try{
-    if(!S.planVer) S.planVer = {};
-    if((S.planVer.eduarda||0) < 35 && S.plan.eduarda){
-      S.plan.eduarda.B = clone(EDU_V35.B);
-      S.plan.eduarda.D = clone(EDU_V35.D);
-      const sc = S.plan.eduarda.schedule;
-      if(sc) Object.keys(SCHED_EDUARDA).forEach(k=>{ if(sc[k] && sc[k].musc===SCHED_EDUARDA[k].musc) sc[k].nota = SCHED_EDUARDA[k].nota; });
-      S.planVer.eduarda = 35; migrouPlano = true;
-    }
-  }catch(e){ console.warn('[migração plano v35]', e); }
-  ui.perfil = AUTH.perfil;
-  ui.dia = avaliar(ui.perfil).win.d;
+  ui.perfil = SESSAO.conta.perfil;
+  ui.dia = avaliar(ui.perfil).win.d || letras(ui.perfil)[0] || "A";
   render();
   syncEngine.start();
-  if(migrouPlano) store.set(S);
+  if(JSON.stringify(S) !== antes) store.set(S);
 })();
 </script>
 </body>
