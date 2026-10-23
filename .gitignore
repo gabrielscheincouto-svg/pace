@@ -1,0 +1,3 @@
+# Configuração local do Netlify CLI (tem caminho do computador; não vai para o repositório)
+.netlify/
+.DS_Store

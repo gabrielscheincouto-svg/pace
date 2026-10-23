@@ -1,0 +1,23 @@
+# Publicação no Netlify (projeto treino-gabi-eduarda).
+# Site estático, sem build: publica a raiz do repositório como está.
+[build]
+  publish = "."
+
+# Documentação e código do servidor ficam no repositório, mas não no site.
+[[redirects]]
+  from = "/supabase/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/docs/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404"
+  status = 404
+  force = true
