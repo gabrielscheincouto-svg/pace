@@ -5,6 +5,8 @@ de o app ir para o GitHub e não têm registro aqui.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| v46 | 24/10/2026 | Coach com conversa (pergunta livre, histórico no aparelho, perguntas rápidas e Análise do dia); sugestão de treino segue o que é marcado no dia (jiu, corrida, futebol ou bike em dia de pernas troca para superiores; jejum tira a musculação); "Hoje vou fazer" logo abaixo do treino sugerido; sessão com tempo, volume e séries no topo, data e letras compactas e a última carga dentro dos campos; Evolução com recordes e grupos da semana |
+| v45 | 23/10/2026 | Jiu do cronograma só conta quando marcado no dia; dia livre por causa do jiu vira dia de treino |
 | v44 | 10/10/2026 | Conta e senha para cada pessoa (link de uso único), dados separados por pessoa, área de acessos e comentários para o administrador; treino e dieta lidos pela IA a partir de texto, PDF ou foto |
 | v43 | 09/10/2026 | Encerrar o treino antes do fim (salva só as séries feitas ou o treino inteiro); marcar treino como feito em dias anteriores sem marcar série por série; registrar pelo Calendário com um toque e Desfazer; coluna Anterior usa a sessão anterior quando o exercício ficou de fora; treino que passa da meia-noite continua ao vivo |
 | v42 | 29/09/2026 | Calendário no menu de baixo, seções em verde, gráficos na Evolução e opções ao tocar na refeição |
