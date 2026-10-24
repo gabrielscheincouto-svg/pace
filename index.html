@@ -3001,10 +3001,13 @@ function viewHoje(p,m){
 
   // próxima atividade
   if(ui.off===0){
-    const sch = getSchedule(p), am = somaDias(hj,1), dA = new Date(am+"T12:00"), sa = sch ? sch[WDK[dA.getDay()]] : null;
+    // v47: amanhã usa a mesma sugestão do app (não repete o treino de hoje), não o cronograma cru
+    const am = somaDias(hj,1), sugA = getSchedule(p) ? sugestaoTreino(p, am) : { musc: avaliar(p).win.d };
     const planA = getPlanejado(p, am) || {};
     const extrasA = Object.keys(planA).filter(k=>k!=="musc" && planA[k]).map(k=>ATIV_LABEL[k]||k);
-    const txt = [sa && sa.musc ? `treino ${sa.musc}` : "sem musculação", sa && sa.nota ? sa.nota : "", extrasA.length ? extrasA.join(", ")+" planejado" : ""].filter(Boolean).join(" · ");
+    const tA = sugA.musc ? days[sugA.musc] : null;
+    const txt = [sugA.musc ? `treino ${sugA.musc}${tA ? " · "+tA.t : ""}` : (sugA.jejum ? "jejum, sem musculação" : "sem musculação"),
+      !sugA.musc && sugA.schedNota ? sugA.schedNota : "", extrasA.length ? extrasA.join(", ")+" planejado" : ""].filter(Boolean).join(" · ");
     out += `<button class="pc-row" data-dt="${am}">${pic("cal")}<div class="main"><div class="t">Amanhã</div><div class="s">${esc(txt)}</div></div><span class="chev">${pic("right")}</span></button>`;
   }
   out += `</div>`;
