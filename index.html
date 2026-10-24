@@ -1188,6 +1188,86 @@
   .adm-link{font-family:var(--mono);font-size:13px;line-height:1.5;word-break:break-all;margin:10px 0 6px;user-select:all;-webkit-user-select:all}
   .adm-txt{white-space:pre-wrap;margin-top:6px;font-size:15.5px;line-height:1.5;color:var(--ink)}
   .adm-data{font-weight:400;color:var(--muted);font-size:13px}
+
+  /* ---------- v46: coach, sessão compacta, recordes, grupos ---------- */
+  .pc-top-r{display:inline-flex;align-items:center;gap:8px}
+  .pc-coachbtn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--hair-3);color:var(--ink);font-size:14px;font-weight:650}
+  .pc-coachbtn .pc-ic{color:var(--ac)}
+  .pc-coach{margin-top:14px}
+  .pc-coach-in{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 14px;border-radius:14px;background:var(--surface);border:1px solid var(--hair-2);color:var(--muted);font-size:16px;text-align:left}
+  .pc-coach-in span{flex:1}
+  .pc-coach-in .pc-ic:first-child{color:var(--ac)}
+  .pc-coach-q,.cc-q{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .pc-coach-q::-webkit-scrollbar,.cc-q::-webkit-scrollbar{display:none}
+  .pc-coach-q .chip,.cc-q .chip{flex:none;height:38px;padding:0 14px;border-radius:999px;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center}
+  .pc-hint{color:var(--faint);font-size:13px;line-height:1.45;margin:0 0 4px}
+  .pc-hint:empty{display:none}
+  .pc-planq{margin-top:16px}
+  .pc-planq-h{font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:8px}
+  .chips.c4{grid-template-columns:repeat(auto-fit,minmax(70px,1fr));margin-bottom:6px}
+  .chips.c4 .chip{height:42px;font-size:14px;gap:4px;padding:0 4px}
+  .pc-acts2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:22px}
+  .pc-act{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:12px;border:1px solid var(--hair-2);background:var(--surface);color:var(--ink);font-size:15px;font-weight:600}
+  .pc-act.on{border-color:var(--ac);color:var(--ac);background:var(--ac-soft)}
+  /* sessão */
+  .pc-sstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+  .pc-sstats>div{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:9px 10px}
+  .pc-sstats b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.15}
+  .pc-sstats span{display:block;font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pc-dline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 4px;color:var(--muted);font-size:14px}
+  .pc-dline>span{display:inline-flex;align-items:center;gap:6px}
+  .pc-dline .pc-link{min-height:36px;font-size:14px;color:var(--ac)}
+  .segs.sm{gap:6px;margin:8px 0 6px;overflow-x:auto;scrollbar-width:none}
+  .segs.sm::-webkit-scrollbar{display:none}
+  .segs.sm .sg{height:auto;min-height:40px;flex:1 0 auto;flex-direction:row;gap:6px;padding:0 10px;border-radius:999px}
+  .segs.sm .sg .l{font-size:18px}
+  .segs.sm .sg .s{margin-top:0;font-size:11px}
+  /* evolução */
+  .pc-grs{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+  .pc-gr .n{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:5px;color:var(--ink)}
+  .pc-gr .n b{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted)}
+  .pc-gr .pc-bar{height:6px}
+  .pc-gr .pc-bar i{background:var(--hair-3)}
+  .pc-gr.ok .n b{color:var(--ok,#2FBF7F)}
+  .pc-gr.ok .pc-bar i{background:var(--ok,#2FBF7F)}
+  .pc-rec .end{flex-direction:column;align-items:flex-end;gap:2px}
+  .pc-rec .end small{font-size:12px;color:var(--muted);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+  .pc-new{background:var(--ac-soft);color:var(--ac);border-radius:999px;padding:1px 7px;font-weight:700;font-size:11px}
+  /* conversa */
+  .sug-sheet.cc-sheet{height:88vh;display:flex;flex-direction:column;padding-bottom:0}
+  .cc-sheet .sug-head{position:sticky;top:-1px;z-index:3;background:var(--surface);padding-top:14px;margin-top:-14px}
+  .cc-sheet #sugCorpo{flex:1;display:flex;flex-direction:column;min-height:0}
+  .cc{display:flex;flex-direction:column;flex:1;min-height:0}
+  .cc-msgs{flex:1;display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+  .cc-intro{display:flex;gap:10px;font-size:14.5px;line-height:1.5;color:var(--muted);background:var(--sunk);border-radius:14px;padding:12px 14px}
+  .cc-intro b{color:var(--ink)}
+  .cc-av{width:30px;height:30px;border-radius:50%;background:var(--ac-soft);color:var(--ac);display:flex;align-items:center;justify-content:center;flex:none}
+  .cc-m{display:flex}
+  .cc-m.u{justify-content:flex-end}
+  .cc-m .b{max-width:86%;border-radius:16px;padding:10px 13px;font-size:15px;line-height:1.5;word-wrap:break-word}
+  .cc-m.u .b{background:var(--ac);color:var(--ac-ink);border-bottom-right-radius:5px}
+  .cc-m.c .b{background:var(--surface-2);color:var(--ink);border-bottom-left-radius:5px}
+  .cc-m .b p{margin:0 0 6px}
+  .cc-m .b p:last-child{margin-bottom:0}
+  .cc-m .b ul{margin:4px 0 8px;padding-left:18px}
+  .cc-m .b li{margin:2px 0}
+  .cc-act{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:10px;min-height:42px;padding:0 12px;border-radius:11px;background:var(--ac);color:var(--ac-ink);font-weight:700;font-size:14.5px}
+  .cc-typing{display:inline-flex;gap:4px;align-items:center;min-height:22px}
+  .cc-typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.4;animation:ccdot 1.2s infinite}
+  .cc-typing i:nth-child(2){animation-delay:.2s} .cc-typing i:nth-child(3){animation-delay:.4s}
+  @keyframes ccdot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
+  .cc-err{font-size:14px;color:var(--danger);background:rgba(248,113,113,.08);border-radius:12px;padding:10px 12px}
+  .cc-err button{color:var(--ink);font-weight:700;text-decoration:underline;margin-left:6px}
+  .cc-foot{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--hair);margin:0 -2px;padding:0 2px}
+  .cc-in{display:flex;gap:8px;align-items:flex-end;padding:6px 0 calc(12px + env(safe-area-inset-bottom))}
+  .cc-in textarea{flex:1;resize:none;min-height:44px;max-height:140px;border-radius:14px;border:1px solid var(--hair-3);background:var(--sunk);color:var(--ink);font:inherit;font-size:16px;line-height:1.4;padding:11px 12px}
+  .cc-in textarea:focus{outline:none;border-color:var(--ac);background:var(--surface)}
+  .cc-send{width:44px;height:44px;border-radius:50%;background:var(--ac);color:var(--ac-ink);display:flex;align-items:center;justify-content:center;flex:none}
+  .cc-send:disabled{opacity:.4}
+  .cc-novo{font-size:13px;font-weight:600;color:var(--muted);padding:0 10px;height:32px;border-radius:999px;border:1px solid var(--hair-2);margin-left:auto;margin-right:8px}
+  .cc-q{padding:8px 0 2px}
+  .cc-q:empty{display:none}
+@media (prefers-reduced-motion: reduce){ .cc-typing i{animation:none} }
 </style>
 </head>
 <body>
@@ -1535,24 +1615,19 @@ function setPlanejado(p, dataISO, obj){
   if(!obj || Object.keys(obj).length===0) delete S.planejado[p][dataISO];
   else S.planejado[p][dataISO] = obj;
 }
+/* v45: jiu só conta quando a pessoa MARCA no dia (planejado) ou REGISTRA o treino de jiu.
+   O jiu do cronograma semanal é só a intenção da rotina: sem marcar, o dia vira um dia comum
+   (dia "livre por causa do jiu" vira dia de treino; notas do tipo "leve pra jiu" não valem). */
+function jiuMarcado(p, dataISO){
+  const pl = S.planejado && S.planejado[p] && S.planejado[p][dataISO];
+  if(pl && pl.jiu) return true;
+  return (S.events||[]).some(e=>e.perfil===p && e.data===dataISO && e.tipo==="extra" && /jiu/i.test(String(e.atividade||"")));
+}
 async function togglePlanejado(p, dataISO, ativ){
   try{
     const atual = getPlanejado(p, dataISO) || {};
     const willActivate = !atual[ativ];
-    // v27: alerta ao marcar jejum em dia com musc programada (schedule ou override)
-    if(ativ === "jejum" && willActivate){
-      const sch = getSchedule(p);
-      if(sch){
-        const d = new Date(dataISO+"T12:00");
-        const dia = sch[WDK[d.getDay()]] || {};
-        const muscOverride = (atual.musc !== undefined) ? atual.musc : dia.musc;
-        if(muscOverride){
-          const jj = meta(p).jejum || {};
-          const ok = await confirmar("Jejum matinal (até o almoço) + musc "+muscOverride+" programada.\n\n"+(jj.confirmar ? jj.confirmar+"\n\n" : "")+"Confirmar jejum hoje?");
-          if(!ok) return;
-        }
-      }
-    }
+    // v46: jejum marcado tira a musculação da sugestão do dia (sem confirmação; dá para treinar mesmo assim)
     atual[ativ] = !atual[ativ];
     if(!atual[ativ]) delete atual[ativ];
     setPlanejado(p, dataISO, atual);
@@ -1586,11 +1661,11 @@ function conflitoPlan(p, dataISO, letraEfetiva){
   const letraSchedule = letraEfetiva || plan.musc || dia.musc;
   const days = dayset(p) || {};
   const isPernas = !!(letraSchedule && days[letraSchedule] && days[letraSchedule].cat==="inf");
-  const temAtividade = plan.jiu || plan.corrida || plan.futebol;
+  const temAtividade = plan.jiu || plan.corrida || plan.futebol || plan.bike;
   if(isPernas && temAtividade){
     const sup = letras(p).find(L => days[L].cat==="sup");
     if(!sup) return null;
-    const ativ = plan.jiu?"jiu":(plan.corrida?"corrida":"futebol");
+    const ativ = plan.jiu?"jiu":(plan.corrida?"corrida":(plan.futebol?"futebol":"bike"));
     return {
       msg:`Você planejou ${ATIV_LABEL[ativ]||ativ} ${dataISO===shift(0)?"hoje":"neste dia"}. O treino sugerido (<b>${letraSchedule}</b>) é de pernas — pode sobrecarregar antes.`,
       sugere: sup, ativ, letraAtual: letraSchedule
@@ -1604,10 +1679,13 @@ function schedHoje(p){
   const orig = s[WDK[d.getDay()]];
   if(!orig) return null;
   const merged = Object.assign({}, orig);
+  // v45: jiu do cronograma não conta sozinho; a nota escrita para o dia de jiu também não
+  const marcado = jiuMarcado(p, iso);
+  if(orig.jiu && !marcado) merged.nota = "";
+  merged.jiu = marcado;
   const plan = getPlanejado(p, iso);
   if(plan){
     if(Object.prototype.hasOwnProperty.call(plan,'musc')) merged.musc = plan.musc;
-    if(plan.jiu) merged.jiu = true;
     if(plan.corrida) merged.corrida = true;
     if(plan.futebol) merged.futebol = true;
     if(plan.bike) merged.bike = true;
@@ -1618,6 +1696,15 @@ function tipoDiaHoje(p){
   const dd = getDietaDias(p); if(!dd) return null;
   const iso = REF(); const d = new Date(iso+"T12:00");
   let tipo = dd[WDK[d.getDay()]] || null;
+  // v45: tipo de dieta pensado para o jiu só vale com jiu marcado no dia
+  if(tipo && /jiu/.test(tipo) && !jiuMarcado(p, iso)){
+    if(tipo==="musc_jiu") tipo = "musc";
+    else if(tipo==="jiu"){
+      const treinou = S.events.some(e=>e.perfil===p && e.tipo==="musc" && e.data===iso);
+      const sug = treinou || !!(sugestaoTreino(p, iso)||{}).musc;
+      tipo = sug ? "musc" : "descanso";
+    }
+  }
   const plan = getPlanejado(p, iso);
   if(plan){
     // jejum sobrepõe os outros tipos; com jiu no mesmo dia vira jejum_jiu quando há meta para isso
@@ -1840,6 +1927,10 @@ const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typ
    amanhã, futuro). Substitui os fixes pontuais das v24/v28 (que só cobriam
    cenários específicos) por uma regra única aplicada em toda leitura.
 
+   v45: jiu só conta quando MARCADO no dia (planejado) ou registrado. Dia que o
+   cronograma deixa sem musculação por causa do jiu vira dia de treino se o jiu não
+   for marcado; jiu marcado em dia de pernas troca por superiores.
+
    Regras (nesta ordem):
      1. Se o usuário JÁ TREINOU nesse dia → devolve o treino registrado com
         jaTreinou:true. Sem tentativa de "sugerir por cima".
@@ -1858,7 +1949,80 @@ const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typ
      { musc, motivo, jaTreinou, override, letraOriginal,
        schedRest, schedJiu, schedNota }
 ============================================================================ */
+/* v46: atividades que pesam nas pernas, marcadas em "Planejar hoje" ou registradas no dia */
+const ATIV_PERNAS = ["jiu","corrida","futebol","bike"];
+function atividadesMarcadas(p, dataISO){
+  const pl = (S.planejado && S.planejado[p] && S.planejado[p][dataISO]) || {};
+  const set = new Set(ATIV_PERNAS.filter(a=>pl[a]));
+  if(jiuMarcado(p, dataISO)) set.add("jiu");
+  (S.events||[]).forEach(e=>{
+    if(e.perfil!==p || e.data!==dataISO || e.tipo!=="extra") return;
+    const t = String(e.atividade||"").toLowerCase();
+    if(/corr/.test(t)) set.add("corrida");
+    else if(/fut/.test(t)) set.add("futebol");
+    else if(/bike|bici|cicl|pedal/.test(t)) set.add("bike");
+  });
+  return ATIV_PERNAS.filter(a=>set.has(a));
+}
+function listaAtiv(arr){
+  const l = arr.map(a=>ATIV_LABEL[a]||a);
+  return l.length<=1 ? (l[0]||"") : l.slice(0,-1).join(", ")+" e "+l[l.length-1];
+}
 function sugestaoTreino(perfil, dataISO){
+  const r = _sugestaoBase(perfil, dataISO);
+  if(r.jaTreinou) return r;
+  const plan = (S.planejado && S.planejado[perfil] && S.planejado[perfil][dataISO]) || null;
+  const escolhidaNaMao = !!(plan && plan.musc);
+  const quando = dataISO===shift(0) ? 'hoje' : 'neste dia';
+  const ativs = atividadesMarcadas(perfil, dataISO);
+  const extra = { ativs };
+  // v46: jejum marcado → dia sem musculação (orientação, não bloqueio: dá para treinar mesmo assim)
+  if(plan && plan.jejum && !escolhidaNaMao){
+    return Object.assign({}, r, extra, {
+      musc: null, schedRest: true, jejum: true, override: !!r.musc, letraOriginal: r.musc || null,
+      schedNota: 'Jejum',
+      motivo: `Você marcou jejum ${quando}: dia sem musculação${r.musc?` (o treino seria o <b>${r.musc}</b>)`:''}. Se quiser treinar mesmo assim, escolha o treino.`
+    });
+  }
+  // v46: jiu, corrida, futebol ou bike marcados + treino de pernas → troca por superiores
+  // (a não ser que a pessoa tenha escolhido a letra na mão para esse dia; aí só avisa — ver conflitoPlan)
+  if(!r.musc || !ativs.length) return Object.assign({}, r, extra);
+  const days = dayset(perfil);
+  if(!days[r.musc] || days[r.musc].cat !== 'inf' || escolhidaNaMao) return Object.assign({}, r, extra);
+  const ctx = _sugContexto(perfil, dataISO);
+  const sups = ctx.ordem.filter(L=>days[L] && days[L].cat==='sup');
+  if(!sups.length) return Object.assign({}, r, extra);
+  const livres = sups.filter(L=>!ctx.recSet.has(L));
+  const alt = ctx.rankParado(livres.length ? livres : sups)[0];
+  return Object.assign({}, r, extra, {
+    musc: alt.L, override: true, letraOriginal: r.musc,
+    motivo: `Você marcou ${listaAtiv(ativs).toLowerCase()} ${quando}: em vez de pernas (<b>${r.musc}</b>), sugerindo <b>${alt.L}</b> (${ctx.fmtParado(alt)}). Mantenha RIR 2-3 nos compostos.`
+  });
+}
+
+/* histórico recente e ranking "parado há mais tempo", usados pela sugestão */
+function _sugContexto(perfil, dataISO){
+  const d = new Date(dataISO+'T12:00:00');
+  const recentes = [];
+  for(let i=1; i<=3; i++){
+    const dPrev = new Date(d); dPrev.setDate(dPrev.getDate()-i);
+    const ev = S.events.find(e=>e.perfil===perfil && e.data===iso(dPrev) && e.tipo==='musc');
+    if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
+  }
+  const recSet = new Set(recentes.map(x=>x.dia));
+  const ordem = letras(perfil);
+  const rankParado = lista => lista.map(L => {
+    const ultEv = S.events
+      .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
+      .sort((a,b)=> a.data<b.data?1:-1)[0];
+    const diasParado = ultEv ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000) : 999;
+    return {L, diasParado};
+  }).sort((a,b)=> b.diasParado-a.diasParado || ordem.indexOf(a.L)-ordem.indexOf(b.L));
+  const fmtParado = x => x.diasParado===999 ? 'nunca feito' : (x.diasParado===1 ? 'parado há 1 dia' : `parado há ${x.diasParado} dias`);
+  return { d, recentes, recSet, ordem, rankParado, fmtParado };
+}
+
+function _sugestaoBase(perfil, dataISO){
   const days = dayset(perfil);
 
   // 1) Já treinou nesse dia?
@@ -1873,48 +2037,49 @@ function sugestaoTreino(perfil, dataISO){
   }
 
   // 2) Letra base = override manual OU schedule fixo do dia da semana
-  const d = new Date(dataISO+'T12:00:00');
+  const ctx = _sugContexto(perfil, dataISO);
+  const { d, recentes, recSet, ordem, rankParado, fmtParado } = ctx;
   const sched = getSchedule(perfil);
   const diaSched = sched ? (sched[WDK[d.getDay()]] || null) : null;
   const plan = (S.planejado && S.planejado[perfil] && S.planejado[perfil][dataISO]) || null;
   const muscOverride = (plan && Object.prototype.hasOwnProperty.call(plan,'musc')) ? plan.musc : null;
-  const jiu  = !!(diaSched && diaSched.jiu) || !!(plan && plan.jiu);
-  const nota = (diaSched && diaSched.nota) || '';
+  // v45: jiu só conta se marcado no dia (ou registrado); o do cronograma é só a intenção
+  const diaDeJiu = !!(diaSched && diaSched.jiu);
+  const jiu  = jiuMarcado(perfil, dataISO);
+  const nota = (diaSched && diaSched.nota && (jiu || !diaDeJiu)) ? diaSched.nota : '';
   const letraBase = (muscOverride !== null ? muscOverride : (diaSched ? diaSched.musc : null));
+  const diaSem = WDL[d.getDay()];
 
-  // 3) Sem letra base → descanso
+  // 3) Sem letra base
   if(!letraBase){
-    const diaSem = WDL[d.getDay()];
+    // v45: o dia só estava sem musculação por causa do jiu, e o jiu não foi marcado → dia de treino
+    if(diaDeJiu && !jiu && ordem.length){
+      const ontem = recentes.find(x=>x.distancia===1);
+      const catOntem = ontem && days[ontem.dia] ? days[ontem.dia].cat : null;
+      let cands = ordem.filter(L=>days[L] && !recSet.has(L));
+      if(!cands.length) cands = ordem.filter(L=>days[L]);
+      // evita o mesmo tipo (superiores/inferiores) de ontem
+      const outraCat = (catOntem && catOntem!=='full') ? cands.filter(L=>days[L].cat!==catOntem) : cands;
+      const escolhida = rankParado(outraCat.length ? outraCat : cands)[0];
+      if(escolhida){
+        const quando = dataISO===shift(0) ? 'hoje' : 'neste dia';
+        return {
+          musc: escolhida.L,
+          motivo: `No cronograma, ${diaSem} fica sem musculação por causa do jiu, mas você não marcou jiu ${quando}. Sugerindo <b>${escolhida.L}</b> (${fmtParado(escolhida)}).`,
+          jaTreinou: false, override: true, letraOriginal: null,
+          schedRest: false, schedJiu: false, schedNota: ''
+        };
+      }
+    }
     return {
       musc: null,
-      motivo: `Cronograma de ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu à noite':''}.`,
+      motivo: `Cronograma de ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu marcado':''}.`,
       jaTreinou: false, override: false, letraOriginal: null,
       schedRest: true, schedJiu: jiu, schedNota: nota
     };
   }
 
-  // 4) Anti-repetição: verifica os 3 dias anteriores
-  const recentes = [];
-  for(let i=1; i<=3; i++){
-    const dPrev = new Date(d); dPrev.setDate(dPrev.getDate()-i);
-    const isoPrev = iso(dPrev);
-    const ev = S.events.find(e=>e.perfil===perfil && e.data===isoPrev && e.tipo==='musc');
-    if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
-  }
-  const recSet = new Set(recentes.map(x=>x.dia));
-  const ordem = letras(perfil);
-  const rankParado = lista => lista.map(L => {
-    const ultEv = S.events
-      .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
-      .sort((a,b)=> a.data<b.data?1:-1)[0];
-    const diasParado = ultEv
-      ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000)
-      : 999;
-    return {L, diasParado};
-  }).sort((a,b)=> b.diasParado-a.diasParado || ordem.indexOf(a.L)-ordem.indexOf(b.L));
-  const fmtParado = x => x.diasParado===999 ? 'nunca feito' : (x.diasParado===1 ? 'parado há 1 dia' : `parado há ${x.diasParado} dias`);
-
-  // 5) A letra do cronograma não existe mais no plano: sugere a parada há mais tempo
+  // 4) A letra do cronograma não existe mais no plano: sugere a parada há mais tempo
   if(!days[letraBase] && ordem.length){
     const lista = ordem.filter(L => !recSet.has(L));
     const escolhida = rankParado(lista.length ? lista : ordem)[0];
@@ -1926,23 +2091,16 @@ function sugestaoTreino(perfil, dataISO){
     };
   }
 
+  // 5) Anti-repetição: a letra foi feita nos 3 dias anteriores → alternativa parada há mais tempo
   if(recSet.has(letraBase)){
-    // Escolhe alternativa parada há mais tempo (excluindo letras dos 3 dias)
     const alternativas = ordem.filter(L => !recSet.has(L) && days[L]);
     if(alternativas.length > 0){
-      const rank = rankParado(alternativas);
-      const escolhida = rank[0];
+      const escolhida = rankParado(alternativas)[0];
       const rec = recentes.find(x=>x.dia===letraBase);
-      const qdo = rec.distancia===1 ? 'ontem'
-                : rec.distancia===2 ? 'anteontem'
-                : `há ${rec.distancia} dias`;
-      const desdeTxt = escolhida.diasParado===999 ? 'nunca feito'
-                     : (escolhida.diasParado===1 ? 'parado há 1 dia'
-                                                 : `parado há ${escolhida.diasParado} dias`);
-      const diaSem = WDL[d.getDay()];
+      const qdo = rec.distancia===1 ? 'ontem' : rec.distancia===2 ? 'anteontem' : `há ${rec.distancia} dias`;
       return {
         musc: escolhida.L,
-        motivo: `Você fez <b>${letraBase}</b> ${qdo}. O cronograma de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${desdeTxt}) pra não repetir.`,
+        motivo: `Você fez <b>${letraBase}</b> ${qdo}. O cronograma de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${fmtParado(escolhida)}) pra não repetir.`,
         jaTreinou: false, override: true, letraOriginal: letraBase,
         schedRest: false, schedJiu: jiu, schedNota: nota
       };
@@ -1950,14 +2108,10 @@ function sugestaoTreino(perfil, dataISO){
   }
 
   // 6) Letra base OK — sem repetição recente
-  const diaSem = WDL[d.getDay()];
-  let motivo;
-  if(muscOverride !== null){
-    motivo = `Override manual: treino <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
-  } else {
-    motivo = `Cronograma de ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
-  }
-  if(jiu) motivo += ' Jiu à noite — mantenha RIR 2-3 nos compostos.';
+  let motivo = muscOverride !== null
+    ? `Você escolheu o treino <b>${letraBase}</b> para este dia${nota?` — ${nota}`:''}.`
+    : `Cronograma de ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
+  if(jiu) motivo += ' Jiu marcado — mantenha RIR 2-3 nos compostos.';
   return {
     musc: letraBase, motivo,
     jaTreinou: false, override: false, letraOriginal: null,
@@ -1986,7 +2140,7 @@ function avaliar(p){
       // Dia sem musc (recuperação/descanso)
       const fallbackD = ordem[0];
       const win = { d:fallbackD, score:0, bloq:"sem musc hoje", notas:[], desde:0,
-                    motivo: sug.motivo, schedJiu: sug.schedJiu, schedNota: sug.schedNota, schedRest: true };
+                    motivo: sug.motivo, schedJiu: sug.schedJiu, schedNota: sug.schedNota, schedRest: true, jejum: !!sug.jejum, letraOriginal: sug.letraOriginal||null, ativs: sug.ativs||[] };
       const resto = ordem.filter(d=>d!==fallbackD).map(d=>({d,score:0,notas:[],desde:0}));
       return { win, resto, descanso:true, schedRest:true, schedJiu:sug.schedJiu };
     }
@@ -1997,7 +2151,7 @@ function avaliar(p){
       desde: 0,
       motivo: sug.motivo,
       schedJiu: sug.schedJiu, schedNota: sug.schedNota,
-      antiRepeticao: sug.override, letraOriginal: sug.letraOriginal
+      antiRepeticao: sug.override, letraOriginal: sug.letraOriginal, ativs: sug.ativs||[]
     };
     const resto = ordem.filter(d=>d!==sug.musc).map(d=>({d,score:0,notas:[],desde:0}));
     return { win, resto, descanso:false, schedRest:false, schedJiu:sug.schedJiu };
@@ -2257,7 +2411,7 @@ async function iaChamar(acao, payload, o){
   const ctrl = new AbortController(), timer = setTimeout(()=>ctrl.abort(), o.tempo || 60000);
   let resp, j = null;
   try{
-    resp = await fetch(IA_URL, { method:'POST', headers:{ 'Content-Type':'application/json' },
+    resp = await fetch(o.url || IA_URL, { method:'POST', headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify(Object.assign({}, payload, { acao, token: SESSAO.token })), signal: ctrl.signal });
     try{ j = await resp.json(); }catch(e){ j = null; }
   }catch(e){
@@ -2426,6 +2580,7 @@ function render(){
   if(!SESSAO || !document.getElementById("tabs")) return;
   if(!perfisDaConta().some(x=>x.perfil===ui.perfil)) ui.perfil = SESSAO.conta.perfil;
   const p = ui.perfil, m = meta(p);
+  if(ui.view!=="treino") ui.dataAberta = false;
   document.documentElement.style.removeProperty("--ac");
   // primeiro acesso: sem treino, só as boas-vindas (e as configurações); com treino e sem dieta, as boas-vindas ficam no Início
   const semTreino = !temPlano(p);
@@ -2487,14 +2642,20 @@ function verificarConflitoIniciar(p, dEscolhido){
   const avisos = [];
   const t = dayset(p)[dEscolhido];
   const pernas = !!(t && t.cat==="inf");
+  // v45: compara com a sugestão do app (que já desvia do cronograma para não repetir,
+  // ou por causa do jiu marcado), não com o cronograma cru — senão o app reclama da
+  // própria sugestão
+  const sugEf = (sugestaoTreino(p, dataRef) || {}).musc || null;
   if(sch){
-    if(sch.musc && sch.musc !== dEscolhido){
+    if(sch.musc && sch.musc !== dEscolhido && sugEf !== dEscolhido){
       const diaSem = WDL[new Date(dataRef+"T12:00").getDay()];
-      let av = `O cronograma de ${diaSem} prevê o treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu o ${dEscolhido}.`;
-      if(sch.jiu && pernas) av += " Tem jiu à noite: pernas pesadas antes podem prejudicar o tatame.";
+      let av = sugEf && sugEf !== sch.musc
+        ? `O sugerido para hoje é o treino ${sugEf}, mas você escolheu o ${dEscolhido}.`
+        : `O cronograma de ${diaSem} prevê o treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu o ${dEscolhido}.`;
+      if(sch.jiu && pernas) av += " Você marcou jiu: pernas pesadas antes podem prejudicar o tatame.";
       avisos.push(av);
     } else if(!sch.musc && pernas && sch.jiu){
-      avisos.push(`Hoje é dia de recuperação e tem jiu à noite. O treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
+      avisos.push(`Você marcou jiu hoje. O treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
     }
   }
   // usa a letra escolhida (não o cronograma bruto), igual ao card principal
@@ -2641,7 +2802,8 @@ const PACE_MARK = (cls) => `<svg class="${cls||"pc-mark"}" viewBox="0 0 64 64" a
 function pcTopo(){
   const m = meta(ui.perfil), ini = (m.label||"?").charAt(0).toUpperCase();
   return `<div class="pc-top"><span class="pc-brand" aria-label="pace">${PACE_MARK()}<span>pace</span></span>
-    <button class="pc-avatar" data-view="config" aria-label="Perfil e configurações (${esc(m.label)})">${ini}</button></div>`;
+    <span class="pc-top-r"><button class="pc-coachbtn" data-coach="1" aria-label="Conversar com o coach">${pic("spark","sm")}<span>Coach</span></button>
+    <button class="pc-avatar" data-view="config" aria-label="Perfil e configurações (${esc(m.label)})">${ini}</button></span></div>`;
 }
 function pcTabs(grupo, itens, atual){
   return `<div class="pc-tabs" role="tablist">${itens.map(([k,l])=>`<button class="pc-tab" role="tab" aria-selected="${k===atual}" data-pctab="${grupo}:${k}">${l}</button>`).join("")}</div>`;
@@ -2703,7 +2865,8 @@ function viewHoje(p,m){
   let out = pcTopo() + `<h1 class="pc-h1">${pcTituloDia()}</h1>` + pcDataNav();
 
   // ---- destaque único: estado real do treino do dia ----
-  const tagJiu = r.schedJiu ? `<span class="tag">Jiu à noite</span>` : "";
+  const ativsW = (r.win && r.win.ativs) || [];
+  const tagJiu = ativsW.length ? `<span class="tag">${esc(listaAtiv(ativsW))} ${ativsW.length>1?"marcados":"marcado"}</span>` : (r.schedJiu ? `<span class="tag">Jiu marcado</span>` : "");
   if(ab){
     out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Treino em andamento</div>
       <div class="ttl">${esc(ab.t.t)}</div>
@@ -2718,11 +2881,13 @@ function viewHoje(p,m){
       <div class="meta">Treino ${treinoDoDia.dia} · ${nSer} séries registradas</div>
       <button class="pc-btn hl" data-edittoday="${treinoDoDia.dia}"><span>Ver ou editar treino</span>${pic("arrow")}</button></section>`;
   } else if(r.schedRest && ui.off===0){
-    const nota = r.win.schedNota || "Descanso";
-    out += `<section class="pc-hl" aria-label="Dia sem musculação"><div class="ey">Pelo seu cronograma${tagJiu}</div>
+    const jj = !!r.win.jejum;
+    const nota = jj ? "Dia de jejum" : (r.win.schedNota || "Descanso");
+    out += `<section class="pc-hl" aria-label="Dia sem musculação"><div class="ey">${jj?"Você marcou jejum":"Pelo seu cronograma"}${jj?"":tagJiu}</div>
       <div class="ttl">${esc(nota)}</div>
-      <div class="meta">Sem musculação hoje</div>
+      <div class="meta">Sem musculação hoje${jj && r.win.letraOriginal?` · seria o treino ${esc(r.win.letraOriginal)}`:""}</div>
       <button class="pc-btn hl" data-picktreino="1"><span>Treinar mesmo assim</span>${pic("arrow")}</button></section>`;
+    if(r.win.motivo) out += `<details class="pc-more"><summary>${pic("info","sm")}<span>Por que sem musculação</span></summary><p>${r.win.motivo}</p></details>`;
   } else {
     const passado = REF() < hj;
     out += `<section class="pc-hl" aria-label="Treino sugerido"><div class="ey">${ui.off===0?"Sugerido para hoje":passado?"Treino deste dia":"Sugerido para este dia"}${tagJiu}</div>
@@ -2733,6 +2898,17 @@ function viewHoje(p,m){
     if(r.win.motivo) out += `<details class="pc-more"><summary>${pic("info","sm")}<span>${r.descanso&&!r.schedRest?"Neste dia o melhor é descansar":"Por que este treino"}</span></summary><p>${r.win.motivo}</p></details>`;
     if(ui.off===0) out += `<div id="pace-ia-card" class="pace-ia-slot"></div>`;
   }
+
+  // ---- atividades do dia: logo abaixo do destaque, para ver a sugestão mudar ----
+  const planHoje = getPlanejado(p, REF()) || {};
+  const quicks = meta(p).ativ;
+  out += `<div class="pc-planq"><div class="pc-planq-h">${ui.off===0 ? "Hoje vou fazer" : "Atividades neste dia"}</div><div class="chips c4">${quicks.map(a=>{
+    const on = !!planHoje[a];
+    return `<button class="chip ${on?"on":""}" data-planq="${a}" aria-pressed="${on}">${pic(on?"check":"plus","sm")}<span>${esc(ATIV_LABEL[a]||a)}</span></button>`;
+  }).join("")}</div>
+  <p class="pc-hint">${quicks.some(a=>ATIV_PERNAS.includes(a))?"Marcou atividade em dia de pernas? O treino sugerido troca para superiores. ":""}${quicks.includes("jejum")?"Jejum marcado tira a musculação do dia.":""}</p></div>`;
+  // coach: pergunta livre logo abaixo do destaque
+  if(ui.off===0) out += pcCoachBar(p, r);
 
   // conflito (atividade planejada × pernas)
   const dataRef = REF();
@@ -2770,24 +2946,17 @@ function viewHoje(p,m){
   }
   out += `</div>`;
 
-  // ---- atividades do dia ----
-  const planHoje = getPlanejado(p, dataRef) || {};
-  const quicks = meta(p).ativ;
-  out += pcSec(ui.off===0 ? "Planejar hoje" : "Atividades do dia");
-  out += `<div class="chips" style="margin-bottom:10px">${quicks.map(a=>{
-    const on = !!planHoje[a];
-    return `<button class="chip ${on?"on":""}" data-planq="${a}" aria-pressed="${on}">${pic(on?"check":"plus","sm")}<span>${esc(ATIV_LABEL[a]||a)}</span></button>`;
-  }).join("")}</div>`;
   const skipAtivo = temSkip(p,0);
   const extrasHoje = extrasDoDia(p, REF()).filter(e=>e.atividade && String(e.atividade).toLowerCase()!==mainSport(p));
-  out += `<div class="pc-list">`;
+  if(extrasHoje.length) out += `<div class="pc-list" style="margin-bottom:10px">`;
   extrasHoje.forEach(e=>{
     out += `<div class="pc-row">${pic("run")}<div class="main"><div class="t">${esc(e.atividade)}</div><div class="s">${e.duracao?e.duracao+" min":""}${e.nota?(e.duracao?" · ":"")+esc(e.nota):""}</div></div>
       <button class="pc-btn sm ghost" data-rmatv="${e.id}">Remover</button></div>`;
   });
-  out += `<button class="pc-row" data-atv="1">${pic("run")}<div class="main"><div class="t">Registrar atividade extra</div><div class="s">${esc([m.extra,"corrida","bike","caminhada"].filter((x,i,a)=>x && a.findIndex(y=>String(y).toLowerCase()===String(x).toLowerCase())===i).join(", "))}…</div></div><span class="chev">${pic("right")}</span></button>
-    <button class="pc-row" data-skip="1">${pic("moon")}<div class="main"><div class="t">${skipAtivo?"Marcado como descanso":"Não treinei"}</div><div class="s">${skipAtivo?"Toque para desfazer":"Marca o dia como descanso"}</div></div><span class="chev">${pic("right")}</span></button>
-    <button class="pc-row" data-coach="1">${pic("spark")}<div class="main"><div class="t">Pergunte ao coach</div><div class="s">Dúvidas sobre treino e alimentação</div></div><span class="chev">${pic("right")}</span></button>
+  if(extrasHoje.length) out += `</div>`;
+  out += `<div class="pc-acts2">
+    <button class="pc-act" data-atv="1">${pic("run","sm")}<span>Atividade extra</span></button>
+    <button class="pc-act ${skipAtivo?"on":""}" data-skip="1" aria-pressed="${skipAtivo}">${pic("moon","sm")}<span>${skipAtivo?"Descanso marcado":"Não treinei"}</span></button>
   </div>`;
   return out;
 }
@@ -2820,8 +2989,8 @@ function viewTreinos(p,m){
 }
 
 /* ------------------------------------------------------------------ SESSÃO (Registrar) */
-function pcCampo(v, exId, i, k, rot){
-  return `<input class="cs" type="text" data-cex="${exId}" data-ci="${i}" data-ck="${k}" value="${esc(String(v==null?"":v))}" placeholder="—" inputmode="decimal" pattern="[0-9.,]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" aria-label="${rot}">`;
+function pcCampo(v, exId, i, k, rot, ph){
+  return `<input class="cs" type="text" data-cex="${exId}" data-ci="${i}" data-ck="${k}" value="${esc(String(v==null?"":v))}" placeholder="${esc(ph!=null && ph!=="" ? String(ph) : "—")}" inputmode="decimal" pattern="[0-9.,]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" aria-label="${rot}">`;
 }
 function pcSerieAtual(treino, dr){
   for(const ex of treino.ex){ const arr = dr[ex.id]||[]; for(let i=0;i<ex.s;i++){ const s = arr[i]; if(!s || !s.ok) return { ex, i }; } }
@@ -2833,6 +3002,46 @@ function pcFmtSet(ex, x){
   if(ex.ty==="reps") return x.reps ? `${x.reps} rep` : "—";
   if(!x.kg && !x.reps) return "—";
   return `${x.kg||"—"} × ${x.reps||"—"}`;
+}
+/* v46: cabeçalho da sessão (tempo, volume e séries) e data compacta */
+function volumeSessao(treino, dr){
+  let v = 0;
+  treino.ex.forEach(e=>{ if(e.ty!=="load") return; (dr[e.id]||[]).slice(0,e.s).forEach(x=>{ if(x && x.ok) v += num(x.kg)*num(x.reps); }); });
+  return Math.round(v);
+}
+function fmtCrono(ms){
+  const t = Math.max(0, Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t%3600/60), sg = t%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(sg).padStart(2,"0")}` : `${m}:${String(sg).padStart(2,"0")}`;
+}
+function pcStats(p, d, treino, dr, c, modoPassado){
+  const mt = S.draftMeta && S.draftMeta[p+":"+d];
+  const vivo = !modoPassado && ui.editId==null && mt && mt.inicio && c.pre>0;
+  const vol = volumeSessao(treino, dr);
+  return `<div class="pc-sstats" role="group" aria-label="Resumo da sessão">
+    <div><b id="pcTimer" ${vivo?`data-ini="${mt.inicio}"`:""}>${vivo?fmtCrono(Date.now()-mt.inicio):"—"}</b><span>tempo</span></div>
+    <div><b>${vol?vol.toLocaleString("pt-BR"):"0"}</b><span>kg de volume</span></div>
+    <div><b id="pcProg">${c.ok}/${c.total}</b><span>séries${c.pre>c.ok?` · ${c.pre-c.ok} preench.`:""}</span></div>
+  </div>`;
+}
+function pcDataTreino(dataTr, hojeIso, passado, futuro, relTr){
+  if(dataTr===hojeIso && ui.editId==null && !ui.dataAberta){
+    return `<div class="pc-dline"><span>${pic("cal","sm")}Hoje · ${esc(cap(dataLonga(dataTr)))}</span><button class="pc-link" data-dataabrir="1">Outro dia</button></div>`;
+  }
+  return `<div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
+      <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
+        <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
+      <div class="db-nav">
+        <button class="db-arw" data-off="-1" aria-label="Dia anterior">${pic("left","sm")}</button>
+        <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
+        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}>${pic("right","sm")}</button>
+      </div>
+    </div>`;
+}
+if(typeof window!=="undefined" && !window.__paceCrono){
+  window.__paceCrono = setInterval(()=>{
+    const el = document.getElementById("pcTimer");
+    if(el && el.dataset.ini) el.textContent = fmtCrono(Date.now()-Number(el.dataset.ini));
+  }, 1000);
 }
 function viewTreino(p,m){
   const d = ui.dia, days = dayset(p), treino = days[d];
@@ -2851,22 +3060,14 @@ function viewTreino(p,m){
         : `<button class="end" id="salvar" ${ui.saving?"disabled":""}>${ui.saved?"Salvo":(ui.editId!=null?"Atualizar":"Encerrar")}</button>`}
     </div>
     ${ui.edit ? `<input class="ed-f" style="margin:6px 0 0" data-f="titulo" value="${esc(treino.t)}" aria-label="Nome do treino">`
-      : `<h1 class="pc-stitle">${esc(treino.t)}</h1><p class="pc-sub" id="pcProg">${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}</p>`}
-    <div class="datebar ${passado?"past":""} ${futuro?"fut":""}">
-      <div class="db-l"><span class="db-k">${ui.editId!=null?"Editando o treino de":"Data do treino"}</span>
-        <span class="db-v">${dataLonga(dataTr)}</span><span class="db-r">${relTr}</span></div>
-      <div class="db-nav">
-        <button class="db-arw" data-off="-1" aria-label="Dia anterior">${pic("left","sm")}</button>
-        <label class="db-btn">Alterar<input type="date" data-trdate value="${dataTr}" max="${hojeIso}" aria-label="Alterar a data do treino"></label>
-        <button class="db-arw" data-off="1" aria-label="Próximo dia" ${dataTr>=hojeIso?"disabled":""}>${pic("right","sm")}</button>
-      </div>
-    </div>`;
+      : `<h1 class="pc-stitle">${esc(treino.t)}</h1>${pcStats(p, d, treino, dr, c, modoPassado)}`}
+    ${pcDataTreino(dataTr, hojeIso, passado, futuro, relTr)}`;
   if(ui.editId!=null) out += `<div class="edit-note">Você está editando um treino já registrado. Ao salvar, ele é atualizado. <button data-canceledit="1">Cancelar edição</button></div>`;
-  out += `<div class="segs">`;
+  out += `<div class="segs sm" role="group" aria-label="Trocar de treino">`;
   letras(p).forEach(k=>{
     const u = evs(p,"musc").filter(e=>e.data<=REF()).find(e=>e.dia===k);
     const t = u ? (dias(u.data)===0?"feito":"há "+dias(u.data)+"d") : "nunca";
-    out += `<button class="sg ${k===d?"on":""}" data-dia="${k}" aria-label="Treino ${k}, ${t}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
+    out += `<button class="sg ${k===d?"on":""}" data-dia="${k}" aria-pressed="${k===d}" aria-label="Treino ${k}, ${t}"><span class="l">${k}</span><span class="s">${t}</span></button>`;
   });
   out += `</div>`;
 
@@ -2899,6 +3100,7 @@ function viewTreino(p,m){
 
   if(Object.keys(ant).length) out += `<div style="display:flex;justify-content:flex-end"><button class="pc-link ac" data-loadlast="1">Preencher tudo com a última vez</button></div>`;
   const atual = pcSerieAtual(treino, dr);
+  const usaAnt = pref("autoPreencher");
   treino.ex.forEach(ex=>{
     const sets = dr[ex.id]||[], a = ant[ex.id]||[];
     const dica = [ex.no?esc(ex.no):"", ex.notas?esc(ex.notas):""].filter(Boolean).join(" ");
@@ -2912,9 +3114,10 @@ function viewTreino(p,m){
     for(let i=0;i<ex.s;i++){
       const s = sets[i]||{}, av = a[i]||null, cur = atual && atual.ex.id===ex.id && atual.i===i;
       out += `<div class="pc-sr set ${s.ok?"done":""} ${cur?"cur":""}"><span class="ix">${i+1}</span><span class="pv">${av?pcFmtSet(ex,av):"—"}</span>`;
-      if(ex.ty==="load") out += pcCampo(s.kg,ex.id,i,"kg",`Série ${i+1}, carga em kg`) + pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`);
-      else if(ex.ty==="time") out += `<span class="w2">${pcCampo(s.sec,ex.id,i,"sec",`Série ${i+1}, segundos`)}</span>`;
-      else out += `<span class="w2">${pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`)}</span>`;
+      const ph = k => (usaAnt && av && av[k]) ? av[k] : "";
+      if(ex.ty==="load") out += pcCampo(s.kg,ex.id,i,"kg",`Série ${i+1}, carga em kg`,ph("kg")) + pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`,ph("reps"));
+      else if(ex.ty==="time") out += `<span class="w2">${pcCampo(s.sec,ex.id,i,"sec",`Série ${i+1}, segundos`,ph("sec"))}</span>`;
+      else out += `<span class="w2">${pcCampo(s.reps,ex.id,i,"reps",`Série ${i+1}, repetições`,ph("reps"))}</span>`;
       out += `<button class="set-ok ${s.ok?"on":""}" data-setok="${ex.id}:${i}" aria-pressed="${!!s.ok}" aria-label="${s.ok?`Reabrir série ${i+1} para corrigir`:`Concluir série ${i+1}`}">${pic("check")}</button></div>`;
       const temObs = !!(s.obs && String(s.obs).trim());
       if(temObs || obsAberto || ui.obsOpen[ex.id+":"+i]) out += `<div class="pc-obs">${campoObs(s.obs,ex.id,i)}</div>`;
@@ -2966,6 +3169,8 @@ function viewCal(p,m){
     <div style="display:flex;align-items:baseline;gap:14px;margin-top:6px"><span class="big">${ses.length}</span><span style="font-size:18px">em ${MES[mes]}</span></div>
     <div class="meta" style="margin:8px 0 0">${semana!=null?`${semana} nesta semana · meta de ${metaSemanal(p)}`:"mês encerrado"}${ab?" · 1 em andamento (não conta)":""}</div></section>`;
   out += pcGraficoSemanas(p, ano, mes);
+  if(ym===hj.slice(0,7)) out += pcGruposSemana(p);
+  out += pcRecordes(p);
 
   // por exercício — só exercícios presentes nas sessões do período
   const todos = letras(p).flatMap(L=>(days[L]?days[L].ex:[]).map(ex=>Object.assign({L}, ex)));
@@ -3401,7 +3606,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v44 · contas individuais e treino e dieta lidos pela IA</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v46 · coach com conversa, sugestão segue o que você marca no dia, sessão e evolução novas</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
@@ -3427,6 +3632,70 @@ function somaDias(isoData, n){ const d = new Date(isoData+"T12:00"); d.setDate(d
 function treinosNaSemana(p, ini){
   const fim = somaDias(ini, 6);
   return new Set(S.events.filter(e=>e.perfil===p && e.tipo==="musc" && e.data>=ini && e.data<=fim).map(e=>e.data)).size;
+}
+/* v46: grupos trabalhados na semana e recordes por exercício */
+const GRUPO_LABEL = { peito:"Peito", costas:"Costas", ombro:"Ombro", biceps:"Bíceps", triceps:"Tríceps", antebraco:"Antebraço",
+  perna_ant:"Quadríceps", perna_post:"Posterior e glúteo", panturrilha:"Panturrilha", core:"Core", cardio:"Cardio" };
+function gruposNaSemana(p, ini){
+  const fim = somaDias(ini, 6), plan = dayset(p), cont = {};
+  S.events.filter(e=>e.perfil===p && e.data>=ini && e.data<=fim).forEach(e=>{
+    if(e.tipo==="musc"){ const t = treinoDaSessao(e, plan) || plan[e.dia]; gruposDoTreino(t).forEach(g=>{ cont[g] = (cont[g]||0)+1; }); }
+    else if(e.tipo==="extra") cont.cardio = (cont.cardio||0)+1;
+  });
+  return cont;
+}
+function recordesPorEx(p){
+  const out = {};
+  S.events.filter(e=>e.perfil===p && e.tipo==="musc").forEach(e=>{
+    Object.keys(e.entries||{}).forEach(id=>{
+      const ex = exInfo(p, id); if(!ex) return;
+      (e.entries[id]||[]).forEach(x=>{
+        if(!x) return;
+        const r = out[id] || (out[id] = { id, ex, e1:0, e1set:null, top:0, topData:"", melhor:0, data:"" });
+        if(ex.ty==="load"){
+          const v = e1rm(x.kg, x.reps);
+          if(v > r.e1){ r.e1 = v; r.e1set = x; r.data = e.data; }
+          if(num(x.kg) > r.top){ r.top = num(x.kg); r.topData = e.data; }
+        } else {
+          const v = num(ex.ty==="time" ? x.sec : x.reps);
+          if(v > r.melhor){ r.melhor = v; r.data = e.data; }
+        }
+      });
+    });
+  });
+  return Object.values(out).filter(r=>r.e1 || r.melhor).sort((a,b)=> a.data<b.data?1:a.data>b.data?-1:0);
+}
+function fmtRecorde(r){
+  if(r.ex.ty==="load") return r.e1set ? `${r.e1set.kg} kg × ${r.e1set.reps}` : "";
+  return r.ex.ty==="time" ? `${r.melhor} s` : `${r.melhor} rep`;
+}
+function pcGruposSemana(p){
+  const ini = inicioSemana(shift(0)), cont = gruposNaSemana(p, ini), metaG = meta(p).meta_semanal || {};
+  const gs = GRUPOS_TREINO.filter(g=>(Number(metaG[g])||0)>0 || cont[g]);
+  if(!gs.length) return "";
+  const itens = gs.map(g=>{
+    const f = cont[g]||0, mt = Number(metaG[g])||0, ok = mt ? f>=mt : f>0;
+    const pct = mt ? Math.min(100, f/mt*100) : (f?100:0);
+    return `<div class="pc-gr ${ok?"ok":""}"><div class="n"><span>${esc(GRUPO_LABEL[g]||g)}</span><b>${f}${mt?`/${mt}`:""}</b></div><div class="pc-bar" aria-hidden="true"><i style="width:${pct}%"></i></div></div>`;
+  }).join("");
+  const faltam = gs.filter(g=>(Number(metaG[g])||0) > (cont[g]||0)).map(g=>GRUPO_LABEL[g]||g);
+  return pcSec("Grupos nesta semana", `<span class="aside">${faltam.length?`faltam ${faltam.length}`:"meta batida"}</span>`)
+    + `<div class="pc-grs">${itens}</div>`
+    + `<p class="pc-hint" style="margin-top:8px">Conta cada treino feito desde segunda pelo grupo que ele trabalha${metaG.cardio?"; atividades extras contam como cardio":""}.</p>`;
+}
+function pcRecordes(p){
+  const atuais = new Set(letras(p).flatMap(L=>(dayset(p)[L].ex||[]).map(x=>x.id)));
+  const recs = recordesPorEx(p).filter(r=>atuais.has(r.id));
+  if(!recs.length) return "";
+  const lim = ui.recTodos ? recs.length : 6, hj = shift(0);
+  const rows = recs.slice(0, lim).map(r=>{
+    const novo = r.data && dias(r.data) <= 7;
+    const sub = r.ex.ty==="load" ? `1RM estimado ${Math.round(r.e1)} kg · carga máx. ${r.top} kg` : (r.ex.ty==="time"?"maior tempo":"mais repetições");
+    return `<button class="pc-row pc-rec" data-exhist="${r.id}"><div class="main"><div class="t">${esc(r.ex.n)}</div><div class="s">${sub}</div></div>
+      <span class="end"><b>${esc(fmtRecorde(r))}</b><small>${novo?`<span class="pc-new">novo</span>`:""}${brd(r.data)}</small></span></button>`;
+  }).join("");
+  return pcSec("Recordes", `<span class="aside">melhor série de cada exercício</span>`) + `<div class="pc-list">${rows}</div>`
+    + (recs.length > 6 ? `<div class="pc-exf" style="justify-content:center"><button class="pc-link ac" data-rectodos="1">${ui.recTodos?"Mostrar menos":`Ver todos (${recs.length})`}</button></div>` : "");
 }
 function semanaCard(p){
   const ref = REF(), ini = inicioSemana(ref), hojeIso = shift(0), meta = metaSemanal(p);
@@ -3577,7 +3846,7 @@ function atualizaBarraSalvar(){
   const total = treino.ex.reduce((a,e)=>a+e.s,0);
   const feitas = treino.ex.reduce((a,e)=>a+((dr[e.id]||[]).slice(0,e.s).filter(x=>x&&(x.kg||x.reps||x.sec)).length),0);
   const pg = document.getElementById("pcProg");
-  if(pg){ const c = contaSeries(treino, dr); pg.textContent = `${c.ok} de ${c.total} séries concluídas${c.pre>c.ok?` · ${c.pre-c.ok} preenchidas`:""}`; }
+  if(pg){ const c = contaSeries(treino, dr); pg.textContent = `${c.ok}/${c.total}`; }
 }
 /* o: { entries, rapido } quando o conteúdo já foi montado por finalizarTreino (encerrar antes do fim);
    chamado direto pelo botão, recebe o evento do clique e grava o rascunho como está */
@@ -4141,8 +4410,24 @@ function _historicoParaCoach(p, n){
 
 let _coachUltimo = null;
 
-async function abrirCoach(){
-  const p = ui.perfil, m = meta(p);
+/* v45: cronograma mandado para o coach sem o jiu "fixo" — jiu só vale quando marcado no dia
+   (vai em planejado_hoje/amanha/semana). Dia que era livre por causa do jiu aparece como livre. */
+function scheduleParaIA(p){
+  const sch = getSchedule(p); if(!sch) return null;
+  const out = {};
+  Object.keys(sch).forEach(k=>{
+    const dia = Object.assign({}, sch[k] || {});
+    if(dia.jiu){
+      dia.jiu = false;
+      dia.nota = dia.musc ? "" : "livre (sem jiu marcado, pode treinar)";
+    }
+    out[k] = dia;
+  });
+  return out;
+}
+
+function _payloadCoach(p){
+  const m = meta(p);
   const r = avaliar(p);
   const days = dayset(p);
   const d = days[r.win.d] || { t:'', ex:[] };
@@ -4175,7 +4460,7 @@ async function abrirCoach(){
     },
     dieta_log,
     checks: check,
-    schedule: getSchedule(p) || null,
+    schedule: scheduleParaIA(p),
     dias_tipo: getDietaDias(p) || null,
     alvos_dia: getAlvosDia(p) || null,
     planejado_hoje: getPlanejado(p, REF()) || {},
@@ -4194,20 +4479,202 @@ async function abrirCoach(){
     })()
   });
 
-  _renderSugestaoShell(
-    'Análise do coach',
-    `${perfilNome} · ${brd(REF())||'hoje'}`,
-    `<div class="sug-load">O coach está analisando seu histórico, dieta e recuperação...<br><br><span style="font-size:11px;color:var(--faint)">isso leva uns 5–10 segundos</span></div>`
-  );
+  return payload;
+}
 
-  try{
-    const j = await iaChamar('coach', payload, { tempo: 50000 });
-    _coachUltimo = j;
-    _renderCoach(j);
-  }catch(e){
-    const c = document.getElementById('sugCorpo');
-    if(c) c.innerHTML = `<div class="sug-err">Não consegui buscar a análise agora. ${_escSug(String(e&&e.message||e))}</div>`;
+/* ================= v46: conversa com o coach ================= */
+const IA_CONVERSA_URL = SUPA_URL + '/functions/v1/pace-conversa';
+const _coachMem = {};
+let _coachBusy = false;
+function coachHist(p){
+  if(!_coachMem[p]){
+    let a = [];
+    try{ a = JSON.parse(localStorage.getItem('pace-coach-v1:'+p) || '[]'); }catch(e){ a = []; }
+    _coachMem[p] = Array.isArray(a) ? a : [];
   }
+  return _coachMem[p];
+}
+function coachSalva(p){
+  _coachMem[p] = (_coachMem[p]||[]).slice(-40);
+  try{ localStorage.setItem('pace-coach-v1:'+p, JSON.stringify(_coachMem[p])); }catch(e){}
+}
+function _semRef(fn){ const sv = ui.off; ui.off = 0; try{ return fn(); } finally{ ui.off = sv; } }
+function coachDados(p){
+  return _semRef(()=>{
+    const hj = REF(), r = avaliar(p), days = dayset(p);
+    const plano = {};
+    letras(p).forEach(L=>{
+      const t = days[L], u = evs(p,"musc").find(e=>e.dia===L && e.data<=hj);
+      plano[L] = { t: t.t, cat: t.cat, ultimo: u ? u.data : "", ex: (t.ex||[]).map(x=>({ n:x.n, s:x.s, p:x.p, ty:x.ty })) };
+    });
+    const tHoje = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===hj);
+    const ab = sessaoAberta(p);
+    const ini = inicioSemana(hj), metaG = meta(p).meta_semanal || {}, cont = gruposNaSemana(p, ini), grupos = {};
+    new Set(Object.keys(metaG).concat(Object.keys(cont))).forEach(g=>{ grupos[GRUPO_LABEL[g]||g] = { feito: cont[g]||0, meta: Number(metaG[g])||0 }; });
+    const D = S.dieta[p] || {}, marc = (S.check && S.check[p+':'+hj]) || {}, R = pcRefeicoesDia(p);
+    const aguaV = (S.agua && S.agua[p+':'+hj]) || 0, aguaA = Number(meta(p).agua) || 2.5;
+    const ah = R.alvoHoje;
+    const lim = somaDias(hj, -7);
+    const agora = new Date();
+    return {
+      hoje: hj, hora: `${String(agora.getHours()).padStart(2,"0")}:${String(agora.getMinutes()).padStart(2,"0")}`,
+      plano, cronograma: scheduleParaIA(p),
+      planejado_hoje: getPlanejado(p, hj) || {}, planejado_amanha: getPlanejado(p, somaDias(hj,1)) || {},
+      sugestao: { letra: r.schedRest ? null : r.win.d, motivo: String(r.win.motivo||"").replace(/<[^>]+>/g,"") },
+      treino_hoje: tHoje ? `treino ${tHoje.dia}${days[tHoje.dia]?" ("+days[tHoje.dia].t+")":""}, séries no histórico` : "",
+      em_andamento: ab ? `treino ${ab.L}, ${ab.ok} de ${ab.total} séries concluídas` : "",
+      semana: { feitos: treinosNaSemana(p, ini), meta: metaSemanal(p), grupos },
+      recordes: recordesPorEx(p).slice(0, 20).map(x=>({ exercicio: x.ex.n, melhor: fmtRecorde(x), e1rm: x.e1 ? Math.round(x.e1) : null, data: x.data })),
+      historico: _historicoParaCoach(p, 20),
+      dieta: {
+        tipo_dia: R.tipo ? (TIPO_DIA_LABEL[R.tipo]||R.tipo) : "",
+        alvo_dia: ah ? `${ah.kcal||"?"} kcal · P ${ah.prot||"?"} · C ${ah.carb||"?"} · G ${ah.gord||"?"}` : "",
+        alvo: D.alvo || {}, nota: D.nota || "",
+        refs: (D.refs||[]).map(x=>({ nome: x.nome, itens: x.itens, feita: marc[x.id]==="ok" })),
+        agua: `${fmtL(aguaV)} de ${fmtL(aguaA)} L`,
+        diario: (D.log||[]).filter(l=>l.data>=lim).slice(-20).reverse().map(l=>({ data:l.data, hora:l.hora, refeicao:l.refNome, texto:l.texto }))
+      }
+    };
+  });
+}
+/* perguntas rápidas conforme o dia */
+function coachPerguntas(p){
+  return _semRef(()=>{
+    const hj = REF(), r = avaliar(p), days = dayset(p), out = [];
+    const feito = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===hj);
+    const ativs = atividadesMarcadas(p, hj), plan = getPlanejado(p, hj) || {};
+    if(feito){
+      out.push("Como foi meu treino de hoje?");
+      out.push("O que comer depois do treino?");
+    } else if(r.schedRest){
+      out.push(plan.jejum ? "Como fazer o jejum de hoje?" : "Posso treinar hoje mesmo assim?");
+    } else {
+      const t = days[r.win.d], ex = t && (t.ex||[]).find(x=>x.ty==="load");
+      out.push("O que treino hoje?");
+      if(ex) out.push(`Que carga usar no ${ex.n}?`);
+    }
+    if(ativs.includes("jiu")) out.push("O que comer antes do jiu?");
+    else if(!feito) out.push("Estou cansado, como ajusto?");
+    out.push("__analise");
+    return out.slice(0, 4);
+  });
+}
+const _rotQ = q => q==="__analise" ? "Análise do dia" : q;
+function pcCoachBar(p, r){
+  const qs = coachPerguntas(p).slice(0, 3);
+  const h = coachHist(p), ult = h.length ? h[h.length-1] : null;
+  return `<section class="pc-coach" aria-label="Coach">
+    <button class="pc-coach-in" data-coach="1">${pic("spark","sm")}<span>${ult?"Continuar conversa com o coach":"Pergunte ao coach…"}</span>${pic("right","sm")}</button>
+    <div class="pc-coach-q">${qs.map(q=>`<button class="chip" data-coachq="${esc(q)}">${esc(_rotQ(q))}</button>`).join("")}</div>
+  </section>`;
+}
+function coachFmt(t){
+  let html = "", lista = false;
+  esc(String(t||"")).split("\n").forEach(l=>{
+    const mm = l.match(/^\s*(?:[-•*]|\d+[.)])\s+(.*)/);
+    if(mm){ if(!lista){ html += "<ul>"; lista = true; } html += `<li>${mm[1]}</li>`; }
+    else { if(lista){ html += "</ul>"; lista = false; } if(l.trim()) html += `<p>${l}</p>`; }
+  });
+  if(lista) html += "</ul>";
+  return html.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+}
+function coachMsgHTML(m){
+  if(m.papel==="user") return `<div class="cc-m u"><div class="b">${esc(m.texto).replace(/\n/g,"<br>")}</div></div>`;
+  const L = m.letra && dayset(ui.perfil)[m.letra] ? m.letra : null;
+  return `<div class="cc-m c"><div class="b">${coachFmt(m.texto)}${L?`<button class="cc-act" data-ccletra="${L}"><span>Abrir treino ${L}</span>${pic("arrow","sm")}</button>`:""}</div></div>`;
+}
+function coachIntro(p){
+  const m = meta(p);
+  const info = _semRef(()=>{
+    const r = avaliar(p), d = dayset(p)[r.win.d];
+    const feito = S.events.find(e=>e.perfil===p && e.tipo==="musc" && e.data===REF());
+    if(feito) return `Hoje você já fez o treino ${feito.dia}.`;
+    if(r.schedRest) return r.win.jejum ? "Hoje está marcado jejum, sem musculação." : "Hoje é dia sem musculação no seu cronograma.";
+    return d ? `A sugestão de hoje é o treino ${r.win.d} (${d.t}).` : "";
+  });
+  return `<div class="cc-intro"><div class="cc-av">${pic("spark","sm")}</div><div><b>Oi, ${esc(m.label)}.</b> Eu vejo seu plano, as cargas de cada série, o que você marcou hoje e a sua dieta. ${esc(info)}<br>Pergunte o que quiser: o que treinar, quanto de carga, o que comer.</div></div>`;
+}
+function coachRender(o){
+  o = o || {};
+  const p = ui.perfil, el = document.getElementById("ccMsgs"), qEl = document.getElementById("ccQ");
+  if(!el) return;
+  const h = coachHist(p);
+  let html = coachIntro(p) + h.map(coachMsgHTML).join("");
+  if(o.pendente) html += `<div class="cc-m c"><div class="b cc-typing" aria-label="O coach está escrevendo"><i></i><i></i><i></i></div></div>`;
+  if(o.erro) html += `<div class="cc-err">${esc(o.erro)} <button data-ccretry="1">Tentar de novo</button></div>`;
+  el.innerHTML = html;
+  const ult = h[h.length-1];
+  const qs = o.pendente ? [] : ((ult && ult.papel==="coach" && ult.sug && ult.sug.length) ? ult.sug.concat(h.some(x=>x.analise)?[]:["__analise"]).slice(0,4) : coachPerguntas(p));
+  if(qEl) qEl.innerHTML = qs.map(q=>`<button class="chip" data-ccq="${esc(q)}">${esc(_rotQ(q))}</button>`).join("");
+  const novo = document.getElementById("ccNovo"); if(novo) novo.hidden = !h.length;
+  const btn = document.querySelector("#ccForm .cc-send"); if(btn) btn.disabled = !!o.pendente;
+  document.querySelectorAll("#sugModal [data-ccq]").forEach(b=>b.onclick=()=>coachEnviar(b.dataset.ccq));
+  document.querySelectorAll("#sugModal [data-ccretry]").forEach(b=>b.onclick=()=>{ const u = coachHist(p); const last = u[u.length-1]; if(last && last.papel==="user"){ last.analise ? coachAnalise(true) : coachPedir(p); } });
+  document.querySelectorAll("#sugModal [data-ccletra]").forEach(b=>b.onclick=()=>{
+    const L = b.dataset.ccletra; fecharSugestao();
+    ui.off = 0; ui.dia = L; ui.view = "treino"; ui.saved = false; ui.edit = false; ui.editId = null; render(); window.scrollTo(0,0);
+  });
+  const sh = document.querySelector("#sugModal .sug-sheet"); if(sh) sh.scrollTop = sh.scrollHeight;
+}
+async function coachPedir(p){
+  _coachBusy = true; coachRender({ pendente:true });
+  try{
+    const h = coachHist(p);
+    const j = await iaChamar('conversa', Object.assign(iaPerfil(p), {
+      mensagens: h.slice(-14).map(m=>({ papel: m.papel, texto: m.texto })),
+      dados: coachDados(p)
+    }), { url: IA_CONVERSA_URL, tempo: 55000 });
+    coachHist(p).push({ papel:"coach", texto: j.resposta, letra: j.treino_letra || null, sug: Array.isArray(j.sugestoes_rapidas) ? j.sugestoes_rapidas : [], t: Date.now() });
+    coachSalva(p);
+    _coachBusy = false; coachRender();
+  }catch(e){ _coachBusy = false; coachRender({ erro: String(e && e.message || e) }); }
+}
+/* "Análise do dia": a análise estruturada de antes, agora como mensagem da conversa */
+async function coachAnalise(repetir){
+  const p = ui.perfil;
+  if(!repetir){ coachHist(p).push({ papel:"user", texto:"Análise do dia", analise:true, t: Date.now() }); coachSalva(p); }
+  _coachBusy = true; coachRender({ pendente:true });
+  try{
+    const j = await iaChamar('coach', _semRef(()=>_payloadCoach(p)), { tempo: 50000 });
+    const L = _extraiLetraDia(j.recomendacao_treino);
+    const partes = [`**${j.recomendacao_treino || "Treino de hoje"}**`, j.por_que || ""];
+    const cargas = Array.isArray(j.cargas_sugeridas) ? j.cargas_sugeridas : [];
+    if(cargas.length) partes.push("**Cargas**\n" + cargas.map(c=>`- ${c.exercicio}: ${c.sugestao}`).join("\n"));
+    if(j.dieta_hoje) partes.push("**Alimentação** " + j.dieta_hoje);
+    if(j.alerta_recuperacao) partes.push("**Recuperação** " + j.alerta_recuperacao);
+    if(j.motivacional) partes.push(j.motivacional);
+    coachHist(p).push({ papel:"coach", texto: partes.filter(Boolean).join("\n\n"), letra: L, sug: [], analise:true, t: Date.now() });
+    coachSalva(p);
+    _coachBusy = false; coachRender();
+  }catch(e){ _coachBusy = false; coachRender({ erro: String(e && e.message || e) }); }
+}
+function coachEnviar(texto){
+  texto = String(texto||"").trim();
+  if(!texto || _coachBusy) return;
+  if(texto==="__analise") return coachAnalise();
+  const p = ui.perfil;
+  coachHist(p).push({ papel:"user", texto: texto.slice(0, 1500), t: Date.now() });
+  coachSalva(p);
+  coachPedir(p);
+}
+function abrirCoach(pergunta){
+  const p = ui.perfil, m = meta(p);
+  _renderSugestaoShell('Coach', 'Plano, cargas, histórico e dieta',
+    `<div class="cc"><div class="cc-msgs" id="ccMsgs" aria-live="polite"></div><div class="cc-foot"><div class="cc-q" id="ccQ"></div>
+      <form class="cc-in" id="ccForm"><textarea id="ccTxt" rows="1" placeholder="Pergunte ao coach…" aria-label="Pergunta para o coach" enterkeyhint="send"></textarea>
+      <button type="submit" class="cc-send" aria-label="Enviar">${pic("arrow")}</button></form></div></div>`);
+  const sh = document.querySelector("#sugModal .sug-sheet"); if(sh) sh.classList.add("cc-sheet");
+  const hd = document.querySelector("#sugModal .sug-head .sug-close");
+  if(hd) hd.insertAdjacentHTML("beforebegin", `<button class="cc-novo" id="ccNovo" hidden>Nova conversa</button>`);
+  const nv = document.getElementById("ccNovo");
+  if(nv) nv.onclick = async ()=>{ if(_coachBusy) return; if(!(await confirmar("Apagar esta conversa e começar outra?", {ok:"Nova conversa"}))) return; _coachMem[p] = []; coachSalva(p); coachRender(); };
+  const f = document.getElementById("ccForm"), ta = document.getElementById("ccTxt");
+  const ajusta = ()=>{ ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 140)+"px"; };
+  ta.oninput = ajusta;
+  ta.onkeydown = e=>{ if(e.key==="Enter" && !e.shiftKey && !("ontouchstart" in window)){ e.preventDefault(); f.requestSubmit ? f.requestSubmit() : f.onsubmit(e); } };
+  f.onsubmit = e=>{ e.preventDefault(); const t = ta.value; if(!t.trim() || _coachBusy) return; ta.value = ""; ajusta(); coachEnviar(t); };
+  coachRender(_coachBusy ? { pendente:true } : {});
+  if(pergunta) coachEnviar(pergunta);
 }
 
 /* letra do plano no começo da recomendação ("B - Costas e Bíceps"), só se existir no plano */
@@ -4400,6 +4867,9 @@ function ligar(){
   document.querySelectorAll("[data-skip]").forEach(b=>b.onclick=()=>toggleSkip());
   document.querySelectorAll("[data-atv]").forEach(b=>b.onclick=()=>abrirAtividadeExtra());
   document.querySelectorAll("[data-coach]").forEach(b=>b.onclick=()=>abrirCoach());
+  document.querySelectorAll("[data-coachq]").forEach(b=>b.onclick=()=>abrirCoach(b.dataset.coachq));
+  document.querySelectorAll("[data-dataabrir]").forEach(b=>b.onclick=()=>{ ui.dataAberta = true; render(); });
+  document.querySelectorAll("[data-rectodos]").forEach(b=>b.onclick=()=>{ ui.recTodos = !ui.recTodos; render(); });
   document.querySelectorAll("[data-rmatv]").forEach(b=>b.onclick=()=>removerExtra(b.dataset.rmatv));
   document.querySelectorAll("[data-picktreino]").forEach(b=>b.onclick=()=>abrirPickTreino());
   /* v26: NÃO registrar onclick direto pros chips [data-planq]/[data-plansugmusc].
@@ -4970,7 +5440,7 @@ async function enviarComentario(){
   if(!t){ toastUndo("Escreva o comentário antes de enviar."); return; }
   bt.disabled = true; bt.textContent = "Enviando…";
   try{
-    const r = await rpc("pace_feedback_enviar", { p_token: SESSAO.token, p_texto: t, p_tela: ui.view, p_versao: "v44" });
+    const r = await rpc("pace_feedback_enviar", { p_token: SESSAO.token, p_texto: t, p_tela: ui.view, p_versao: "v46" });
     if(r && r.erro) toastUndo(r.erro);
     else { if(ta) ta.value = ""; toastUndo("Comentário enviado. Obrigado."); }
   }catch(e){
