@@ -1535,6 +1535,14 @@ function setPlanejado(p, dataISO, obj){
   if(!obj || Object.keys(obj).length===0) delete S.planejado[p][dataISO];
   else S.planejado[p][dataISO] = obj;
 }
+/* v45: jiu só conta quando a pessoa MARCA no dia (planejado) ou REGISTRA o treino de jiu.
+   O jiu do cronograma semanal é só a intenção da rotina: sem marcar, o dia vira um dia comum
+   (dia "livre por causa do jiu" vira dia de treino; notas do tipo "leve pra jiu" não valem). */
+function jiuMarcado(p, dataISO){
+  const pl = S.planejado && S.planejado[p] && S.planejado[p][dataISO];
+  if(pl && pl.jiu) return true;
+  return (S.events||[]).some(e=>e.perfil===p && e.data===dataISO && e.tipo==="extra" && /jiu/i.test(String(e.atividade||"")));
+}
 async function togglePlanejado(p, dataISO, ativ){
   try{
     const atual = getPlanejado(p, dataISO) || {};
@@ -1604,10 +1612,13 @@ function schedHoje(p){
   const orig = s[WDK[d.getDay()]];
   if(!orig) return null;
   const merged = Object.assign({}, orig);
+  // v45: jiu do cronograma não conta sozinho; a nota escrita para o dia de jiu também não
+  const marcado = jiuMarcado(p, iso);
+  if(orig.jiu && !marcado) merged.nota = "";
+  merged.jiu = marcado;
   const plan = getPlanejado(p, iso);
   if(plan){
     if(Object.prototype.hasOwnProperty.call(plan,'musc')) merged.musc = plan.musc;
-    if(plan.jiu) merged.jiu = true;
     if(plan.corrida) merged.corrida = true;
     if(plan.futebol) merged.futebol = true;
     if(plan.bike) merged.bike = true;
@@ -1618,6 +1629,15 @@ function tipoDiaHoje(p){
   const dd = getDietaDias(p); if(!dd) return null;
   const iso = REF(); const d = new Date(iso+"T12:00");
   let tipo = dd[WDK[d.getDay()]] || null;
+  // v45: tipo de dieta pensado para o jiu só vale com jiu marcado no dia
+  if(tipo && /jiu/.test(tipo) && !jiuMarcado(p, iso)){
+    if(tipo==="musc_jiu") tipo = "musc";
+    else if(tipo==="jiu"){
+      const treinou = S.events.some(e=>e.perfil===p && e.tipo==="musc" && e.data===iso);
+      const sug = treinou || !!(sugestaoTreino(p, iso)||{}).musc;
+      tipo = sug ? "musc" : "descanso";
+    }
+  }
   const plan = getPlanejado(p, iso);
   if(plan){
     // jejum sobrepõe os outros tipos; com jiu no mesmo dia vira jejum_jiu quando há meta para isso
@@ -1840,6 +1860,10 @@ const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typ
    amanhã, futuro). Substitui os fixes pontuais das v24/v28 (que só cobriam
    cenários específicos) por uma regra única aplicada em toda leitura.
 
+   v45: jiu só conta quando MARCADO no dia (planejado) ou registrado. Dia que o
+   cronograma deixa sem musculação por causa do jiu vira dia de treino se o jiu não
+   for marcado; jiu marcado em dia de pernas troca por superiores.
+
    Regras (nesta ordem):
      1. Se o usuário JÁ TREINOU nesse dia → devolve o treino registrado com
         jaTreinou:true. Sem tentativa de "sugerir por cima".
@@ -1859,6 +1883,49 @@ const emojiAtiv = a => { const k=String(a||"").toLowerCase().trim(); return (typ
        schedRest, schedJiu, schedNota }
 ============================================================================ */
 function sugestaoTreino(perfil, dataISO){
+  const r = _sugestaoBase(perfil, dataISO);
+  // v45: jiu MARCADO no dia + treino de pernas → troca por superiores (a não ser que a
+  // pessoa tenha escolhido a letra na mão para esse dia, aí só avisa — ver conflitoPlan)
+  if(r.jaTreinou || !r.musc || !r.schedJiu) return r;
+  const days = dayset(perfil);
+  if(!days[r.musc] || days[r.musc].cat !== 'inf') return r;
+  const plan = (S.planejado && S.planejado[perfil] && S.planejado[perfil][dataISO]) || null;
+  if(plan && plan.musc) return r;
+  const ctx = _sugContexto(perfil, dataISO);
+  const sups = ctx.ordem.filter(L=>days[L] && days[L].cat==='sup');
+  if(!sups.length) return r;
+  const livres = sups.filter(L=>!ctx.recSet.has(L));
+  const alt = ctx.rankParado(livres.length ? livres : sups)[0];
+  const quando = dataISO===shift(0) ? 'hoje' : 'neste dia';
+  return Object.assign({}, r, {
+    musc: alt.L, override: true, letraOriginal: r.musc,
+    motivo: `Você marcou jiu ${quando}: em vez de pernas (<b>${r.musc}</b>), sugerindo <b>${alt.L}</b> (${ctx.fmtParado(alt)}). Mantenha RIR 2-3 nos compostos.`
+  });
+}
+
+/* histórico recente e ranking "parado há mais tempo", usados pela sugestão */
+function _sugContexto(perfil, dataISO){
+  const d = new Date(dataISO+'T12:00:00');
+  const recentes = [];
+  for(let i=1; i<=3; i++){
+    const dPrev = new Date(d); dPrev.setDate(dPrev.getDate()-i);
+    const ev = S.events.find(e=>e.perfil===perfil && e.data===iso(dPrev) && e.tipo==='musc');
+    if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
+  }
+  const recSet = new Set(recentes.map(x=>x.dia));
+  const ordem = letras(perfil);
+  const rankParado = lista => lista.map(L => {
+    const ultEv = S.events
+      .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
+      .sort((a,b)=> a.data<b.data?1:-1)[0];
+    const diasParado = ultEv ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000) : 999;
+    return {L, diasParado};
+  }).sort((a,b)=> b.diasParado-a.diasParado || ordem.indexOf(a.L)-ordem.indexOf(b.L));
+  const fmtParado = x => x.diasParado===999 ? 'nunca feito' : (x.diasParado===1 ? 'parado há 1 dia' : `parado há ${x.diasParado} dias`);
+  return { d, recentes, recSet, ordem, rankParado, fmtParado };
+}
+
+function _sugestaoBase(perfil, dataISO){
   const days = dayset(perfil);
 
   // 1) Já treinou nesse dia?
@@ -1873,48 +1940,49 @@ function sugestaoTreino(perfil, dataISO){
   }
 
   // 2) Letra base = override manual OU schedule fixo do dia da semana
-  const d = new Date(dataISO+'T12:00:00');
+  const ctx = _sugContexto(perfil, dataISO);
+  const { d, recentes, recSet, ordem, rankParado, fmtParado } = ctx;
   const sched = getSchedule(perfil);
   const diaSched = sched ? (sched[WDK[d.getDay()]] || null) : null;
   const plan = (S.planejado && S.planejado[perfil] && S.planejado[perfil][dataISO]) || null;
   const muscOverride = (plan && Object.prototype.hasOwnProperty.call(plan,'musc')) ? plan.musc : null;
-  const jiu  = !!(diaSched && diaSched.jiu) || !!(plan && plan.jiu);
-  const nota = (diaSched && diaSched.nota) || '';
+  // v45: jiu só conta se marcado no dia (ou registrado); o do cronograma é só a intenção
+  const diaDeJiu = !!(diaSched && diaSched.jiu);
+  const jiu  = jiuMarcado(perfil, dataISO);
+  const nota = (diaSched && diaSched.nota && (jiu || !diaDeJiu)) ? diaSched.nota : '';
   const letraBase = (muscOverride !== null ? muscOverride : (diaSched ? diaSched.musc : null));
+  const diaSem = WDL[d.getDay()];
 
-  // 3) Sem letra base → descanso
+  // 3) Sem letra base
   if(!letraBase){
-    const diaSem = WDL[d.getDay()];
+    // v45: o dia só estava sem musculação por causa do jiu, e o jiu não foi marcado → dia de treino
+    if(diaDeJiu && !jiu && ordem.length){
+      const ontem = recentes.find(x=>x.distancia===1);
+      const catOntem = ontem && days[ontem.dia] ? days[ontem.dia].cat : null;
+      let cands = ordem.filter(L=>days[L] && !recSet.has(L));
+      if(!cands.length) cands = ordem.filter(L=>days[L]);
+      // evita o mesmo tipo (superiores/inferiores) de ontem
+      const outraCat = (catOntem && catOntem!=='full') ? cands.filter(L=>days[L].cat!==catOntem) : cands;
+      const escolhida = rankParado(outraCat.length ? outraCat : cands)[0];
+      if(escolhida){
+        const quando = dataISO===shift(0) ? 'hoje' : 'neste dia';
+        return {
+          musc: escolhida.L,
+          motivo: `No cronograma, ${diaSem} fica sem musculação por causa do jiu, mas você não marcou jiu ${quando}. Sugerindo <b>${escolhida.L}</b> (${fmtParado(escolhida)}).`,
+          jaTreinou: false, override: true, letraOriginal: null,
+          schedRest: false, schedJiu: false, schedNota: ''
+        };
+      }
+    }
     return {
       musc: null,
-      motivo: `Cronograma de ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu à noite':''}.`,
+      motivo: `Cronograma de ${diaSem}: <b>${nota||'sem musculação'}</b>${jiu?' · Jiu marcado':''}.`,
       jaTreinou: false, override: false, letraOriginal: null,
       schedRest: true, schedJiu: jiu, schedNota: nota
     };
   }
 
-  // 4) Anti-repetição: verifica os 3 dias anteriores
-  const recentes = [];
-  for(let i=1; i<=3; i++){
-    const dPrev = new Date(d); dPrev.setDate(dPrev.getDate()-i);
-    const isoPrev = iso(dPrev);
-    const ev = S.events.find(e=>e.perfil===perfil && e.data===isoPrev && e.tipo==='musc');
-    if(ev && ev.dia) recentes.push({dia: ev.dia, distancia: i});
-  }
-  const recSet = new Set(recentes.map(x=>x.dia));
-  const ordem = letras(perfil);
-  const rankParado = lista => lista.map(L => {
-    const ultEv = S.events
-      .filter(e=>e.perfil===perfil && e.tipo==='musc' && e.dia===L && e.data<dataISO)
-      .sort((a,b)=> a.data<b.data?1:-1)[0];
-    const diasParado = ultEv
-      ? Math.floor((d - new Date(ultEv.data+'T12:00:00'))/86400000)
-      : 999;
-    return {L, diasParado};
-  }).sort((a,b)=> b.diasParado-a.diasParado || ordem.indexOf(a.L)-ordem.indexOf(b.L));
-  const fmtParado = x => x.diasParado===999 ? 'nunca feito' : (x.diasParado===1 ? 'parado há 1 dia' : `parado há ${x.diasParado} dias`);
-
-  // 5) A letra do cronograma não existe mais no plano: sugere a parada há mais tempo
+  // 4) A letra do cronograma não existe mais no plano: sugere a parada há mais tempo
   if(!days[letraBase] && ordem.length){
     const lista = ordem.filter(L => !recSet.has(L));
     const escolhida = rankParado(lista.length ? lista : ordem)[0];
@@ -1926,23 +1994,16 @@ function sugestaoTreino(perfil, dataISO){
     };
   }
 
+  // 5) Anti-repetição: a letra foi feita nos 3 dias anteriores → alternativa parada há mais tempo
   if(recSet.has(letraBase)){
-    // Escolhe alternativa parada há mais tempo (excluindo letras dos 3 dias)
     const alternativas = ordem.filter(L => !recSet.has(L) && days[L]);
     if(alternativas.length > 0){
-      const rank = rankParado(alternativas);
-      const escolhida = rank[0];
+      const escolhida = rankParado(alternativas)[0];
       const rec = recentes.find(x=>x.dia===letraBase);
-      const qdo = rec.distancia===1 ? 'ontem'
-                : rec.distancia===2 ? 'anteontem'
-                : `há ${rec.distancia} dias`;
-      const desdeTxt = escolhida.diasParado===999 ? 'nunca feito'
-                     : (escolhida.diasParado===1 ? 'parado há 1 dia'
-                                                 : `parado há ${escolhida.diasParado} dias`);
-      const diaSem = WDL[d.getDay()];
+      const qdo = rec.distancia===1 ? 'ontem' : rec.distancia===2 ? 'anteontem' : `há ${rec.distancia} dias`;
       return {
         musc: escolhida.L,
-        motivo: `Você fez <b>${letraBase}</b> ${qdo}. O cronograma de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${desdeTxt}) pra não repetir.`,
+        motivo: `Você fez <b>${letraBase}</b> ${qdo}. O cronograma de ${diaSem} pediria <b>${letraBase}</b> de novo — sugerindo <b>${escolhida.L}</b> (${fmtParado(escolhida)}) pra não repetir.`,
         jaTreinou: false, override: true, letraOriginal: letraBase,
         schedRest: false, schedJiu: jiu, schedNota: nota
       };
@@ -1950,14 +2011,10 @@ function sugestaoTreino(perfil, dataISO){
   }
 
   // 6) Letra base OK — sem repetição recente
-  const diaSem = WDL[d.getDay()];
-  let motivo;
-  if(muscOverride !== null){
-    motivo = `Override manual: treino <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
-  } else {
-    motivo = `Cronograma de ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
-  }
-  if(jiu) motivo += ' Jiu à noite — mantenha RIR 2-3 nos compostos.';
+  let motivo = muscOverride !== null
+    ? `Você escolheu o treino <b>${letraBase}</b> para este dia${nota?` — ${nota}`:''}.`
+    : `Cronograma de ${diaSem}: <b>${letraBase}</b>${nota?` — ${nota}`:''}.`;
+  if(jiu) motivo += ' Jiu marcado — mantenha RIR 2-3 nos compostos.';
   return {
     musc: letraBase, motivo,
     jaTreinou: false, override: false, letraOriginal: null,
@@ -2491,10 +2548,10 @@ function verificarConflitoIniciar(p, dEscolhido){
     if(sch.musc && sch.musc !== dEscolhido){
       const diaSem = WDL[new Date(dataRef+"T12:00").getDay()];
       let av = `O cronograma de ${diaSem} prevê o treino ${sch.musc}${sch.nota?" ("+sch.nota+")":""}, mas você escolheu o ${dEscolhido}.`;
-      if(sch.jiu && pernas) av += " Tem jiu à noite: pernas pesadas antes podem prejudicar o tatame.";
+      if(sch.jiu && pernas) av += " Você marcou jiu: pernas pesadas antes podem prejudicar o tatame.";
       avisos.push(av);
     } else if(!sch.musc && pernas && sch.jiu){
-      avisos.push(`Hoje é dia de recuperação e tem jiu à noite. O treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
+      avisos.push(`Você marcou jiu hoje. O treino ${dEscolhido} (pernas) pode sobrecarregar antes do tatame.`);
     }
   }
   // usa a letra escolhida (não o cronograma bruto), igual ao card principal
@@ -2703,7 +2760,7 @@ function viewHoje(p,m){
   let out = pcTopo() + `<h1 class="pc-h1">${pcTituloDia()}</h1>` + pcDataNav();
 
   // ---- destaque único: estado real do treino do dia ----
-  const tagJiu = r.schedJiu ? `<span class="tag">Jiu à noite</span>` : "";
+  const tagJiu = r.schedJiu ? `<span class="tag">Jiu marcado</span>` : "";
   if(ab){
     out += `<section class="pc-hl" aria-label="Treino em andamento"><div class="ey"><span class="dot"></span>Treino em andamento</div>
       <div class="ttl">${esc(ab.t.t)}</div>
@@ -3401,7 +3458,7 @@ function viewConfig(p,m){
     <div class="cfg-list">
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("info")}</span>
-        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v44 · contas individuais e treino e dieta lidos pela IA</span></span>
+        <span class="lb"><span class="tt">Versão</span><span class="st">pace · v45 · sugestão de treino só considera o jiu quando marcado no dia</span></span>
       </div>
       <div class="cfg-row" style="cursor:default">
         <span class="em">${pic("cloud")}</span>
@@ -4141,6 +4198,22 @@ function _historicoParaCoach(p, n){
 
 let _coachUltimo = null;
 
+/* v45: cronograma mandado para o coach sem o jiu "fixo" — jiu só vale quando marcado no dia
+   (vai em planejado_hoje/amanha/semana). Dia que era livre por causa do jiu aparece como livre. */
+function scheduleParaIA(p){
+  const sch = getSchedule(p); if(!sch) return null;
+  const out = {};
+  Object.keys(sch).forEach(k=>{
+    const dia = Object.assign({}, sch[k] || {});
+    if(dia.jiu){
+      dia.jiu = false;
+      dia.nota = dia.musc ? "" : "livre (sem jiu marcado, pode treinar)";
+    }
+    out[k] = dia;
+  });
+  return out;
+}
+
 async function abrirCoach(){
   const p = ui.perfil, m = meta(p);
   const r = avaliar(p);
@@ -4175,7 +4248,7 @@ async function abrirCoach(){
     },
     dieta_log,
     checks: check,
-    schedule: getSchedule(p) || null,
+    schedule: scheduleParaIA(p),
     dias_tipo: getDietaDias(p) || null,
     alvos_dia: getAlvosDia(p) || null,
     planejado_hoje: getPlanejado(p, REF()) || {},
@@ -4970,7 +5043,7 @@ async function enviarComentario(){
   if(!t){ toastUndo("Escreva o comentário antes de enviar."); return; }
   bt.disabled = true; bt.textContent = "Enviando…";
   try{
-    const r = await rpc("pace_feedback_enviar", { p_token: SESSAO.token, p_texto: t, p_tela: ui.view, p_versao: "v44" });
+    const r = await rpc("pace_feedback_enviar", { p_token: SESSAO.token, p_texto: t, p_tela: ui.view, p_versao: "v45" });
     if(r && r.erro) toastUndo(r.erro);
     else { if(ta) ta.value = ""; toastUndo("Comentário enviado. Obrigado."); }
   }catch(e){
