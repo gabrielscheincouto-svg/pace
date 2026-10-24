@@ -4,7 +4,7 @@ App de treino e dieta do Gabriel e da Eduarda (e de quem mais receber acesso).
 Funciona no navegador e pode ser instalado na tela de início do celular.
 
 - **No ar:** https://treino-gabi-eduarda.netlify.app (Netlify, projeto `treino-gabi-eduarda`)
-- **Versão atual:** v46 (24/10/2026) — ver [docs/HISTORICO.md](docs/HISTORICO.md)
+- **Versão atual:** v47 (24/10/2026) — ver [docs/HISTORICO.md](docs/HISTORICO.md)
 
 ## Como está organizado
 
@@ -27,7 +27,7 @@ Mono do Google Fonts. Telas principais: Hoje, Treinos, Dieta, Evolução e
 Calendário; administrador tem ainda Acessos e Comentários.
 
 O número da versão aparece em dois lugares do `index.html` (tela de
-configurações e envio de comentário, procure por `v46`) — atualize os dois a
+configurações e envio de comentário, procure por `v47`) — atualize os dois a
 cada versão nova.
 
 ### Banco (`supabase/sql/pace.sql`)
